@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:teia/views/tap_icon.dart';
 
@@ -9,6 +7,7 @@ class GraphPageNode extends StatefulWidget {
   final Color? hoverColor;
   final Color? clickColor;
   final Function(int)? createPage;
+  final Function(int)? enterPage;
 
   const GraphPageNode({
     Key? key,
@@ -17,6 +16,7 @@ class GraphPageNode extends StatefulWidget {
     this.hoverColor,
     this.clickColor,
     this.createPage,
+    this.enterPage,
   }) : super(key: key);
 
   @override
@@ -38,7 +38,9 @@ class _GraphPageNodeState extends State<GraphPageNode> {
               splashColor: widget.clickColor,
               customBorder: const GraphPageNodeBorder(),
               onTap: () {
-                log('Clicked ${widget.id}');
+                if (widget.enterPage != null) {
+                  widget.enterPage!(widget.id);
+                }
               },
               child: Padding(
                 padding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 24.0),

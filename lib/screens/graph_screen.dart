@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:graphview/GraphView.dart';
 import 'package:teia/models/chapter.dart';
+import 'package:teia/screens/text_editor_screen.dart';
 import 'package:teia/views/graph_page_node.dart';
 
 class GraphScreen extends StatefulWidget {
@@ -53,30 +54,41 @@ class _GraphScreenState extends State<GraphScreen> {
     return InteractiveViewer(
       constrained: false,
       boundaryMargin: const EdgeInsets.fromLTRB(0.0, 0.0, 20.0, 20.0),
-      minScale: 0.0001,
-      maxScale: 5.6,
-      child: GraphView(
-        graph: graph,
-        algorithm: BuchheimWalkerAlgorithm(builder, ArrowEdgeRenderer()),
-        paint: Paint()
-          ..color = arrowColor
-          ..strokeWidth = 1
-          ..style = PaintingStyle.stroke,
-        builder: (Node node) {
-          return GraphPageNode(
-            id: node.key!.value as int,
-            color: nodeColor,
-            hoverColor: nodeHoverColor,
-            clickColor: nodeClickColor,
-            createPage: (id) {
-              log('Clicked Plus $id');
-              setState(() {
-                chapter.addPage(id);
-              });
-              log(chapter.graph.toString());
-            },
-          );
-        },
+      child: Center(
+        child: GraphView(
+          graph: graph,
+          algorithm: BuchheimWalkerAlgorithm(builder, ArrowEdgeRenderer()),
+          paint: Paint()
+            ..color = arrowColor
+            ..strokeWidth = 1
+            ..style = PaintingStyle.stroke,
+          builder: (Node node) {
+            return Padding(
+              padding: const EdgeInsets.all(10.0),
+              child: GraphPageNode(
+                id: node.key!.value as int,
+                color: nodeColor,
+                hoverColor: nodeHoverColor,
+                clickColor: nodeClickColor,
+                enterPage: (id) {
+                  log('Clicked $id');
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const TextEditorScreen(),
+                    ),
+                  );
+                },
+                createPage: (id) {
+                  log('Clicked Plus $id');
+                  setState(() {
+                    chapter.addPage(id);
+                  });
+                },
+              ),
+            );
+          },
+        ),
       ),
     );
   }
