@@ -6,7 +6,7 @@ class Utils {
   static late Color nodeInsideColor;
   static late Color nodeBorderColor;
   static late Color nodeTextColor;
-  static late Color nodePlusColor;
+  static late Color nodeIconColor;
   static late Color arrowColor;
   static late Color nodeHoverSplashColor;
   static late Color nodeClickSplashColor;
@@ -20,9 +20,9 @@ class Utils {
     nodeInsideColor = swatch(const Color(0xfff5f2eb));
     nodeBorderColor = swatch(const Color(0xff3c321d));
     nodeTextColor = swatch(const Color(0xff3c321d));
-    nodePlusColor = swatch(const Color(0xff3c321d));
-    nodeHoverSplashColor = swatch(const Color(0xff3c321d));
-    nodeClickSplashColor = swatch(const Color(0xff3c321d));
+    nodeIconColor = swatch(const Color(0xff3c321d));
+    nodeHoverSplashColor = swatch(const Color(0xfff0ebe0));
+    nodeClickSplashColor = swatch(const Color(0xfff0ebe0));
     arrowColor = swatch(const Color(0xff3c321d));
   }
 }

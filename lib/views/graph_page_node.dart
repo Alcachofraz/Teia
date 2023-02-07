@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:teia/views/tap_icon.dart';
+import 'package:teia/views/tile.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
 class GraphPageNode extends StatefulWidget {
   final int id;
@@ -7,9 +9,12 @@ class GraphPageNode extends StatefulWidget {
   final Color? borderColor;
   final Color? hoverColor;
   final Color? clickColor;
-  final Color? plusColor;
+  final Color? iconColor;
   final Function(int)? createPage;
+  final Function(int)? dissociatePage;
+  final Function(int)? connectPage;
   final Function(int)? enterPage;
+  final bool simplified;
 
   const GraphPageNode({
     Key? key,
@@ -17,10 +22,13 @@ class GraphPageNode extends StatefulWidget {
     this.insideColor,
     this.borderColor,
     this.hoverColor,
-    this.plusColor,
+    this.iconColor,
     this.clickColor,
     this.createPage,
+    this.dissociatePage,
+    this.connectPage,
     this.enterPage,
+    this.simplified = false,
   }) : super(key: key);
 
   @override
@@ -30,7 +38,129 @@ class GraphPageNode extends StatefulWidget {
 class _GraphPageNodeState extends State<GraphPageNode> {
   @override
   Widget build(BuildContext context) {
-    return Stack(
+    return widget.simplified
+        ? Padding(
+            padding: const EdgeInsets.only(bottom: 4.0),
+            child: Tile(
+              clickColor: widget.clickColor,
+              hoverColor: widget.hoverColor,
+              radiusAll: 8.0,
+              padding: EdgeInsets.zero,
+              borderSide: BorderSide(
+                color: widget.borderColor ?? Colors.black,
+                width: 1.5,
+              ),
+              onTap: () {
+                if (widget.enterPage != null) {
+                  widget.enterPage!(widget.id);
+                }
+              },
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 24.0, horizontal: 28.0),
+                child: Text('Page ${widget.id}'),
+              ),
+            ),
+          )
+        : Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(bottom: 4.0),
+                child: Tile(
+                  clickColor: widget.clickColor,
+                  hoverColor: widget.hoverColor,
+                  radiusAll: 8.0,
+                  padding: EdgeInsets.zero,
+                  borderSide: BorderSide(
+                    color: widget.borderColor ?? Colors.black,
+                    width: 1.5,
+                  ),
+                  onTap: () {
+                    if (widget.enterPage != null) {
+                      widget.enterPage!(widget.id);
+                    }
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 24.0, horizontal: 28.0),
+                    child: Text('Page ${widget.id}'),
+                  ),
+                ),
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                mainAxisSize: MainAxisSize.max,
+                children: [
+                  Tooltip(
+                    message: 'Dissociate from parent',
+                    child: TapIcon(
+                      splashRadius: 4.0,
+                      borderColor: widget.borderColor ?? Colors.black,
+                      borderWidth: 1.5,
+                      backgroundColor: widget.insideColor,
+                      clickColor: widget.clickColor,
+                      hoverColor: widget.hoverColor,
+                      icon: Icon(
+                        MdiIcons.contentCut,
+                        size: 14.0,
+                        color: widget.iconColor,
+                      ),
+                      onTap: () {
+                        if (widget.dissociatePage != null) {
+                          widget.dissociatePage!(widget.id);
+                        }
+                      },
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                    child: Tooltip(
+                      message: 'Create new child',
+                      child: TapIcon(
+                        splashRadius: 4.0,
+                        borderColor: widget.borderColor ?? Colors.black,
+                        borderWidth: 1.5,
+                        backgroundColor: widget.insideColor,
+                        clickColor: widget.clickColor,
+                        hoverColor: widget.hoverColor,
+                        icon: Icon(
+                          MdiIcons.fileDocumentPlusOutline,
+                          size: 14.0,
+                          color: widget.iconColor,
+                        ),
+                        onTap: () {
+                          if (widget.createPage != null) {
+                            widget.createPage!(widget.id);
+                          }
+                        },
+                      ),
+                    ),
+                  ),
+                  Tooltip(
+                    message: 'Connect to child',
+                    child: TapIcon(
+                      splashRadius: 4.0,
+                      borderColor: widget.borderColor ?? Colors.black,
+                      borderWidth: 1.5,
+                      backgroundColor: widget.insideColor,
+                      clickColor: widget.clickColor,
+                      hoverColor: widget.hoverColor,
+                      icon: Icon(
+                        MdiIcons.transitConnectionVariant,
+                        size: 14.0,
+                        color: widget.iconColor,
+                      ),
+                      onTap: () {
+                        if (widget.connectPage != null) {
+                          widget.connectPage!(widget.id);
+                        }
+                      },
+                    ),
+                  ),
+                ],
+              )
+            ],
+          );
+
+    /*Stack(
       children: [
         CustomPaint(
           painter: GraphPageNodePainter(
@@ -74,10 +204,10 @@ class _GraphPageNodeState extends State<GraphPageNode> {
           ),
         ),
       ],
-    );
+    );*/
   }
 }
-
+/*
 class GraphPageNodePainter extends CustomPainter {
   Color color;
   Color borderColor;
@@ -192,3 +322,4 @@ class GraphPageNodeBorder extends OutlinedBorder {
   @override
   ShapeBorder scale(double t) => GraphPageNodeBorder(side: side.scale(t));
 }
+*/
