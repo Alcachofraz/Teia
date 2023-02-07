@@ -3,17 +3,21 @@ import 'package:teia/views/tap_icon.dart';
 
 class GraphPageNode extends StatefulWidget {
   final int id;
-  final Color? color;
+  final Color? insideColor;
+  final Color? borderColor;
   final Color? hoverColor;
   final Color? clickColor;
+  final Color? plusColor;
   final Function(int)? createPage;
   final Function(int)? enterPage;
 
   const GraphPageNode({
     Key? key,
     required this.id,
-    this.color,
+    this.insideColor,
+    this.borderColor,
     this.hoverColor,
+    this.plusColor,
     this.clickColor,
     this.createPage,
     this.enterPage,
@@ -29,7 +33,10 @@ class _GraphPageNodeState extends State<GraphPageNode> {
     return Stack(
       children: [
         CustomPaint(
-          painter: GraphPageNodePainter(color: widget.color),
+          painter: GraphPageNodePainter(
+            color: widget.insideColor ?? Colors.black,
+            borderColor: widget.borderColor ?? Colors.black,
+          ),
           child: Material(
             color: Colors.transparent,
             shape: const GraphPageNodeBorder(),
@@ -43,7 +50,7 @@ class _GraphPageNodeState extends State<GraphPageNode> {
                 }
               },
               child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 24.0),
+                padding: const EdgeInsets.symmetric(vertical: 24.0, horizontal: 28.0),
                 child: Text('Page ${widget.id}'),
               ),
             ),
@@ -54,9 +61,10 @@ class _GraphPageNodeState extends State<GraphPageNode> {
           bottom: 0,
           child: TapIcon(
             splashRadius: 0.0,
-            icon: const Icon(
+            icon: Icon(
               Icons.add_rounded,
               size: 20.0,
+              color: widget.plusColor,
             ),
             onTap: () {
               if (widget.createPage != null) {
@@ -71,16 +79,16 @@ class _GraphPageNodeState extends State<GraphPageNode> {
 }
 
 class GraphPageNodePainter extends CustomPainter {
-  Color? color;
+  Color color;
+  Color borderColor;
 
-  GraphPageNodePainter({this.color});
+  GraphPageNodePainter({
+    required this.color,
+    required this.borderColor,
+  });
 
   @override
   void paint(Canvas canvas, Size size) {
-    var paint = Paint()
-      ..strokeWidth = 0
-      ..color = color ?? Colors.black;
-
     double w = size.width;
     double h = size.height;
     double plusDelta = h * 0.35;
@@ -100,7 +108,18 @@ class GraphPageNodePainter extends CustomPainter {
     path.lineTo(cornerDelta, h);
     path.quadraticBezierTo(0, h, 0, h - cornerDelta);
     path.lineTo(0, cornerDelta);
+
+    var paint = Paint()
+      ..color = color
+      ..style = PaintingStyle.fill
+      ..strokeWidth = 0;
     canvas.drawPath(path, paint);
+
+    final borderPaint = Paint()
+      ..color = borderColor
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.5;
+    canvas.drawPath(path, borderPaint);
   }
 
   @override
@@ -110,7 +129,9 @@ class GraphPageNodePainter extends CustomPainter {
 }
 
 class GraphPageNodeBorder extends OutlinedBorder {
-  const GraphPageNodeBorder({BorderSide side = BorderSide.none}) : super(side: side);
+  const GraphPageNodeBorder({
+    BorderSide side = BorderSide.none,
+  }) : super(side: side);
 
   Path customBorderPath(Rect rect) {
     double w = rect.width;
@@ -163,7 +184,6 @@ class GraphPageNodeBorder extends OutlinedBorder {
           customBorderPath(rect),
           Paint()
             ..style = PaintingStyle.stroke
-            ..color = Colors.transparent
             ..strokeWidth = 0.0,
         );
     }
