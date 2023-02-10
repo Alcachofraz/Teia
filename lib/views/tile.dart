@@ -13,6 +13,9 @@ class Tile extends StatefulWidget {
   final double? height;
   final double? width;
   final Widget? child;
+  final BorderSide borderSide;
+  final Color? clickColor;
+  final Color? hoverColor;
   final GestureTapCallback? onTap;
 
   const Tile({
@@ -29,6 +32,9 @@ class Tile extends StatefulWidget {
     this.height,
     this.width,
     this.child,
+    this.borderSide = const BorderSide(),
+    this.clickColor,
+    this.hoverColor,
     this.onTap,
   }) : super(key: key);
 
@@ -48,10 +54,15 @@ class _TileState extends State<Tile> {
     return Card(
       margin: widget.padding,
       color: widget.color,
-      shape: RoundedRectangleBorder(borderRadius: borderRadius),
+      shape: RoundedRectangleBorder(
+        borderRadius: borderRadius,
+        side: widget.borderSide,
+      ),
       child: Material(
         color: Colors.transparent,
         child: InkWell(
+          hoverColor: widget.hoverColor,
+          splashColor: widget.clickColor,
           customBorder: RoundedRectangleBorder(
             borderRadius: borderRadius,
           ),
