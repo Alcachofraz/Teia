@@ -1,11 +1,11 @@
-class TChapterGraph {
+class ChapterGraph {
   Map<int, List<int>> nodes;
 
-  TChapterGraph(this.nodes);
+  ChapterGraph(this.nodes);
 
   // Execute [action] for each connection of the graph.
   // * [action] Action (function) to execute for start and end (nodes) ID's of the connection.
-  forEachConnection(Function(int start, int end) action) {
+  void forEachConnection(Function(int start, int end) action) {
     nodes.forEach((start, endList) {
       for (var end in endList) {
         action(start, end);
@@ -17,7 +17,7 @@ class TChapterGraph {
   // * [start] Start node ID (page ID).
   // * [end] End node ID (page ID).
   // Returns false if [start] doesn't exist.
-  addConnection(int start, int end) {
+  bool addConnection(int start, int end) {
     if (nodes.containsKey(start)) {
       nodes[start]!.add(end);
       nodes[end] = [];
@@ -28,8 +28,16 @@ class TChapterGraph {
   }
 
   // Get total number of pages in the graph.
-  numberOfPages() {
+  int numberOfPages() {
     return nodes.keys.length;
+  }
+
+  // Check if page is leaf (has no child connections).
+  // Returns true if pageId doesn't exist.
+  bool isLeaf(int pageId) {
+    final children = nodes[pageId];
+    if (children == null) return true;
+    return children.isEmpty;
   }
 
   @override

@@ -40,6 +40,12 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
 
+  # Amplify service libraries
+  amplify_flutter: ^1.0.0-next.4
+  amplify_auth_cognito: ^1.0.0-next.4
+  amplify_authenticator: ^1.0.0-next.3
+  amplify_api: ^1.0.0-next.4
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

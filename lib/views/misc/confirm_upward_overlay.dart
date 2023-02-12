@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
-import 'package:teia/views/animated_dialog.dart';
-import 'package:teia/views/rounded_button.dart';
+import 'package:teia/views/misc/animated_dialog.dart';
+import 'package:teia/views/misc/rounded_button.dart';
 
 class ConfirmUpwardOverlay extends StatefulWidget {
   final String title;

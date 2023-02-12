@@ -1,22 +1,55 @@
 import 'package:flutter/material.dart';
-import 'package:teia/models/page.dart';
-import 'package:teia/views/screen_wrapper.dart';
+import 'package:teia/models/chapter.dart';
+import 'package:teia/views/misc/screen_wrapper.dart';
 
 class ReadChapterScreen extends StatefulWidget {
-  const ReadChapterScreen({Key? key}) : super(key: key);
+  final Chapter chapter;
+  const ReadChapterScreen({
+    Key? key,
+    required this.chapter,
+  }) : super(key: key);
 
   @override
   State<ReadChapterScreen> createState() => _ReadChapterScreenState();
 }
 
 class _ReadChapterScreenState extends State<ReadChapterScreen> {
-  Widget _renderPage(TPage page) {}
+  int pageId = 0; // Get this from database
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  /// Callback to when a choice is clicked.
+  void onChoice(int newPageId) {}
+
+  /// Callback to when a choice is clicked.
+  void onImage(String url) {}
+
+  /// Callback to when a choice is clicked.
+  void onSecret(String secret) {}
 
   @override
   Widget build(BuildContext context) {
     return ScreenWrapper(
       body: Column(
-        children: const [],
+        children: [
+          PageView(),
+          if (widget.chapter.isFinalPage(pageId))
+            TextButton(
+              onPressed: () {
+                // Finish chapter
+              },
+              child: const Text(
+                'Finish Chapter',
+                style: TextStyle(
+                  color: Colors.blue,
+                  decoration: TextDecoration.underline,
+                ),
+              ),
+            ),
+        ],
       ),
     );
   }

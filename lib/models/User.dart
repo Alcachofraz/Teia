@@ -25,13 +25,14 @@ import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 
 
-/** This is an auto generated class representing the Page type in your schema. */
+/** This is an auto generated class representing the User type in your schema. */
 @immutable
-class Page extends Model {
-  static const classType = const _PageModelType();
+class User extends Model {
+  static const classType = const _UserModelType();
   final String id;
-  final Chapter? _chapter;
-  final List<Snippet>? _snippets;
+  final String? _name;
+  final TemporalDate? _joinedAt;
+  final List<UsersWriteStories>? _stories;
   final TemporalDateTime? _createdAt;
   final TemporalDateTime? _updatedAt;
 
@@ -42,18 +43,31 @@ class Page extends Model {
   @override
   String getId() => id;
   
-  PageModelIdentifier get modelIdentifier {
-      return PageModelIdentifier(
+  UserModelIdentifier get modelIdentifier {
+      return UserModelIdentifier(
         id: id
       );
   }
   
-  Chapter? get chapter {
-    return _chapter;
+  String get name {
+    try {
+      return _name!;
+    } catch(e) {
+      throw new AmplifyCodeGenModelException(
+          AmplifyExceptionMessages.codeGenRequiredFieldForceCastExceptionMessage,
+          recoverySuggestion:
+            AmplifyExceptionMessages.codeGenRequiredFieldForceCastRecoverySuggestion,
+          underlyingException: e.toString()
+          );
+    }
   }
   
-  List<Snippet>? get snippets {
-    return _snippets;
+  TemporalDate? get joinedAt {
+    return _joinedAt;
+  }
+  
+  List<UsersWriteStories>? get stories {
+    return _stories;
   }
   
   TemporalDateTime? get createdAt {
@@ -64,13 +78,14 @@ class Page extends Model {
     return _updatedAt;
   }
   
-  const Page._internal({required this.id, chapter, snippets, createdAt, updatedAt}): _chapter = chapter, _snippets = snippets, _createdAt = createdAt, _updatedAt = updatedAt;
+  const User._internal({required this.id, required name, joinedAt, stories, createdAt, updatedAt}): _name = name, _joinedAt = joinedAt, _stories = stories, _createdAt = createdAt, _updatedAt = updatedAt;
   
-  factory Page({String? id, Chapter? chapter, List<Snippet>? snippets}) {
-    return Page._internal(
+  factory User({String? id, required String name, TemporalDate? joinedAt, List<UsersWriteStories>? stories}) {
+    return User._internal(
       id: id == null ? UUID.getUUID() : id,
-      chapter: chapter,
-      snippets: snippets != null ? List<Snippet>.unmodifiable(snippets) : snippets);
+      name: name,
+      joinedAt: joinedAt,
+      stories: stories != null ? List<UsersWriteStories>.unmodifiable(stories) : stories);
   }
   
   bool equals(Object other) {
@@ -80,10 +95,11 @@ class Page extends Model {
   @override
   bool operator ==(Object other) {
     if (identical(other, this)) return true;
-    return other is Page &&
+    return other is User &&
       id == other.id &&
-      _chapter == other._chapter &&
-      DeepCollectionEquality().equals(_snippets, other._snippets);
+      _name == other._name &&
+      _joinedAt == other._joinedAt &&
+      DeepCollectionEquality().equals(_stories, other._stories);
   }
   
   @override
@@ -93,9 +109,10 @@ class Page extends Model {
   String toString() {
     var buffer = new StringBuffer();
     
-    buffer.write("Page {");
+    buffer.write("User {");
     buffer.write("id=" + "$id" + ", ");
-    buffer.write("chapter=" + (_chapter != null ? _chapter!.toString() : "null") + ", ");
+    buffer.write("name=" + "$_name" + ", ");
+    buffer.write("joinedAt=" + (_joinedAt != null ? _joinedAt!.format() : "null") + ", ");
     buffer.write("createdAt=" + (_createdAt != null ? _createdAt!.format() : "null") + ", ");
     buffer.write("updatedAt=" + (_updatedAt != null ? _updatedAt!.format() : "null"));
     buffer.write("}");
@@ -103,61 +120,65 @@ class Page extends Model {
     return buffer.toString();
   }
   
-  Page copyWith({Chapter? chapter, List<Snippet>? snippets}) {
-    return Page._internal(
+  User copyWith({String? name, TemporalDate? joinedAt, List<UsersWriteStories>? stories}) {
+    return User._internal(
       id: id,
-      chapter: chapter ?? this.chapter,
-      snippets: snippets ?? this.snippets);
+      name: name ?? this.name,
+      joinedAt: joinedAt ?? this.joinedAt,
+      stories: stories ?? this.stories);
   }
   
-  Page.fromJson(Map<String, dynamic> json)  
+  User.fromJson(Map<String, dynamic> json)  
     : id = json['id'],
-      _chapter = json['chapter']?['serializedData'] != null
-        ? Chapter.fromJson(new Map<String, dynamic>.from(json['chapter']['serializedData']))
-        : null,
-      _snippets = json['snippets'] is List
-        ? (json['snippets'] as List)
+      _name = json['name'],
+      _joinedAt = json['joinedAt'] != null ? TemporalDate.fromString(json['joinedAt']) : null,
+      _stories = json['stories'] is List
+        ? (json['stories'] as List)
           .where((e) => e?['serializedData'] != null)
-          .map((e) => Snippet.fromJson(new Map<String, dynamic>.from(e['serializedData'])))
+          .map((e) => UsersWriteStories.fromJson(new Map<String, dynamic>.from(e['serializedData'])))
           .toList()
         : null,
       _createdAt = json['createdAt'] != null ? TemporalDateTime.fromString(json['createdAt']) : null,
       _updatedAt = json['updatedAt'] != null ? TemporalDateTime.fromString(json['updatedAt']) : null;
   
   Map<String, dynamic> toJson() => {
-    'id': id, 'chapter': _chapter?.toJson(), 'snippets': _snippets?.map((Snippet? e) => e?.toJson()).toList(), 'createdAt': _createdAt?.format(), 'updatedAt': _updatedAt?.format()
+    'id': id, 'name': _name, 'joinedAt': _joinedAt?.format(), 'stories': _stories?.map((UsersWriteStories? e) => e?.toJson()).toList(), 'createdAt': _createdAt?.format(), 'updatedAt': _updatedAt?.format()
   };
   
   Map<String, Object?> toMap() => {
-    'id': id, 'chapter': _chapter, 'snippets': _snippets, 'createdAt': _createdAt, 'updatedAt': _updatedAt
+    'id': id, 'name': _name, 'joinedAt': _joinedAt, 'stories': _stories, 'createdAt': _createdAt, 'updatedAt': _updatedAt
   };
 
-  static final QueryModelIdentifier<PageModelIdentifier> MODEL_IDENTIFIER = QueryModelIdentifier<PageModelIdentifier>();
+  static final QueryModelIdentifier<UserModelIdentifier> MODEL_IDENTIFIER = QueryModelIdentifier<UserModelIdentifier>();
   static final QueryField ID = QueryField(fieldName: "id");
-  static final QueryField CHAPTER = QueryField(
-    fieldName: "chapter",
-    fieldType: ModelFieldType(ModelFieldTypeEnum.model, ofModelName: 'Chapter'));
-  static final QueryField SNIPPETS = QueryField(
-    fieldName: "snippets",
-    fieldType: ModelFieldType(ModelFieldTypeEnum.model, ofModelName: 'Snippet'));
+  static final QueryField NAME = QueryField(fieldName: "name");
+  static final QueryField JOINEDAT = QueryField(fieldName: "joinedAt");
+  static final QueryField STORIES = QueryField(
+    fieldName: "stories",
+    fieldType: ModelFieldType(ModelFieldTypeEnum.model, ofModelName: 'UsersWriteStories'));
   static var schema = Model.defineSchema(define: (ModelSchemaDefinition modelSchemaDefinition) {
-    modelSchemaDefinition.name = "Page";
-    modelSchemaDefinition.pluralName = "Pages";
+    modelSchemaDefinition.name = "User";
+    modelSchemaDefinition.pluralName = "Users";
     
     modelSchemaDefinition.addField(ModelFieldDefinition.id());
     
-    modelSchemaDefinition.addField(ModelFieldDefinition.belongsTo(
-      key: Page.CHAPTER,
+    modelSchemaDefinition.addField(ModelFieldDefinition.field(
+      key: User.NAME,
+      isRequired: true,
+      ofType: ModelFieldType(ModelFieldTypeEnum.string)
+    ));
+    
+    modelSchemaDefinition.addField(ModelFieldDefinition.field(
+      key: User.JOINEDAT,
       isRequired: false,
-      targetNames: ['chapterPagesId'],
-      ofModelName: 'Chapter'
+      ofType: ModelFieldType(ModelFieldTypeEnum.date)
     ));
     
     modelSchemaDefinition.addField(ModelFieldDefinition.hasMany(
-      key: Page.SNIPPETS,
+      key: User.STORIES,
       isRequired: false,
-      ofModelName: 'Snippet',
-      associatedKey: Snippet.PAGE
+      ofModelName: 'UsersWriteStories',
+      associatedKey: UsersWriteStories.USER
     ));
     
     modelSchemaDefinition.addField(ModelFieldDefinition.nonQueryField(
@@ -176,30 +197,30 @@ class Page extends Model {
   });
 }
 
-class _PageModelType extends ModelType<Page> {
-  const _PageModelType();
+class _UserModelType extends ModelType<User> {
+  const _UserModelType();
   
   @override
-  Page fromJson(Map<String, dynamic> jsonData) {
-    return Page.fromJson(jsonData);
+  User fromJson(Map<String, dynamic> jsonData) {
+    return User.fromJson(jsonData);
   }
   
   @override
   String modelName() {
-    return 'Page';
+    return 'User';
   }
 }
 
 /**
  * This is an auto generated class representing the model identifier
- * of [Page] in your schema.
+ * of [User] in your schema.
  */
 @immutable
-class PageModelIdentifier implements ModelIdentifier<Page> {
+class UserModelIdentifier implements ModelIdentifier<User> {
   final String id;
 
-  /** Create an instance of PageModelIdentifier using [id] the primary key. */
-  const PageModelIdentifier({
+  /** Create an instance of UserModelIdentifier using [id] the primary key. */
+  const UserModelIdentifier({
     required this.id});
   
   @override
@@ -217,7 +238,7 @@ class PageModelIdentifier implements ModelIdentifier<Page> {
   String serializeAsString() => serializeAsMap().values.join('#');
   
   @override
-  String toString() => 'PageModelIdentifier(id: $id)';
+  String toString() => 'UserModelIdentifier(id: $id)';
   
   @override
   bool operator ==(Object other) {
@@ -225,7 +246,7 @@ class PageModelIdentifier implements ModelIdentifier<Page> {
       return true;
     }
     
-    return other is PageModelIdentifier &&
+    return other is UserModelIdentifier &&
       id == other.id;
   }
   

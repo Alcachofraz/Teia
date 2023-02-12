@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:teia/views/tap_icon.dart';
-import 'package:teia/views/tile.dart';
+import 'package:teia/views/misc/tap_icon.dart';
+import 'package:teia/views/misc/tile.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
 class GraphPageNode extends StatefulWidget {

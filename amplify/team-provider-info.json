@@ -1,0 +1,20 @@
+{
+  "dev": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-teia-dev-115146-authRole",
+      "UnauthRoleArn": "arn:aws:iam::650047901612:role/amplify-teia-dev-115146-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::650047901612:role/amplify-teia-dev-115146-authRole",
+      "Region": "eu-west-3",
+      "DeploymentBucketName": "amplify-teia-dev-115146-deployment",
+      "UnauthRoleName": "amplify-teia-dev-115146-unauthRole",
+      "StackName": "amplify-teia-dev-115146",
+      "StackId": "arn:aws:cloudformation:eu-west-3:650047901612:stack/amplify-teia-dev-115146/7673f200-aa02-11ed-9bbe-0ee071e3cf74",
+      "AmplifyAppId": "d3sk9k1jmgi825"
+    },
+    "categories": {
+      "auth": {
+        "teiac5d171c9": {}
+      }
+    }
+  }
+}
