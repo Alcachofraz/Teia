@@ -21,17 +21,16 @@
 
 import 'ModelProvider.dart';
 import 'package:amplify_core/amplify_core.dart';
-import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 
 
-/** This is an auto generated class representing the Page type in your schema. */
+/** This is an auto generated class representing the UsersWriteStories type in your schema. */
 @immutable
-class Page extends Model {
-  static const classType = const _PageModelType();
+class UsersWriteStories extends Model {
+  static const classType = const _UsersWriteStoriesModelType();
   final String id;
-  final Chapter? _chapter;
-  final List<Snippet>? _snippets;
+  final User? _user;
+  final Story? _story;
   final TemporalDateTime? _createdAt;
   final TemporalDateTime? _updatedAt;
 
@@ -42,18 +41,36 @@ class Page extends Model {
   @override
   String getId() => id;
   
-  PageModelIdentifier get modelIdentifier {
-      return PageModelIdentifier(
+  UsersWriteStoriesModelIdentifier get modelIdentifier {
+      return UsersWriteStoriesModelIdentifier(
         id: id
       );
   }
   
-  Chapter? get chapter {
-    return _chapter;
+  User get user {
+    try {
+      return _user!;
+    } catch(e) {
+      throw new AmplifyCodeGenModelException(
+          AmplifyExceptionMessages.codeGenRequiredFieldForceCastExceptionMessage,
+          recoverySuggestion:
+            AmplifyExceptionMessages.codeGenRequiredFieldForceCastRecoverySuggestion,
+          underlyingException: e.toString()
+          );
+    }
   }
   
-  List<Snippet>? get snippets {
-    return _snippets;
+  Story get story {
+    try {
+      return _story!;
+    } catch(e) {
+      throw new AmplifyCodeGenModelException(
+          AmplifyExceptionMessages.codeGenRequiredFieldForceCastExceptionMessage,
+          recoverySuggestion:
+            AmplifyExceptionMessages.codeGenRequiredFieldForceCastRecoverySuggestion,
+          underlyingException: e.toString()
+          );
+    }
   }
   
   TemporalDateTime? get createdAt {
@@ -64,13 +81,13 @@ class Page extends Model {
     return _updatedAt;
   }
   
-  const Page._internal({required this.id, chapter, snippets, createdAt, updatedAt}): _chapter = chapter, _snippets = snippets, _createdAt = createdAt, _updatedAt = updatedAt;
+  const UsersWriteStories._internal({required this.id, required user, required story, createdAt, updatedAt}): _user = user, _story = story, _createdAt = createdAt, _updatedAt = updatedAt;
   
-  factory Page({String? id, Chapter? chapter, List<Snippet>? snippets}) {
-    return Page._internal(
+  factory UsersWriteStories({String? id, required User user, required Story story}) {
+    return UsersWriteStories._internal(
       id: id == null ? UUID.getUUID() : id,
-      chapter: chapter,
-      snippets: snippets != null ? List<Snippet>.unmodifiable(snippets) : snippets);
+      user: user,
+      story: story);
   }
   
   bool equals(Object other) {
@@ -80,10 +97,10 @@ class Page extends Model {
   @override
   bool operator ==(Object other) {
     if (identical(other, this)) return true;
-    return other is Page &&
+    return other is UsersWriteStories &&
       id == other.id &&
-      _chapter == other._chapter &&
-      DeepCollectionEquality().equals(_snippets, other._snippets);
+      _user == other._user &&
+      _story == other._story;
   }
   
   @override
@@ -93,9 +110,10 @@ class Page extends Model {
   String toString() {
     var buffer = new StringBuffer();
     
-    buffer.write("Page {");
+    buffer.write("UsersWriteStories {");
     buffer.write("id=" + "$id" + ", ");
-    buffer.write("chapter=" + (_chapter != null ? _chapter!.toString() : "null") + ", ");
+    buffer.write("user=" + (_user != null ? _user!.toString() : "null") + ", ");
+    buffer.write("story=" + (_story != null ? _story!.toString() : "null") + ", ");
     buffer.write("createdAt=" + (_createdAt != null ? _createdAt!.format() : "null") + ", ");
     buffer.write("updatedAt=" + (_updatedAt != null ? _updatedAt!.format() : "null"));
     buffer.write("}");
@@ -103,61 +121,63 @@ class Page extends Model {
     return buffer.toString();
   }
   
-  Page copyWith({Chapter? chapter, List<Snippet>? snippets}) {
-    return Page._internal(
+  UsersWriteStories copyWith({User? user, Story? story}) {
+    return UsersWriteStories._internal(
       id: id,
-      chapter: chapter ?? this.chapter,
-      snippets: snippets ?? this.snippets);
+      user: user ?? this.user,
+      story: story ?? this.story);
   }
   
-  Page.fromJson(Map<String, dynamic> json)  
+  UsersWriteStories.fromJson(Map<String, dynamic> json)  
     : id = json['id'],
-      _chapter = json['chapter']?['serializedData'] != null
-        ? Chapter.fromJson(new Map<String, dynamic>.from(json['chapter']['serializedData']))
+      _user = json['user']?['serializedData'] != null
+        ? User.fromJson(new Map<String, dynamic>.from(json['user']['serializedData']))
         : null,
-      _snippets = json['snippets'] is List
-        ? (json['snippets'] as List)
-          .where((e) => e?['serializedData'] != null)
-          .map((e) => Snippet.fromJson(new Map<String, dynamic>.from(e['serializedData'])))
-          .toList()
+      _story = json['story']?['serializedData'] != null
+        ? Story.fromJson(new Map<String, dynamic>.from(json['story']['serializedData']))
         : null,
       _createdAt = json['createdAt'] != null ? TemporalDateTime.fromString(json['createdAt']) : null,
       _updatedAt = json['updatedAt'] != null ? TemporalDateTime.fromString(json['updatedAt']) : null;
   
   Map<String, dynamic> toJson() => {
-    'id': id, 'chapter': _chapter?.toJson(), 'snippets': _snippets?.map((Snippet? e) => e?.toJson()).toList(), 'createdAt': _createdAt?.format(), 'updatedAt': _updatedAt?.format()
+    'id': id, 'user': _user?.toJson(), 'story': _story?.toJson(), 'createdAt': _createdAt?.format(), 'updatedAt': _updatedAt?.format()
   };
   
   Map<String, Object?> toMap() => {
-    'id': id, 'chapter': _chapter, 'snippets': _snippets, 'createdAt': _createdAt, 'updatedAt': _updatedAt
+    'id': id, 'user': _user, 'story': _story, 'createdAt': _createdAt, 'updatedAt': _updatedAt
   };
 
-  static final QueryModelIdentifier<PageModelIdentifier> MODEL_IDENTIFIER = QueryModelIdentifier<PageModelIdentifier>();
+  static final QueryModelIdentifier<UsersWriteStoriesModelIdentifier> MODEL_IDENTIFIER = QueryModelIdentifier<UsersWriteStoriesModelIdentifier>();
   static final QueryField ID = QueryField(fieldName: "id");
-  static final QueryField CHAPTER = QueryField(
-    fieldName: "chapter",
-    fieldType: ModelFieldType(ModelFieldTypeEnum.model, ofModelName: 'Chapter'));
-  static final QueryField SNIPPETS = QueryField(
-    fieldName: "snippets",
-    fieldType: ModelFieldType(ModelFieldTypeEnum.model, ofModelName: 'Snippet'));
+  static final QueryField USER = QueryField(
+    fieldName: "user",
+    fieldType: ModelFieldType(ModelFieldTypeEnum.model, ofModelName: 'User'));
+  static final QueryField STORY = QueryField(
+    fieldName: "story",
+    fieldType: ModelFieldType(ModelFieldTypeEnum.model, ofModelName: 'Story'));
   static var schema = Model.defineSchema(define: (ModelSchemaDefinition modelSchemaDefinition) {
-    modelSchemaDefinition.name = "Page";
-    modelSchemaDefinition.pluralName = "Pages";
+    modelSchemaDefinition.name = "UsersWriteStories";
+    modelSchemaDefinition.pluralName = "UsersWriteStories";
+    
+    modelSchemaDefinition.indexes = [
+      ModelIndex(fields: const ["userId"], name: "byUser"),
+      ModelIndex(fields: const ["storyId"], name: "byStory")
+    ];
     
     modelSchemaDefinition.addField(ModelFieldDefinition.id());
     
     modelSchemaDefinition.addField(ModelFieldDefinition.belongsTo(
-      key: Page.CHAPTER,
-      isRequired: false,
-      targetNames: ['chapterPagesId'],
-      ofModelName: 'Chapter'
+      key: UsersWriteStories.USER,
+      isRequired: true,
+      targetNames: ['userId'],
+      ofModelName: 'User'
     ));
     
-    modelSchemaDefinition.addField(ModelFieldDefinition.hasMany(
-      key: Page.SNIPPETS,
-      isRequired: false,
-      ofModelName: 'Snippet',
-      associatedKey: Snippet.PAGE
+    modelSchemaDefinition.addField(ModelFieldDefinition.belongsTo(
+      key: UsersWriteStories.STORY,
+      isRequired: true,
+      targetNames: ['storyId'],
+      ofModelName: 'Story'
     ));
     
     modelSchemaDefinition.addField(ModelFieldDefinition.nonQueryField(
@@ -176,30 +196,30 @@ class Page extends Model {
   });
 }
 
-class _PageModelType extends ModelType<Page> {
-  const _PageModelType();
+class _UsersWriteStoriesModelType extends ModelType<UsersWriteStories> {
+  const _UsersWriteStoriesModelType();
   
   @override
-  Page fromJson(Map<String, dynamic> jsonData) {
-    return Page.fromJson(jsonData);
+  UsersWriteStories fromJson(Map<String, dynamic> jsonData) {
+    return UsersWriteStories.fromJson(jsonData);
   }
   
   @override
   String modelName() {
-    return 'Page';
+    return 'UsersWriteStories';
   }
 }
 
 /**
  * This is an auto generated class representing the model identifier
- * of [Page] in your schema.
+ * of [UsersWriteStories] in your schema.
  */
 @immutable
-class PageModelIdentifier implements ModelIdentifier<Page> {
+class UsersWriteStoriesModelIdentifier implements ModelIdentifier<UsersWriteStories> {
   final String id;
 
-  /** Create an instance of PageModelIdentifier using [id] the primary key. */
-  const PageModelIdentifier({
+  /** Create an instance of UsersWriteStoriesModelIdentifier using [id] the primary key. */
+  const UsersWriteStoriesModelIdentifier({
     required this.id});
   
   @override
@@ -217,7 +237,7 @@ class PageModelIdentifier implements ModelIdentifier<Page> {
   String serializeAsString() => serializeAsMap().values.join('#');
   
   @override
-  String toString() => 'PageModelIdentifier(id: $id)';
+  String toString() => 'UsersWriteStoriesModelIdentifier(id: $id)';
   
   @override
   bool operator ==(Object other) {
@@ -225,7 +245,7 @@ class PageModelIdentifier implements ModelIdentifier<Page> {
       return true;
     }
     
-    return other is PageModelIdentifier &&
+    return other is UsersWriteStoriesModelIdentifier &&
       id == other.id;
   }
   

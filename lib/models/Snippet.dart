@@ -21,17 +21,16 @@
 
 import 'ModelProvider.dart';
 import 'package:amplify_core/amplify_core.dart';
-import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 
 
-/** This is an auto generated class representing the Page type in your schema. */
+/** This is an auto generated class representing the Snippet type in your schema. */
 @immutable
-class Page extends Model {
-  static const classType = const _PageModelType();
+class Snippet extends Model {
+  static const classType = const _SnippetModelType();
   final String id;
-  final Chapter? _chapter;
-  final List<Snippet>? _snippets;
+  final String? _text;
+  final Page? _page;
   final TemporalDateTime? _createdAt;
   final TemporalDateTime? _updatedAt;
 
@@ -42,18 +41,27 @@ class Page extends Model {
   @override
   String getId() => id;
   
-  PageModelIdentifier get modelIdentifier {
-      return PageModelIdentifier(
+  SnippetModelIdentifier get modelIdentifier {
+      return SnippetModelIdentifier(
         id: id
       );
   }
   
-  Chapter? get chapter {
-    return _chapter;
+  String get text {
+    try {
+      return _text!;
+    } catch(e) {
+      throw new AmplifyCodeGenModelException(
+          AmplifyExceptionMessages.codeGenRequiredFieldForceCastExceptionMessage,
+          recoverySuggestion:
+            AmplifyExceptionMessages.codeGenRequiredFieldForceCastRecoverySuggestion,
+          underlyingException: e.toString()
+          );
+    }
   }
   
-  List<Snippet>? get snippets {
-    return _snippets;
+  Page? get page {
+    return _page;
   }
   
   TemporalDateTime? get createdAt {
@@ -64,13 +72,13 @@ class Page extends Model {
     return _updatedAt;
   }
   
-  const Page._internal({required this.id, chapter, snippets, createdAt, updatedAt}): _chapter = chapter, _snippets = snippets, _createdAt = createdAt, _updatedAt = updatedAt;
+  const Snippet._internal({required this.id, required text, page, createdAt, updatedAt}): _text = text, _page = page, _createdAt = createdAt, _updatedAt = updatedAt;
   
-  factory Page({String? id, Chapter? chapter, List<Snippet>? snippets}) {
-    return Page._internal(
+  factory Snippet({String? id, required String text, Page? page}) {
+    return Snippet._internal(
       id: id == null ? UUID.getUUID() : id,
-      chapter: chapter,
-      snippets: snippets != null ? List<Snippet>.unmodifiable(snippets) : snippets);
+      text: text,
+      page: page);
   }
   
   bool equals(Object other) {
@@ -80,10 +88,10 @@ class Page extends Model {
   @override
   bool operator ==(Object other) {
     if (identical(other, this)) return true;
-    return other is Page &&
+    return other is Snippet &&
       id == other.id &&
-      _chapter == other._chapter &&
-      DeepCollectionEquality().equals(_snippets, other._snippets);
+      _text == other._text &&
+      _page == other._page;
   }
   
   @override
@@ -93,9 +101,10 @@ class Page extends Model {
   String toString() {
     var buffer = new StringBuffer();
     
-    buffer.write("Page {");
+    buffer.write("Snippet {");
     buffer.write("id=" + "$id" + ", ");
-    buffer.write("chapter=" + (_chapter != null ? _chapter!.toString() : "null") + ", ");
+    buffer.write("text=" + "$_text" + ", ");
+    buffer.write("page=" + (_page != null ? _page!.toString() : "null") + ", ");
     buffer.write("createdAt=" + (_createdAt != null ? _createdAt!.format() : "null") + ", ");
     buffer.write("updatedAt=" + (_updatedAt != null ? _updatedAt!.format() : "null"));
     buffer.write("}");
@@ -103,61 +112,53 @@ class Page extends Model {
     return buffer.toString();
   }
   
-  Page copyWith({Chapter? chapter, List<Snippet>? snippets}) {
-    return Page._internal(
+  Snippet copyWith({String? text, Page? page}) {
+    return Snippet._internal(
       id: id,
-      chapter: chapter ?? this.chapter,
-      snippets: snippets ?? this.snippets);
+      text: text ?? this.text,
+      page: page ?? this.page);
   }
   
-  Page.fromJson(Map<String, dynamic> json)  
+  Snippet.fromJson(Map<String, dynamic> json)  
     : id = json['id'],
-      _chapter = json['chapter']?['serializedData'] != null
-        ? Chapter.fromJson(new Map<String, dynamic>.from(json['chapter']['serializedData']))
-        : null,
-      _snippets = json['snippets'] is List
-        ? (json['snippets'] as List)
-          .where((e) => e?['serializedData'] != null)
-          .map((e) => Snippet.fromJson(new Map<String, dynamic>.from(e['serializedData'])))
-          .toList()
+      _text = json['text'],
+      _page = json['page']?['serializedData'] != null
+        ? Page.fromJson(new Map<String, dynamic>.from(json['page']['serializedData']))
         : null,
       _createdAt = json['createdAt'] != null ? TemporalDateTime.fromString(json['createdAt']) : null,
       _updatedAt = json['updatedAt'] != null ? TemporalDateTime.fromString(json['updatedAt']) : null;
   
   Map<String, dynamic> toJson() => {
-    'id': id, 'chapter': _chapter?.toJson(), 'snippets': _snippets?.map((Snippet? e) => e?.toJson()).toList(), 'createdAt': _createdAt?.format(), 'updatedAt': _updatedAt?.format()
+    'id': id, 'text': _text, 'page': _page?.toJson(), 'createdAt': _createdAt?.format(), 'updatedAt': _updatedAt?.format()
   };
   
   Map<String, Object?> toMap() => {
-    'id': id, 'chapter': _chapter, 'snippets': _snippets, 'createdAt': _createdAt, 'updatedAt': _updatedAt
+    'id': id, 'text': _text, 'page': _page, 'createdAt': _createdAt, 'updatedAt': _updatedAt
   };
 
-  static final QueryModelIdentifier<PageModelIdentifier> MODEL_IDENTIFIER = QueryModelIdentifier<PageModelIdentifier>();
+  static final QueryModelIdentifier<SnippetModelIdentifier> MODEL_IDENTIFIER = QueryModelIdentifier<SnippetModelIdentifier>();
   static final QueryField ID = QueryField(fieldName: "id");
-  static final QueryField CHAPTER = QueryField(
-    fieldName: "chapter",
-    fieldType: ModelFieldType(ModelFieldTypeEnum.model, ofModelName: 'Chapter'));
-  static final QueryField SNIPPETS = QueryField(
-    fieldName: "snippets",
-    fieldType: ModelFieldType(ModelFieldTypeEnum.model, ofModelName: 'Snippet'));
+  static final QueryField TEXT = QueryField(fieldName: "text");
+  static final QueryField PAGE = QueryField(
+    fieldName: "page",
+    fieldType: ModelFieldType(ModelFieldTypeEnum.model, ofModelName: 'Page'));
   static var schema = Model.defineSchema(define: (ModelSchemaDefinition modelSchemaDefinition) {
-    modelSchemaDefinition.name = "Page";
-    modelSchemaDefinition.pluralName = "Pages";
+    modelSchemaDefinition.name = "Snippet";
+    modelSchemaDefinition.pluralName = "Snippets";
     
     modelSchemaDefinition.addField(ModelFieldDefinition.id());
     
-    modelSchemaDefinition.addField(ModelFieldDefinition.belongsTo(
-      key: Page.CHAPTER,
-      isRequired: false,
-      targetNames: ['chapterPagesId'],
-      ofModelName: 'Chapter'
+    modelSchemaDefinition.addField(ModelFieldDefinition.field(
+      key: Snippet.TEXT,
+      isRequired: true,
+      ofType: ModelFieldType(ModelFieldTypeEnum.string)
     ));
     
-    modelSchemaDefinition.addField(ModelFieldDefinition.hasMany(
-      key: Page.SNIPPETS,
+    modelSchemaDefinition.addField(ModelFieldDefinition.belongsTo(
+      key: Snippet.PAGE,
       isRequired: false,
-      ofModelName: 'Snippet',
-      associatedKey: Snippet.PAGE
+      targetNames: ['pageSnippetsId'],
+      ofModelName: 'Page'
     ));
     
     modelSchemaDefinition.addField(ModelFieldDefinition.nonQueryField(
@@ -176,30 +177,30 @@ class Page extends Model {
   });
 }
 
-class _PageModelType extends ModelType<Page> {
-  const _PageModelType();
+class _SnippetModelType extends ModelType<Snippet> {
+  const _SnippetModelType();
   
   @override
-  Page fromJson(Map<String, dynamic> jsonData) {
-    return Page.fromJson(jsonData);
+  Snippet fromJson(Map<String, dynamic> jsonData) {
+    return Snippet.fromJson(jsonData);
   }
   
   @override
   String modelName() {
-    return 'Page';
+    return 'Snippet';
   }
 }
 
 /**
  * This is an auto generated class representing the model identifier
- * of [Page] in your schema.
+ * of [Snippet] in your schema.
  */
 @immutable
-class PageModelIdentifier implements ModelIdentifier<Page> {
+class SnippetModelIdentifier implements ModelIdentifier<Snippet> {
   final String id;
 
-  /** Create an instance of PageModelIdentifier using [id] the primary key. */
-  const PageModelIdentifier({
+  /** Create an instance of SnippetModelIdentifier using [id] the primary key. */
+  const SnippetModelIdentifier({
     required this.id});
   
   @override
@@ -217,7 +218,7 @@ class PageModelIdentifier implements ModelIdentifier<Page> {
   String serializeAsString() => serializeAsMap().values.join('#');
   
   @override
-  String toString() => 'PageModelIdentifier(id: $id)';
+  String toString() => 'SnippetModelIdentifier(id: $id)';
   
   @override
   bool operator ==(Object other) {
@@ -225,7 +226,7 @@ class PageModelIdentifier implements ModelIdentifier<Page> {
       return true;
     }
     
-    return other is PageModelIdentifier &&
+    return other is SnippetModelIdentifier &&
       id == other.id;
   }
   

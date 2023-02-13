@@ -6,7 +6,7 @@ import 'package:teia/models/chapter.dart';
 import 'package:teia/screens/text_editor_screen.dart';
 import 'package:teia/utils/utils.dart';
 import 'package:teia/views/graph_page_node.dart';
-import 'package:teia/views/screen_wrapper.dart';
+import 'package:teia/views/misc/screen_wrapper.dart';
 
 class GraphScreen extends StatefulWidget {
   final bool picking;
@@ -18,7 +18,7 @@ class GraphScreen extends StatefulWidget {
 }
 
 class _GraphScreenState extends State<GraphScreen> {
-  final TChapter _chapter = TChapter.create(1, 'My chapter');
+  final Chapter _chapter = Chapter.create(1, 'My chapter');
 
   @override
   void initState() {
@@ -26,7 +26,7 @@ class _GraphScreenState extends State<GraphScreen> {
   }
 
   /// Returns a list with [Graph, BuchheimWalkerAlgorithm];
-  List<dynamic> buildGraph(TChapter chapter) {
+  List<dynamic> buildGraph(Chapter chapter) {
     Graph graph = Graph()..isTree = true;
     graph.addNode(Node.Id(1));
 

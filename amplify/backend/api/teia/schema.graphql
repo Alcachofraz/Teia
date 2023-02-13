@@ -1,0 +1,44 @@
+# This "input" configures a global authorization rule to enable public access to
+# all models in this schema. Learn more about authorization rules here: https://docs.amplify.aws/cli/graphql/authorization-rules
+input AMPLIFY { globalAuthRule: AuthRule = { allow: public } } # FOR TESTING ONLY!
+
+type User @model {
+  id: ID!
+  name: String!
+  joinedAt: AWSDate
+  stories: [Story] @manyToMany(relationName: "UsersWriteStories")
+}
+
+type Story @model {
+  id: ID!
+  title: String!
+  createdAt: AWSDate
+  authors: [User] @manyToMany(relationName: "UsersWriteStories")
+  chapters: [Chapter] @hasMany
+}
+
+type Chapter @model {
+  id: ID!
+  title: String!
+  graph: ChapterGraph @hasOne
+  story: Story @belongsTo
+  pages: [Page] @hasMany
+}
+
+type ChapterGraph @model {
+  id: ID!
+  chapter: Chapter @belongsTo
+  nodes: AWSJSON
+}
+
+type Page @model {
+  id: ID!
+  chapter: Chapter @belongsTo
+  snippets: [Snippet] @hasMany
+}
+
+type Snippet @model {
+  id: ID!
+  text: String!
+  page: Page @belongsTo
+}
