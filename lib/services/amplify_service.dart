@@ -1,9 +1,9 @@
 import 'dart:developer';
 
-import 'package:amplify_api/amplify_api.dart';
 import 'package:amplify_auth_cognito/amplify_auth_cognito.dart';
+import 'package:amplify_api/amplify_api.dart';
 import 'package:amplify_flutter/amplify_flutter.dart';
-import 'package:teia/amplifyconfiguration.dart';
+import 'package:teia/amplify/amplifyconfiguration.dart';
 
 class AmplifyService {
   static configure() async {
@@ -13,7 +13,7 @@ class AmplifyService {
       AmplifyAPI api = AmplifyAPI(modelProvider: ModelProvider.instance);
       await Amplify.addPlugins([
         amplifyAuthCognito,
-        api,
+        //api,
       ]);
 
       // Configure Amplify

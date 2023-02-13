@@ -4,7 +4,7 @@
   "frontend": "flutter",
   "flutter": {
     "config": {
-      "ResDir": "./lib/"
+      "ResDir": "./lib/amplify"
     }
   },
   "providers": [
