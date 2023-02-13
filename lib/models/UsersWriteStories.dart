@@ -1,6 +1,3 @@
-<<<<<<< HEAD
-class User {}
-=======
 /*
 * Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 *
@@ -24,18 +21,16 @@ class User {}
 
 import 'ModelProvider.dart';
 import 'package:amplify_core/amplify_core.dart';
-import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 
 
-/** This is an auto generated class representing the User type in your schema. */
+/** This is an auto generated class representing the UsersWriteStories type in your schema. */
 @immutable
-class User extends Model {
-  static const classType = const _UserModelType();
+class UsersWriteStories extends Model {
+  static const classType = const _UsersWriteStoriesModelType();
   final String id;
-  final String? _name;
-  final TemporalDate? _joinedAt;
-  final List<UsersWriteStories>? _stories;
+  final User? _user;
+  final Story? _story;
   final TemporalDateTime? _createdAt;
   final TemporalDateTime? _updatedAt;
 
@@ -46,15 +41,15 @@ class User extends Model {
   @override
   String getId() => id;
   
-  UserModelIdentifier get modelIdentifier {
-      return UserModelIdentifier(
+  UsersWriteStoriesModelIdentifier get modelIdentifier {
+      return UsersWriteStoriesModelIdentifier(
         id: id
       );
   }
   
-  String get name {
+  User get user {
     try {
-      return _name!;
+      return _user!;
     } catch(e) {
       throw new AmplifyCodeGenModelException(
           AmplifyExceptionMessages.codeGenRequiredFieldForceCastExceptionMessage,
@@ -65,12 +60,17 @@ class User extends Model {
     }
   }
   
-  TemporalDate? get joinedAt {
-    return _joinedAt;
-  }
-  
-  List<UsersWriteStories>? get stories {
-    return _stories;
+  Story get story {
+    try {
+      return _story!;
+    } catch(e) {
+      throw new AmplifyCodeGenModelException(
+          AmplifyExceptionMessages.codeGenRequiredFieldForceCastExceptionMessage,
+          recoverySuggestion:
+            AmplifyExceptionMessages.codeGenRequiredFieldForceCastRecoverySuggestion,
+          underlyingException: e.toString()
+          );
+    }
   }
   
   TemporalDateTime? get createdAt {
@@ -81,14 +81,13 @@ class User extends Model {
     return _updatedAt;
   }
   
-  const User._internal({required this.id, required name, joinedAt, stories, createdAt, updatedAt}): _name = name, _joinedAt = joinedAt, _stories = stories, _createdAt = createdAt, _updatedAt = updatedAt;
+  const UsersWriteStories._internal({required this.id, required user, required story, createdAt, updatedAt}): _user = user, _story = story, _createdAt = createdAt, _updatedAt = updatedAt;
   
-  factory User({String? id, required String name, TemporalDate? joinedAt, List<UsersWriteStories>? stories}) {
-    return User._internal(
+  factory UsersWriteStories({String? id, required User user, required Story story}) {
+    return UsersWriteStories._internal(
       id: id == null ? UUID.getUUID() : id,
-      name: name,
-      joinedAt: joinedAt,
-      stories: stories != null ? List<UsersWriteStories>.unmodifiable(stories) : stories);
+      user: user,
+      story: story);
   }
   
   bool equals(Object other) {
@@ -98,11 +97,10 @@ class User extends Model {
   @override
   bool operator ==(Object other) {
     if (identical(other, this)) return true;
-    return other is User &&
+    return other is UsersWriteStories &&
       id == other.id &&
-      _name == other._name &&
-      _joinedAt == other._joinedAt &&
-      DeepCollectionEquality().equals(_stories, other._stories);
+      _user == other._user &&
+      _story == other._story;
   }
   
   @override
@@ -112,10 +110,10 @@ class User extends Model {
   String toString() {
     var buffer = new StringBuffer();
     
-    buffer.write("User {");
+    buffer.write("UsersWriteStories {");
     buffer.write("id=" + "$id" + ", ");
-    buffer.write("name=" + "$_name" + ", ");
-    buffer.write("joinedAt=" + (_joinedAt != null ? _joinedAt!.format() : "null") + ", ");
+    buffer.write("user=" + (_user != null ? _user!.toString() : "null") + ", ");
+    buffer.write("story=" + (_story != null ? _story!.toString() : "null") + ", ");
     buffer.write("createdAt=" + (_createdAt != null ? _createdAt!.format() : "null") + ", ");
     buffer.write("updatedAt=" + (_updatedAt != null ? _updatedAt!.format() : "null"));
     buffer.write("}");
@@ -123,65 +121,63 @@ class User extends Model {
     return buffer.toString();
   }
   
-  User copyWith({String? name, TemporalDate? joinedAt, List<UsersWriteStories>? stories}) {
-    return User._internal(
+  UsersWriteStories copyWith({User? user, Story? story}) {
+    return UsersWriteStories._internal(
       id: id,
-      name: name ?? this.name,
-      joinedAt: joinedAt ?? this.joinedAt,
-      stories: stories ?? this.stories);
+      user: user ?? this.user,
+      story: story ?? this.story);
   }
   
-  User.fromJson(Map<String, dynamic> json)  
+  UsersWriteStories.fromJson(Map<String, dynamic> json)  
     : id = json['id'],
-      _name = json['name'],
-      _joinedAt = json['joinedAt'] != null ? TemporalDate.fromString(json['joinedAt']) : null,
-      _stories = json['stories'] is List
-        ? (json['stories'] as List)
-          .where((e) => e?['serializedData'] != null)
-          .map((e) => UsersWriteStories.fromJson(new Map<String, dynamic>.from(e['serializedData'])))
-          .toList()
+      _user = json['user']?['serializedData'] != null
+        ? User.fromJson(new Map<String, dynamic>.from(json['user']['serializedData']))
+        : null,
+      _story = json['story']?['serializedData'] != null
+        ? Story.fromJson(new Map<String, dynamic>.from(json['story']['serializedData']))
         : null,
       _createdAt = json['createdAt'] != null ? TemporalDateTime.fromString(json['createdAt']) : null,
       _updatedAt = json['updatedAt'] != null ? TemporalDateTime.fromString(json['updatedAt']) : null;
   
   Map<String, dynamic> toJson() => {
-    'id': id, 'name': _name, 'joinedAt': _joinedAt?.format(), 'stories': _stories?.map((UsersWriteStories? e) => e?.toJson()).toList(), 'createdAt': _createdAt?.format(), 'updatedAt': _updatedAt?.format()
+    'id': id, 'user': _user?.toJson(), 'story': _story?.toJson(), 'createdAt': _createdAt?.format(), 'updatedAt': _updatedAt?.format()
   };
   
   Map<String, Object?> toMap() => {
-    'id': id, 'name': _name, 'joinedAt': _joinedAt, 'stories': _stories, 'createdAt': _createdAt, 'updatedAt': _updatedAt
+    'id': id, 'user': _user, 'story': _story, 'createdAt': _createdAt, 'updatedAt': _updatedAt
   };
 
-  static final QueryModelIdentifier<UserModelIdentifier> MODEL_IDENTIFIER = QueryModelIdentifier<UserModelIdentifier>();
+  static final QueryModelIdentifier<UsersWriteStoriesModelIdentifier> MODEL_IDENTIFIER = QueryModelIdentifier<UsersWriteStoriesModelIdentifier>();
   static final QueryField ID = QueryField(fieldName: "id");
-  static final QueryField NAME = QueryField(fieldName: "name");
-  static final QueryField JOINEDAT = QueryField(fieldName: "joinedAt");
-  static final QueryField STORIES = QueryField(
-    fieldName: "stories",
-    fieldType: ModelFieldType(ModelFieldTypeEnum.model, ofModelName: 'UsersWriteStories'));
+  static final QueryField USER = QueryField(
+    fieldName: "user",
+    fieldType: ModelFieldType(ModelFieldTypeEnum.model, ofModelName: 'User'));
+  static final QueryField STORY = QueryField(
+    fieldName: "story",
+    fieldType: ModelFieldType(ModelFieldTypeEnum.model, ofModelName: 'Story'));
   static var schema = Model.defineSchema(define: (ModelSchemaDefinition modelSchemaDefinition) {
-    modelSchemaDefinition.name = "User";
-    modelSchemaDefinition.pluralName = "Users";
+    modelSchemaDefinition.name = "UsersWriteStories";
+    modelSchemaDefinition.pluralName = "UsersWriteStories";
+    
+    modelSchemaDefinition.indexes = [
+      ModelIndex(fields: const ["userId"], name: "byUser"),
+      ModelIndex(fields: const ["storyId"], name: "byStory")
+    ];
     
     modelSchemaDefinition.addField(ModelFieldDefinition.id());
     
-    modelSchemaDefinition.addField(ModelFieldDefinition.field(
-      key: User.NAME,
+    modelSchemaDefinition.addField(ModelFieldDefinition.belongsTo(
+      key: UsersWriteStories.USER,
       isRequired: true,
-      ofType: ModelFieldType(ModelFieldTypeEnum.string)
+      targetNames: ['userId'],
+      ofModelName: 'User'
     ));
     
-    modelSchemaDefinition.addField(ModelFieldDefinition.field(
-      key: User.JOINEDAT,
-      isRequired: false,
-      ofType: ModelFieldType(ModelFieldTypeEnum.date)
-    ));
-    
-    modelSchemaDefinition.addField(ModelFieldDefinition.hasMany(
-      key: User.STORIES,
-      isRequired: false,
-      ofModelName: 'UsersWriteStories',
-      associatedKey: UsersWriteStories.USER
+    modelSchemaDefinition.addField(ModelFieldDefinition.belongsTo(
+      key: UsersWriteStories.STORY,
+      isRequired: true,
+      targetNames: ['storyId'],
+      ofModelName: 'Story'
     ));
     
     modelSchemaDefinition.addField(ModelFieldDefinition.nonQueryField(
@@ -200,30 +196,30 @@ class User extends Model {
   });
 }
 
-class _UserModelType extends ModelType<User> {
-  const _UserModelType();
+class _UsersWriteStoriesModelType extends ModelType<UsersWriteStories> {
+  const _UsersWriteStoriesModelType();
   
   @override
-  User fromJson(Map<String, dynamic> jsonData) {
-    return User.fromJson(jsonData);
+  UsersWriteStories fromJson(Map<String, dynamic> jsonData) {
+    return UsersWriteStories.fromJson(jsonData);
   }
   
   @override
   String modelName() {
-    return 'User';
+    return 'UsersWriteStories';
   }
 }
 
 /**
  * This is an auto generated class representing the model identifier
- * of [User] in your schema.
+ * of [UsersWriteStories] in your schema.
  */
 @immutable
-class UserModelIdentifier implements ModelIdentifier<User> {
+class UsersWriteStoriesModelIdentifier implements ModelIdentifier<UsersWriteStories> {
   final String id;
 
-  /** Create an instance of UserModelIdentifier using [id] the primary key. */
-  const UserModelIdentifier({
+  /** Create an instance of UsersWriteStoriesModelIdentifier using [id] the primary key. */
+  const UsersWriteStoriesModelIdentifier({
     required this.id});
   
   @override
@@ -241,7 +237,7 @@ class UserModelIdentifier implements ModelIdentifier<User> {
   String serializeAsString() => serializeAsMap().values.join('#');
   
   @override
-  String toString() => 'UserModelIdentifier(id: $id)';
+  String toString() => 'UsersWriteStoriesModelIdentifier(id: $id)';
   
   @override
   bool operator ==(Object other) {
@@ -249,7 +245,7 @@ class UserModelIdentifier implements ModelIdentifier<User> {
       return true;
     }
     
-    return other is UserModelIdentifier &&
+    return other is UsersWriteStoriesModelIdentifier &&
       id == other.id;
   }
   
@@ -257,4 +253,3 @@ class UserModelIdentifier implements ModelIdentifier<User> {
   int get hashCode =>
     id.hashCode;
 }
->>>>>>> d43f899cef355c9fdb4a565efd8c754c0c2a095b

@@ -1,9 +1,16 @@
 import 'dart:developer';
 
+<<<<<<< HEAD
 import 'package:amplify_auth_cognito/amplify_auth_cognito.dart';
 import 'package:amplify_api/amplify_api.dart';
 import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:teia/amplify/amplifyconfiguration.dart';
+=======
+import 'package:amplify_api/amplify_api.dart';
+import 'package:amplify_auth_cognito/amplify_auth_cognito.dart';
+import 'package:amplify_flutter/amplify_flutter.dart';
+import 'package:teia/amplifyconfiguration.dart';
+>>>>>>> d43f899cef355c9fdb4a565efd8c754c0c2a095b
 
 class AmplifyService {
   static configure() async {
@@ -13,7 +20,11 @@ class AmplifyService {
       AmplifyAPI api = AmplifyAPI(modelProvider: ModelProvider.instance);
       await Amplify.addPlugins([
         amplifyAuthCognito,
+<<<<<<< HEAD
         //api,
+=======
+        api,
+>>>>>>> d43f899cef355c9fdb4a565efd8c754c0c2a095b
       ]);
 
       // Configure Amplify

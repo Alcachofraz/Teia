@@ -4,7 +4,11 @@
   "frontend": "flutter",
   "flutter": {
     "config": {
+<<<<<<< HEAD
       "ResDir": "./lib/amplify"
+=======
+      "ResDir": "./lib/"
+>>>>>>> d43f899cef355c9fdb4a565efd8c754c0c2a095b
     }
   },
   "providers": [
