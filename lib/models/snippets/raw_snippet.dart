@@ -1,5 +1,5 @@
 import 'package:teia/models/snippets/snippet.dart';
 
 class RawSnippet extends Snippet {
-  RawSnippet(text) : super(text);
+  RawSnippet(String text) : super(text);
 }

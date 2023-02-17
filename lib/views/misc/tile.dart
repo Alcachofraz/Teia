@@ -32,7 +32,7 @@ class Tile extends StatefulWidget {
     this.height,
     this.width,
     this.child,
-    this.borderSide = const BorderSide(),
+    this.borderSide = BorderSide.none,
     this.clickColor,
     this.hoverColor,
     this.onTap,

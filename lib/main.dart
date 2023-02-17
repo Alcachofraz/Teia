@@ -1,21 +1,19 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:teia/screens/graph_screen.dart';
-import 'package:teia/services/amplify_service.dart';
+import 'package:teia/firebase_options.dart';
+import 'package:teia/screens/chapter_editor_screen.dart';
 
 import 'package:teia/utils/swatch.dart';
 import 'package:teia/utils/utils.dart';
-
-import 'package:amplify_authenticator/amplify_authenticator.dart';
+import 'package:teia/views/auth/auth_gate.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   Utils.init();
-  await AmplifyService.configure();
-  runApp(
-    Authenticator(
-      child: const Teia(),
-    ),
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
   );
+  runApp(const Teia());
 }
 
 class Teia extends StatelessWidget {
@@ -30,22 +28,9 @@ class Teia extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: swatch(Colors.red[300]!),
       ),
-      builder: Authenticator.builder(),
-      home: const LandingPage(),
+      home: const AuthGate(
+        landingScreen: ChapterEditorScreen(),
+      ),
     );
-  }
-}
-
-class LandingPage extends StatefulWidget {
-  const LandingPage({Key? key}) : super(key: key);
-
-  @override
-  State<LandingPage> createState() => _LandingPageState();
-}
-
-class _LandingPageState extends State<LandingPage> {
-  @override
-  Widget build(BuildContext context) {
-    return const GraphScreen();
   }
 }

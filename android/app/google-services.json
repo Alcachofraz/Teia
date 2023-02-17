@@ -1,0 +1,69 @@
+{
+  "project_info": {
+    "project_number": "347930300612",
+    "firebase_url": "https://teia-f652a-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "teia-f652a",
+    "storage_bucket": "teia-f652a.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:347930300612:android:98d89784bc8fdb4f15f991",
+        "android_client_info": {
+          "package_name": "com.alcachofra.teia2"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "347930300612-5aq6120me28qelb7g0t4uv6plis1r9vc.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDFV3gf4hTOdojsyxXVvWoErXSTiCvUagA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "347930300612-5aq6120me28qelb7g0t4uv6plis1r9vc.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:347930300612:android:0431b3e232dbec6915f991",
+        "android_client_info": {
+          "package_name": "com.example.teia"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "347930300612-5aq6120me28qelb7g0t4uv6plis1r9vc.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDFV3gf4hTOdojsyxXVvWoErXSTiCvUagA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "347930300612-5aq6120me28qelb7g0t4uv6plis1r9vc.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

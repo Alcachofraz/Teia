@@ -11,10 +11,7 @@ class GraphPageNode extends StatefulWidget {
   final Color? clickColor;
   final Color? iconColor;
   final Function(int)? createPage;
-  final Function(int)? dissociatePage;
-  final Function(int)? connectPage;
-  final Function(int)? enterPage;
-  final bool simplified;
+  final Function(int)? clickPage;
 
   const GraphPageNode({
     Key? key,
@@ -25,10 +22,7 @@ class GraphPageNode extends StatefulWidget {
     this.iconColor,
     this.clickColor,
     this.createPage,
-    this.dissociatePage,
-    this.connectPage,
-    this.enterPage,
-    this.simplified = false,
+    this.clickPage,
   }) : super(key: key);
 
   @override
@@ -38,127 +32,59 @@ class GraphPageNode extends StatefulWidget {
 class _GraphPageNodeState extends State<GraphPageNode> {
   @override
   Widget build(BuildContext context) {
-    return widget.simplified
-        ? Padding(
-            padding: const EdgeInsets.only(bottom: 4.0),
-            child: Tile(
-              clickColor: widget.clickColor,
-              hoverColor: widget.hoverColor,
-              radiusAll: 8.0,
-              padding: EdgeInsets.zero,
-              borderSide: BorderSide(
-                color: widget.borderColor ?? Colors.black,
-                width: 1.5,
-              ),
-              onTap: () {
-                if (widget.enterPage != null) {
-                  widget.enterPage!(widget.id);
-                }
-              },
-              child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 24.0, horizontal: 28.0),
-                child: Text('Page ${widget.id}'),
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(bottom: 4.0),
+          child: Tile(
+            clickColor: widget.clickColor,
+            hoverColor: widget.hoverColor,
+            radiusAll: 8.0,
+            padding: EdgeInsets.zero,
+            borderSide: BorderSide(
+              color: widget.borderColor ?? Colors.black,
+              width: 1.5,
+            ),
+            onTap: () {
+              if (widget.clickPage != null) {
+                widget.clickPage!(widget.id);
+              }
+            },
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 24.0, horizontal: 28.0),
+              child: Text('Page ${widget.id}'),
+            ),
+          ),
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          mainAxisSize: MainAxisSize.max,
+          children: [
+            Tooltip(
+              message: 'Create new child',
+              child: TapIcon(
+                splashRadius: 4.0,
+                borderColor: widget.borderColor ?? Colors.black,
+                borderWidth: 1.5,
+                backgroundColor: widget.insideColor,
+                clickColor: widget.clickColor,
+                hoverColor: widget.hoverColor,
+                icon: Icon(
+                  MdiIcons.fileDocumentPlusOutline,
+                  size: 14.0,
+                  color: widget.iconColor,
+                ),
+                onTap: () {
+                  if (widget.createPage != null) {
+                    widget.createPage!(widget.id);
+                  }
+                },
               ),
             ),
-          )
-        : Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(bottom: 4.0),
-                child: Tile(
-                  clickColor: widget.clickColor,
-                  hoverColor: widget.hoverColor,
-                  radiusAll: 8.0,
-                  padding: EdgeInsets.zero,
-                  borderSide: BorderSide(
-                    color: widget.borderColor ?? Colors.black,
-                    width: 1.5,
-                  ),
-                  onTap: () {
-                    if (widget.enterPage != null) {
-                      widget.enterPage!(widget.id);
-                    }
-                  },
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 24.0, horizontal: 28.0),
-                    child: Text('Page ${widget.id}'),
-                  ),
-                ),
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                mainAxisSize: MainAxisSize.max,
-                children: [
-                  Tooltip(
-                    message: 'Dissociate from parent',
-                    child: TapIcon(
-                      splashRadius: 4.0,
-                      borderColor: widget.borderColor ?? Colors.black,
-                      borderWidth: 1.5,
-                      backgroundColor: widget.insideColor,
-                      clickColor: widget.clickColor,
-                      hoverColor: widget.hoverColor,
-                      icon: Icon(
-                        MdiIcons.contentCut,
-                        size: 14.0,
-                        color: widget.iconColor,
-                      ),
-                      onTap: () {
-                        if (widget.dissociatePage != null) {
-                          widget.dissociatePage!(widget.id);
-                        }
-                      },
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 4.0),
-                    child: Tooltip(
-                      message: 'Create new child',
-                      child: TapIcon(
-                        splashRadius: 4.0,
-                        borderColor: widget.borderColor ?? Colors.black,
-                        borderWidth: 1.5,
-                        backgroundColor: widget.insideColor,
-                        clickColor: widget.clickColor,
-                        hoverColor: widget.hoverColor,
-                        icon: Icon(
-                          MdiIcons.fileDocumentPlusOutline,
-                          size: 14.0,
-                          color: widget.iconColor,
-                        ),
-                        onTap: () {
-                          if (widget.createPage != null) {
-                            widget.createPage!(widget.id);
-                          }
-                        },
-                      ),
-                    ),
-                  ),
-                  Tooltip(
-                    message: 'Connect to child',
-                    child: TapIcon(
-                      splashRadius: 4.0,
-                      borderColor: widget.borderColor ?? Colors.black,
-                      borderWidth: 1.5,
-                      backgroundColor: widget.insideColor,
-                      clickColor: widget.clickColor,
-                      hoverColor: widget.hoverColor,
-                      icon: Icon(
-                        MdiIcons.transitConnectionVariant,
-                        size: 14.0,
-                        color: widget.iconColor,
-                      ),
-                      onTap: () {
-                        if (widget.connectPage != null) {
-                          widget.connectPage!(widget.id);
-                        }
-                      },
-                    ),
-                  ),
-                ],
-              )
-            ],
-          );
+          ],
+        )
+      ],
+    );
 
     /*Stack(
       children: [
