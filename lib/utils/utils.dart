@@ -11,11 +11,14 @@ class Utils {
   static late Color nodeHoverSplashColor;
   static late Color nodeClickSplashColor;
 
-  static late double graphPadding;
+  static const double graphPadding = 50.0;
+  static const double textEditorWeight = 0.5;
+  static const double collapseButtonSize = 32;
+  static const int textEditorAnimationDuration = 300;
+
+  static const textEditorStyle = TextStyle();
 
   static void init() {
-    graphPadding = 50.0;
-
     backgroundColor = swatch(const Color(0xffded2ba));
     nodeInsideColor = swatch(const Color(0xfff5f2eb));
     nodeBorderColor = swatch(const Color(0xff3c321d));

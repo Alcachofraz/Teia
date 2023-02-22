@@ -1,14 +1,19 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart' hide Page;
-import 'package:flutter_quill/flutter_quill.dart';
 import 'package:teia/models/page.dart';
+import 'package:fleather/fleather.dart';
 
 class TextEditor extends StatefulWidget {
   final Page page;
+  final Function(String)? onChanged;
+  final Function(TextSelection, SelectionChangedCause?)? onSelectionChanged;
+
   const TextEditor({
     super.key,
     required this.page,
+    this.onChanged,
+    this.onSelectionChanged,
   });
 
   @override
@@ -16,31 +21,40 @@ class TextEditor extends StatefulWidget {
 }
 
 class _TextEditorState extends State<TextEditor> {
-  final QuillController _controller = QuillController.basic();
+  //final TextEditingController _controller = TextEditingController();
+  final FocusNode _node = FocusNode();
+  final FleatherController _controller = FleatherController();
 
   @override
   void initState() {
-    _controller.onSelectionChanged = (selection) {
-      if (selection.baseOffset != selection.extentOffset) {
-        log(_controller.getPlainText());
-      }
-    };
-    _controller.document = Document()..insert(0, widget.page.getRawText());
+    /*_controller.addListener(() {
+      log('Listener!');
+    });*/
+    _controller.addListener(() {
+      log('Listener!');
+    });
     super.initState();
   }
 
   @override
+  void dispose() {
+    //_controller.dispose();
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Container(
-          color: Colors.white,
-          child: QuillEditor.basic(
-            controller: _controller,
-            readOnly: false, // true for view only mode
-          ),
-        ),
-      ],
-    );
+    return FleatherEditor(controller: _controller);
+    /*return TextField(
+      controller: _controller,
+      focusNode: _node,
+      style: Utils.textEditorStyle,
+      maxLines: null,
+      minLines: null,
+      decoration: const InputDecoration.collapsed(
+        hintText: 'Once upon a time...',
+      ),
+    );*/
   }
 }

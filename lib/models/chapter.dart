@@ -20,7 +20,7 @@ class Chapter {
       id,
       title,
       [
-        Page(1, [RawSnippet('Once upon a time...')]),
+        Page(1, [RawSnippet('')]),
       ],
       ChapterGraph({1: []}),
     );
@@ -31,7 +31,7 @@ class Chapter {
   /// Returns the created page id.
   int addPage(int id) {
     int newId = pages.length + 1;
-    pages.add(Page(newId, [RawSnippet('Once upon a time...')]));
+    pages.add(Page(newId, [RawSnippet('')]));
     graph.addConnection(id, newId);
     return newId;
   }
