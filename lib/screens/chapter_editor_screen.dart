@@ -1,8 +1,11 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart' hide Page;
 import 'package:teia/models/chapter.dart';
 import 'package:teia/models/page.dart';
 import 'package:teia/screens/chapter_graph.dart';
-import 'package:teia/screens/text_editor.dart';
+import 'package:teia/views/text_editor/page_edititing_controller.dart';
+import 'package:teia/views/text_editor/page_editor.dart';
 import 'package:teia/utils/utils.dart';
 import 'package:teia/views/misc/screen_wrapper.dart';
 import 'package:teia/views/misc/tile.dart';
@@ -18,21 +21,26 @@ class ChapterEditorScreen extends StatefulWidget {
 }
 
 class _ChapterEditorScreenState extends State<ChapterEditorScreen> {
-  final Chapter _chapter = Chapter.create(1, 'My chapter');
+  final Chapter _chapter = Chapter.create(1, 'storyId', 'My chapter');
   late double textEditorWeight;
   Page? selectedPage;
 
-  late MultiSplitViewController _multiSplitViewController;
+  final MultiSplitViewController _multiSplitViewController = MultiSplitViewController(
+    areas: [
+      Area(minimalWeight: 0.25, weight: 1 - Utils.textEditorWeight),
+      Area(minimalWeight: 0.25, weight: Utils.textEditorWeight),
+    ],
+  );
+
+  late PageEditingController _pageEditorController;
 
   @override
   void initState() {
     textEditorWeight = Utils.textEditorWeight;
-    _multiSplitViewController = MultiSplitViewController(
-      areas: [
-        Area(minimalWeight: 0.25, weight: 1 - Utils.textEditorWeight),
-        Area(minimalWeight: 0.25, weight: Utils.textEditorWeight),
-      ],
-    );
+    //_pageEditorController = PageEditingController(_chapter.pages.first.snippets);
+    _pageEditorController.addListener(() {
+      log('Listener!');
+    });
     super.initState();
   }
 
@@ -54,7 +62,6 @@ class _ChapterEditorScreenState extends State<ChapterEditorScreen> {
                 if (selectedPage!.id == pageId) {
                   return;
                 }
-                // Animate off and on!
                 setState(() {
                   selectedPage = null;
                 });
@@ -130,9 +137,12 @@ class _ChapterEditorScreenState extends State<ChapterEditorScreen> {
                                 child: Padding(
                                   padding: const EdgeInsets.fromLTRB(8.0, 0.0, 8.0, 8.0),
                                   child: selectedPage != null
-                                      ? TextEditor(page: selectedPage!)
+                                      ? PageEditor(
+                                          page: selectedPage!,
+                                          controller: _pageEditorController,
+                                        )
                                       : const Center(
-                                          child: Text('Nothing to be seen here.'),
+                                          child: Text('Hold on for a moment...'),
                                         ),
                                 ),
                               ),

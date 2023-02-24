@@ -2,8 +2,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart' hide Page;
 import 'package:teia/models/page.dart';
 import 'package:teia/models/snippets/choice_snippet.dart';
-import 'package:teia/models/snippets/raw_snippet.dart';
-import 'package:teia/models/snippets/secret_snippet.dart';
+import 'package:teia/models/snippets/text_snippet.dart';
 import 'package:teia/models/snippets/snippet.dart';
 
 class PageView extends StatefulWidget {
@@ -29,22 +28,17 @@ class _PageViewState extends State<PageView> {
   @override
   void initState() {
     for (Snippet snippet in widget.page.snippets) {
-      if (snippet is RawSnippet) {
+      if (snippet is TextSnippet) {
         snippets.add(TextSpan(text: snippet.text));
       } else if (snippet is ChoiceSnippet) {
         snippets.add(TextSpan(
           text: snippet.text,
           recognizer: TapGestureRecognizer()..onTap = widget.onChoice,
         ));
-      } else if (snippet is RawSnippet) {
+      } else if (snippet is TextSnippet) {
         snippets.add(TextSpan(
           text: snippet.text,
           recognizer: TapGestureRecognizer()..onTap = widget.onImage,
-        ));
-      } else if (snippet is SecretSnippet) {
-        snippets.add(TextSpan(
-          text: snippet.text,
-          recognizer: TapGestureRecognizer()..onTap = widget.onSecret,
         ));
       }
     }
