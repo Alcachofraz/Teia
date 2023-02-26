@@ -1,13 +1,17 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
-import 'package:teia/views/text_editor/text_part_style_definition.dart';
+import 'package:teia/models/snippets/snippet.dart';
 
 class PageEditingController extends TextEditingController {
-  final TextPartStyleDefinitions styles;
-  final Pattern combinedPattern;
+  int colorIterator = 0;
 
-  PageEditingController({
-    required this.styles,
-  }) : combinedPattern = styles.createCombinedPatternBasedOnStyleMap();
+  PageEditingController(/*{
+    required this.snippets,
+  }*/
+      );
+
+  int snippetIcons = 0;
 
   List<Color> highlightColors = [
     Colors.red[200]!,
@@ -15,28 +19,98 @@ class PageEditingController extends TextEditingController {
     Colors.green[200]!,
   ];
 
-  //List<Snippet> snippets;
+  @override
+  set value(TextEditingValue newValue) {
+    assert(
+      !newValue.composing.isValid || newValue.isComposingRangeValid,
+      'New TextEditingValue $newValue has an invalid non-empty composing range '
+      '${newValue.composing}. It is recommended to use a valid composing range, '
+      'even for readonly text fields',
+    );
 
-  /*void update(List<Snippet> snippets) {
+    super.value = newValue.copyWith(
+        selection: TextSelection(
+      baseOffset: newValue.selection.baseOffset + snippetIcons,
+      extentOffset: newValue.selection.extentOffset + snippetIcons,
+    ));
+  }
+
+  Color get highlightColor {
+    Color ret = highlightColors[colorIterator];
+    if (++colorIterator >= highlightColors.length) colorIterator = 0;
+    return ret;
+  }
+
+  List<Snippet> snippets = [];
+
+  @override
+  set text(String newText) {
+    log(newText);
+    value = value.copyWith(
+      text: newText,
+      selection: const TextSelection.collapsed(offset: -1),
+      composing: TextRange.empty,
+    );
+  }
+
+  set textSnippets(List<Snippet> snippets) {
     // String with full text
-    String text = '';
+    String fullText = '';
     // Update snippets
     this.snippets = snippets;
     for (var snippet in snippets) {
-      text += snippet.text;
+      fullText += snippet.text;
     }
-    // Iterate snipepts to generate new spans
     value = value.copyWith(
-      text: text,
+      text: fullText,
+      selection: const TextSelection.collapsed(offset: -1),
+      composing: TextRange.empty,
     );
-  }*/
+  }
 
   @override
   TextSpan buildTextSpan({required BuildContext context, TextStyle? style, required bool withComposing}) {
-    return TextSpan(style: style, children: [
-      TextSpan(text: text.substring(0, text.length > 2 ? 2 : text.length)),
-      if (text.length > 2) TextSpan(text: text.substring(2, text.length), style: const TextStyle(color: Colors.red)),
-    ]);
+    /*List<TextSpan> spans = [];
+    for (Snippet snippet in snippets) {
+      spans.add(TextSpan(text: snippet.text, style: snippet is TextSnippet ? TextStyle(color: highlightColor) : const TextStyle()));
+    }
+    return TextSpan(style: style, children: spans);*/
+    List<TextSpan> spans = [];
+    snippetIcons = 0;
+    text.splitMapJoin(
+      RegExp(
+        '[.,?!]|(?:(the|a|an) +)',
+        multiLine: true,
+        caseSensitive: false,
+      ),
+      onMatch: (Match match) {
+        final String textPart = match.group(0) ?? '';
+
+        snippetIcons++;
+
+        spans.add(
+          TextSpan(style: const TextStyle(color: Colors.blue), children: [
+            TextSpan(
+              text: textPart,
+            ),
+            const WidgetSpan(child: Icon(Icons.image)),
+          ]),
+        );
+
+        return '';
+      },
+      onNonMatch: (String text) {
+        spans.add(
+          TextSpan(
+            text: text,
+          ),
+        );
+
+        return '';
+      },
+    );
+
+    return TextSpan(style: style, children: spans);
   }
 
   /*@override

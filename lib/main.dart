@@ -1,12 +1,10 @@
 import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide Page;
 import 'package:teia/firebase_options.dart';
+import 'package:teia/screens/chapter_editor_screen.dart';
 import 'package:teia/utils/swatch.dart';
 
 import 'package:teia/utils/utils.dart';
-import 'package:teia/views/auth/auth_gate.dart';
-import 'package:teia/views/text_editor/page_edititing_controller.dart';
-import 'package:teia/views/text_editor/text_part_style_definition.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -29,55 +27,10 @@ class Teia extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: swatch(Colors.red[300]!),
       ),
-      home: const MyHomePage(),
+      home: const ChapterEditorScreen(),
     );
   }
 }
-
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({Key? key}) : super(key: key);
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  @override
-  Widget build(BuildContext context) {
-    final TextEditingController textEditingController = PageEditingController(
-      styles: TextPartStyleDefinitions(
-        definitionList: <TextPartStyleDefinition>[
-          TextPartStyleDefinition(
-            style: const TextStyle(
-              color: Colors.green,
-              fontWeight: FontWeight.bold,
-            ),
-            pattern: '[.,?!]',
-          ),
-          TextPartStyleDefinition(
-            style: const TextStyle(
-              color: Colors.red,
-              fontWeight: FontWeight.bold,
-            ),
-            pattern: '(?:(the|a|an) +)',
-          ),
-        ],
-      ),
-    );
-
-    return Scaffold(
-      body: Center(
-        child: TextField(
-          controller: textEditingController,
-          autocorrect: false,
-          enableSuggestions: false,
-          textCapitalization: TextCapitalization.none,
-        ),
-      ),
-    );
-  }
-}
-
 
 /*import 'dart:async';
 import 'package:firebase_core/firebase_core.dart';

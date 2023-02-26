@@ -15,6 +15,7 @@ class Utils {
   static const double textEditorWeight = 0.5;
   static const double collapseButtonSize = 32;
   static const int textEditorAnimationDuration = 300;
+  static const List<String> snippetColors = ['#f57c00', '#4caf50', '#2196f3'];
 
   static const textEditorStyle = TextStyle();
 
@@ -28,4 +29,7 @@ class Utils {
     nodeClickSplashColor = swatch(const Color(0xfff0ebe0));
     arrowColor = swatch(const Color(0xff3c321d));
   }
+
+  static String colorHex(Color color) =>
+      '#${color.red.toRadixString(16).padLeft(2, '0')}${color.green.toRadixString(16).padLeft(2, '0')}${color.blue.toRadixString(16).padLeft(2, '0')}';
 }

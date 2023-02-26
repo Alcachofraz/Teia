@@ -137,14 +137,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.0.2"
-  csslib:
-    dependency: transitive
-    description:
-      name: csslib
-      sha256: b36c7f7e24c0bdf1bf9a3da461c837d1de64b9f8beb190c9011d8c72a3dfd745
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.17.2"
   cupertino_icons:
     dependency: "direct main"
     description:
@@ -313,14 +305,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.2.3+30"
-  fleather:
-    dependency: "direct main"
-    description:
-      name: fleather
-      sha256: "6c0673d3d2eaa512958097a38992d6cb5e3d5d0332e321c10ea1074b95a30bc3"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.5.0"
   flutter:
     dependency: "direct main"
     description: flutter
@@ -533,14 +517,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.1.1"
-  html:
-    dependency: transitive
-    description:
-      name: html
-      sha256: d9793e10dbe0e6c364f4c59bf3e01fb33a9b2a674bc7a1081693dba0614b6269
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.15.1"
   http:
     dependency: transitive
     description:
@@ -589,6 +565,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.0.1"
+  logger:
+    dependency: "direct main"
+    description:
+      name: logger
+      sha256: c40f9ef51e5bffb4ce69ad2d8c8aad7bd47ec109c090521109b63a4e2bc27191
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.2.2"
   matcher:
     dependency: transitive
     description:
@@ -637,14 +621,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.1.0"
-  parchment:
-    dependency: transitive
-    description:
-      name: parchment
-      sha256: daf6e25bee9add7fee8addb2e5a78bfeb2714fe8f5079af1df49211416e03584
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.5.0"
   pasteboard:
     dependency: transitive
     description:
@@ -819,7 +795,7 @@ packages:
     source: hosted
     version: "0.4.16"
   tuple:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: tuple
       sha256: "0ea99cd2f9352b2586583ab2ce6489d1f95a5f6de6fb9492faaf97ae2060f0aa"

@@ -1,10 +1,7 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart' hide Page;
+import 'package:flutter_quill/flutter_quill.dart' hide Text;
 import 'package:teia/models/chapter.dart';
-import 'package:teia/models/page.dart';
 import 'package:teia/screens/chapter_graph.dart';
-import 'package:teia/views/text_editor/page_edititing_controller.dart';
 import 'package:teia/views/text_editor/page_editor.dart';
 import 'package:teia/utils/utils.dart';
 import 'package:teia/views/misc/screen_wrapper.dart';
@@ -23,7 +20,7 @@ class ChapterEditorScreen extends StatefulWidget {
 class _ChapterEditorScreenState extends State<ChapterEditorScreen> {
   final Chapter _chapter = Chapter.create(1, 'storyId', 'My chapter');
   late double textEditorWeight;
-  Page? selectedPage;
+  int? selectedPageId;
 
   final MultiSplitViewController _multiSplitViewController = MultiSplitViewController(
     areas: [
@@ -32,15 +29,11 @@ class _ChapterEditorScreenState extends State<ChapterEditorScreen> {
     ],
   );
 
-  late PageEditingController _pageEditorController;
+  final QuillController _controller = QuillController.basic();
 
   @override
   void initState() {
     textEditorWeight = Utils.textEditorWeight;
-    //_pageEditorController = PageEditingController(_chapter.pages.first.snippets);
-    _pageEditorController.addListener(() {
-      log('Listener!');
-    });
     super.initState();
   }
 
@@ -58,24 +51,24 @@ class _ChapterEditorScreenState extends State<ChapterEditorScreen> {
               });
             },
             clickPage: (pageId) {
-              if (selectedPage != null) {
-                if (selectedPage!.id == pageId) {
+              if (selectedPageId != null) {
+                if (selectedPageId == pageId) {
                   return;
                 }
                 setState(() {
-                  selectedPage = null;
+                  selectedPageId = null;
                 });
                 Future.delayed(
                   const Duration(milliseconds: Utils.textEditorAnimationDuration),
                   () {
                     setState(() {
-                      selectedPage = _chapter.pages[pageId - 1];
+                      selectedPageId = pageId - 1;
                     });
                   },
                 );
               } else {
                 setState(() {
-                  selectedPage = _chapter.pages[pageId - 1];
+                  selectedPageId = pageId - 1;
                 });
               }
             },
@@ -83,7 +76,7 @@ class _ChapterEditorScreenState extends State<ChapterEditorScreen> {
           AnimatedPositioned(
             duration: const Duration(milliseconds: Utils.textEditorAnimationDuration),
             curve: Curves.decelerate,
-            right: selectedPage == null ? -(MediaQuery.of(context).size.width * textEditorWeight) : 0,
+            right: selectedPageId == null ? -(MediaQuery.of(context).size.width * textEditorWeight) : 0,
             child: SizedBox(
               width: MediaQuery.of(context).size.width,
               height: MediaQuery.of(context).size.height,
@@ -110,45 +103,17 @@ class _ChapterEditorScreenState extends State<ChapterEditorScreen> {
                           ),
                           onTap: () {
                             setState(() {
-                              selectedPage = null;
+                              selectedPageId = null;
                             });
                           },
                         ),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.fromLTRB(8.0, 18.0, 16.0, 0.0),
-                                child: Text(
-                                  'Page ${selectedPage?.id ?? 1}',
-                                  style: TextStyle(
-                                    color: Utils.nodeBorderColor,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 18.0,
-                                  ),
+                        selectedPageId != null
+                            ? Expanded(
+                                child: PageEditor(
+                                  pageId: selectedPageId!.toString(),
                                 ),
-                              ),
-                              const Padding(
-                                padding: EdgeInsets.fromLTRB(8.0, 8.0, 0.0, 8.0),
-                                child: Divider(),
-                              ),
-                              Expanded(
-                                child: Padding(
-                                  padding: const EdgeInsets.fromLTRB(8.0, 0.0, 8.0, 8.0),
-                                  child: selectedPage != null
-                                      ? PageEditor(
-                                          page: selectedPage!,
-                                          controller: _pageEditorController,
-                                        )
-                                      : const Center(
-                                          child: Text('Hold on for a moment...'),
-                                        ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
+                              )
+                            : const SizedBox.expand(),
                       ],
                     ),
                   ),
