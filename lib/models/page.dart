@@ -9,15 +9,52 @@ class Page {
   final int id;
   final int chapterId;
   final String storyId;
+  final String? lastModifierUid;
 
   final List<Snippet> snippets;
 
-  Page(this.id, this.chapterId, this.storyId, this.snippets);
+  Page(this.id, this.chapterId, this.storyId, this.snippets, this.lastModifierUid);
 
-  factory Page.empty(int id, int chapterId, String storyId) {
-    return Page(id, chapterId, storyId, []);
+  /// Empty Page constructor. Instantiates a page with the specified
+  /// attributes and one empty TextSnippet.
+  ///
+  /// * [id] Id of the page to instantiate.
+  /// * [chapterId] Id of this page's chapter.
+  /// * [storyId] Id of this page's story.
+  /// * [uid] Uid of the user that is creating this page (optional).
+  factory Page.empty(int id, int chapterId, String storyId, {String? uid}) {
+    return Page(id, chapterId, storyId, [TextSnippet('')], uid);
   }
 
+  /// Map Page constructor. Instantiate a page from a
+  /// Map<String, dynamic> object.
+  factory Page.fromMap(Map<String, dynamic>? map) {
+    if (map == null) return Page(-1, -1, '', [], null);
+    return Page(
+      map['id'] as int,
+      map['chapterId'] as int,
+      map['storyId'] as String,
+      map['snippets'].map<Snippet>((snippet) {
+        if (snippet['type'] == 0) {
+          return TextSnippet(snippet['text']);
+        } else if (snippet['type'] == 1) {
+          return ChoiceSnippet(snippet['text'], snippet['choice']);
+        } else if (snippet['type'] == 2) {
+          return ImageSnippet(snippet['text'], snippet['url']);
+        } else {
+          return TextSnippet(''); // In case somethign goes wrong
+        }
+      }).toList(),
+      map['lastModifierUid'] as String,
+    );
+  }
+
+  /// Calculate length of this page. Iterates all
+  /// snippets and counts the number of characters.
+  int get length => snippets.fold<int>(0, (previous, snippet) => previous + snippet.text.length);
+
+  /// Get raw text of this page. Iterates all snippets
+  /// and concatenates all text.
   String getRawText() {
     String ret = '';
     for (Snippet snippet in snippets) {
@@ -26,6 +63,11 @@ class Page {
     return ret;
   }
 
+  /// Convert this page to a Quill Delta, giving a different
+  /// color to the special snippets' text, cycling through
+  /// [snippetColors].
+  ///
+  /// * [snippetColors] List of color codes for special snippets.
   Delta toDelta({List<String>? snippetColors = Utils.snippetColors}) {
     Delta ret = Delta();
     int index = 0;
@@ -49,8 +91,13 @@ class Page {
     return ret;
   }
 
-  List<Map<String, dynamic>> snippetsToMap() => snippets.map<Map<String, dynamic>>((snippet) => snippet.toMap()).toList();
+  /// Convert get a list of mapped snippets (instead of
+  /// Snippet objects). Each snippets is converted to a
+  /// Map<String, dynamic> object.
+  List<Map<String, dynamic>> snippetsToMap() =>
+      snippets.map<Map<String, dynamic>>((snippet) => snippet.toMap()).toList();
 
+  /// Convert this page to a Map<String, dynamic> object.
   Map<String, dynamic> toMap() => {'id': id, 'chapterId': chapterId, 'storyId': storyId, 'snippets': snippetsToMap()};
 
   List<Snippet> snippetsFromMap(List<Map<String, dynamic>> snippets) => snippets.map<Snippet>((snippet) {
@@ -65,28 +112,8 @@ class Page {
         }
       }).toList();
 
-  factory Page.fromMap(Map<String, dynamic>? map) {
-    if (map == null) return Page(-1, -1, '', []);
-    return Page(
-      map['id'] as int,
-      map['chapterId'] as int,
-      map['storyId'] as String,
-      map['snippets'].map<Snippet>((snippet) {
-        if (snippet['type'] == 0) {
-          return TextSnippet(snippet['text']);
-        } else if (snippet['type'] == 1) {
-          return ChoiceSnippet(snippet['text'], snippet['choice']);
-        } else if (snippet['type'] == 2) {
-          return ImageSnippet(snippet['text'], snippet['url']);
-        } else {
-          return TextSnippet(''); // In case somethign goes wrong
-        }
-      }).toList(),
-    );
-  }
-
   @override
   String toString() {
-    return 'Page{id: $id}';
+    return toMap().toString();
   }
 }

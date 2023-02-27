@@ -2,6 +2,7 @@ import 'package:flutter/material.dart' hide Page;
 import 'package:flutter_quill/flutter_quill.dart' hide Text;
 import 'package:teia/models/chapter.dart';
 import 'package:teia/screens/chapter_graph.dart';
+import 'package:teia/services/authentication_service.dart';
 import 'package:teia/views/text_editor/page_editor.dart';
 import 'package:teia/utils/utils.dart';
 import 'package:teia/views/misc/screen_wrapper.dart';
@@ -18,7 +19,7 @@ class ChapterEditorScreen extends StatefulWidget {
 }
 
 class _ChapterEditorScreenState extends State<ChapterEditorScreen> {
-  final Chapter _chapter = Chapter.create(1, 'storyId', 'My chapter');
+  final Chapter _chapter = Chapter.create(1, 'storyId', 'My chapter', AuthenticationService.uid);
   late double textEditorWeight;
   int? selectedPageId;
 
@@ -47,7 +48,7 @@ class _ChapterEditorScreenState extends State<ChapterEditorScreen> {
             chapter: _chapter,
             createPage: (pageId) {
               setState(() {
-                _chapter.addPage(pageId);
+                _chapter.addPage(pageId, AuthenticationService.uid);
               });
             },
             clickPage: (pageId) {
@@ -62,13 +63,13 @@ class _ChapterEditorScreenState extends State<ChapterEditorScreen> {
                   const Duration(milliseconds: Utils.textEditorAnimationDuration),
                   () {
                     setState(() {
-                      selectedPageId = pageId - 1;
+                      selectedPageId = pageId;
                     });
                   },
                 );
               } else {
                 setState(() {
-                  selectedPageId = pageId - 1;
+                  selectedPageId = pageId;
                 });
               }
             },
@@ -113,7 +114,7 @@ class _ChapterEditorScreenState extends State<ChapterEditorScreen> {
                                   pageId: selectedPageId!.toString(),
                                 ),
                               )
-                            : const SizedBox.expand(),
+                            : const SizedBox.shrink(),
                       ],
                     ),
                   ),

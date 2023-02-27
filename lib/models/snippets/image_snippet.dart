@@ -7,6 +7,7 @@ class ImageSnippet extends Snippet {
   @override
   Map<String, dynamic> toMap() => {
         'text': text,
+        'type': 2,
         'url': imageUrl,
       };
 }

@@ -7,6 +7,7 @@ class ChoiceSnippet extends Snippet {
   @override
   Map<String, dynamic> toMap() => {
         'text': text,
+        'type': 1,
         'choice': pageId,
       };
 }

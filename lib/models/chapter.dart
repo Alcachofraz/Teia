@@ -19,18 +19,24 @@ class Chapter {
     this.graph,
   );
 
-  factory Chapter.create(int id, String storyId, String title) {
+  factory Chapter.create(int id, String storyId, String title, String uid) {
     return Chapter(
       id,
       storyId,
       title,
       [
-        Page(1, [
-          TextSnippet('Olá. '),
-          ChoiceSnippet('Isto é uma escolha.', 2),
-          TextSnippet(' '),
-          ImageSnippet('Isto é uma imagem.', '')
-        ]),
+        Page(
+          1,
+          id,
+          storyId,
+          [
+            TextSnippet('Olá. '),
+            ChoiceSnippet('Isto é uma escolha.', 2),
+            TextSnippet(' '),
+            ImageSnippet('Isto é uma imagem.', '')
+          ],
+          uid,
+        ),
       ],
       ChapterGraph({1: []}),
     );
@@ -39,9 +45,15 @@ class Chapter {
   /// Create a new page.
   /// * [id] parent id.
   /// Returns the created page id.
-  int addPage(int id) {
+  int addPage(int id, String uid) {
     int newId = pages.length + 1;
-    pages.add(Page(newId, [TextSnippet('')]));
+    pages.add(Page(
+      newId,
+      id,
+      storyId,
+      [TextSnippet('')],
+      uid,
+    ));
     graph.addConnection(id, newId);
     return newId;
   }

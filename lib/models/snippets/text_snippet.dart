@@ -6,5 +6,6 @@ class TextSnippet extends Snippet {
   @override
   Map<String, dynamic> toMap() => {
         'text': text,
+        'type': 0,
       };
 }
