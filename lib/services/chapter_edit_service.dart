@@ -1,6 +1,5 @@
 import 'package:teia/models/page.dart';
 import 'package:teia/services/firebase/firestore_utils.dart';
-import 'package:teia/utils/logs.dart';
 
 class ChapterEditService {
   static Stream<Page> pageStream(
@@ -19,7 +18,7 @@ class ChapterEditService {
           .asyncMap((doc) => Page.fromMap(doc.data()));
 
   static Future<void> pageUpdate(Page page, String uid) async {
-    Logs.d('Sending $page');
+    //Logs.d('Sending $page');
     FirebaseUtils.firestore
         .collection('stories')
         .doc(page.storyId)

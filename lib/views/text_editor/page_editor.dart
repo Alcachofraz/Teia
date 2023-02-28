@@ -6,6 +6,7 @@ import 'package:flutter_quill/flutter_quill.dart' hide Text;
 import 'package:teia/models/snippets/snippet.dart';
 import 'package:teia/services/authentication_service.dart';
 import 'package:teia/services/chapter_edit_service.dart';
+import 'package:teia/utils/loading.dart';
 import 'package:teia/utils/logs.dart';
 import 'package:teia/utils/utils.dart';
 import 'dart:math' as math;
@@ -52,7 +53,7 @@ class _PageEditorState extends State<PageEditor> {
   }
 
   /// Currently totally replaces the document, initializing it again.
-  void _updateDocumentWithDelta(Delta delta) {
+  void _updateDocumentWithDelta(Delta delta, bool firstFecth) {
     // Store current selection
     final selection = _controller.selection;
     // Cancel previous subscription to changes
@@ -60,14 +61,21 @@ class _PageEditorState extends State<PageEditor> {
     // Initialize the document with the specified delta
     _controller.document = Document.fromDelta(delta);
     // Set selection to stored state
-    _controller.updateSelection(selection, ChangeSource.LOCAL);
+    if (firstFecth) {
+      _controller.moveCursorToEnd();
+    } else {
+      _controller.updateSelection(selection, ChangeSource.LOCAL);
+    }
     // Restart subscription to changes
     _documentChangesSubscription = _controller.document.changes.listen(_onLocalChange);
   }
 
+  /// Receive local document change.
+  ///
+  /// * [event] A tuple containing the deltas and change source.
   void _onLocalChange(Tuple3<Delta, Delta, ChangeSource> event) {
     if (page == null) return;
-    //
+    // Characters to skip.
     int skip = 0;
     for (Operation op in event.item2.toList()) {
       if (op.isRetain) {
@@ -93,13 +101,15 @@ class _PageEditorState extends State<PageEditor> {
     }
   }
 
-  /// Receive remote document change (Page object)
+  /// Receive remote document change (Page object).
   ///
   /// * [page] Page object containing the new [snippets] and the [lastModifierUid]
   void _onRemoteChange(Page page) {
-    // Ignore changes made by the user himself
-    if (page.lastModifierUid == AuthenticationService.uid && this.page != null) return;
-    Logs.d('Receiving $page');
+    // Ignore changes made by the user himself, as long
+    // as it's not the first fetch.
+    // If current editing page is null, it's the first fetch
+    bool firstFecth = this.page == null;
+    if (page.lastModifierUid == AuthenticationService.uid && !firstFecth) return;
     // Update page
     this.page = page;
     // Get page delta
@@ -107,7 +117,9 @@ class _PageEditorState extends State<PageEditor> {
     // Append new line (to soothe the Quill Document =-=)
     delta.push(Operation.insert('\n'));
     // Update document with receiving data
-    _updateDocumentWithDelta(delta);
+    _updateDocumentWithDelta(delta, firstFecth);
+
+    if (firstFecth) setState(() {});
   }
 
   void _onSelectionChanged(TextSelection selection) {
@@ -115,7 +127,6 @@ class _PageEditorState extends State<PageEditor> {
   }
 
   void _onInsert(int skip, String text) {
-    Logs.d('onInsert($skip, $text)');
     if (page == null) {
       Logs.e('Trying to insert on a null Page!');
       return;
@@ -209,12 +220,18 @@ class _PageEditorState extends State<PageEditor> {
           child: Divider(),
         ),
         Expanded(
-          child: Padding(
-              padding: const EdgeInsets.fromLTRB(8.0, 0.0, 8.0, 8.0),
-              child: QuillEditor.basic(
-                controller: _controller,
-                readOnly: false,
-              )),
+          child: page == null
+              ? loadingRotate()
+              : Padding(
+                  padding: const EdgeInsets.fromLTRB(8.0, 0.0, 8.0, 8.0),
+                  child: MouseRegion(
+                    cursor: SystemMouseCursors.text,
+                    child: QuillEditor.basic(
+                      controller: _controller,
+                      readOnly: false,
+                    ),
+                  ),
+                ),
         ),
       ],
     );
