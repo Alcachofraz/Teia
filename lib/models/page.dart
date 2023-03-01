@@ -63,6 +63,18 @@ class Page {
     return ret;
   }
 
+  /// Find the snippet that contains the character at [index].
+  Snippet findSnippet(int index) {
+    int skipped = 0;
+    try {
+      return snippets.firstWhere((snippet) {
+        return (skipped += snippet.text.length) >= index;
+      });
+    } catch (e) {
+      return snippets.last;
+    }
+  }
+
   /// Convert this page to a Quill Delta, giving a different
   /// color to the special snippets' text, cycling through
   /// [snippetColors].

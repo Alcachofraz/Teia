@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart' hide Page;
-import 'package:flutter_quill/flutter_quill.dart' hide Text;
 import 'package:teia/models/chapter.dart';
 import 'package:teia/screens/chapter_graph.dart';
 import 'package:teia/services/authentication_service.dart';
@@ -25,23 +24,21 @@ class _ChapterEditorScreenState extends State<ChapterEditorScreen> {
 
   final MultiSplitViewController _multiSplitViewController = MultiSplitViewController(
     areas: [
-      Area(minimalWeight: 0.25, weight: 1 - Utils.textEditorWeight),
-      Area(minimalWeight: 0.25, weight: Utils.textEditorWeight),
+      Area(minimalWeight: 1 - Utils.textEditorMaximumWeight, weight: 1 - Utils.textEditorDefaultWeight),
+      Area(minimalWeight: Utils.textEditorMinimumWeight, weight: Utils.textEditorDefaultWeight),
     ],
   );
 
-  final QuillController _controller = QuillController.basic();
-
   @override
   void initState() {
-    textEditorWeight = Utils.textEditorWeight;
+    textEditorWeight = Utils.textEditorDefaultWeight;
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     return ScreenWrapper(
-      backgroundColor: Utils.backgroundColor,
+      backgroundColor: Utils.graphSettings.backgroundColor,
       body: Stack(
         children: [
           ChapterGraph(

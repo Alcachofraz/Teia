@@ -61,7 +61,7 @@ class _ChapterGraphState extends State<ChapterGraph> {
           graph: graph,
           algorithm: algorithm,
           paint: Paint()
-            ..color = Utils.arrowColor
+            ..color = Utils.graphSettings.arrowColor
             ..strokeWidth = 1.5
             ..style = PaintingStyle.stroke,
           builder: (Node node) {
@@ -69,11 +69,11 @@ class _ChapterGraphState extends State<ChapterGraph> {
               padding: const EdgeInsets.only(left: 10.0, right: 10.0, bottom: 10.0),
               child: GraphPageNode(
                 id: node.key!.value as int,
-                insideColor: Utils.nodeInsideColor,
-                borderColor: Utils.nodeBorderColor,
-                hoverColor: Utils.nodeHoverSplashColor,
-                clickColor: Utils.nodeClickSplashColor,
-                iconColor: Utils.nodeIconColor,
+                insideColor: Utils.graphSettings.nodeInsideColor,
+                borderColor: Utils.graphSettings.nodeBorderColor,
+                hoverColor: Utils.graphSettings.nodeHoverSplashColor,
+                clickColor: Utils.graphSettings.nodeClickSplashColor,
+                iconColor: Utils.graphSettings.nodeIconColor,
                 clickPage: widget.clickPage,
                 createPage: widget.createPage,
               ),

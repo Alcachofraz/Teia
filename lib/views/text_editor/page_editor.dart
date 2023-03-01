@@ -9,6 +9,7 @@ import 'package:teia/services/chapter_edit_service.dart';
 import 'package:teia/utils/loading.dart';
 import 'package:teia/utils/logs.dart';
 import 'package:teia/utils/utils.dart';
+import 'package:teia/views/misc/tile.dart';
 import 'dart:math' as math;
 import 'package:tuple/tuple.dart';
 
@@ -25,14 +26,21 @@ class PageEditor extends StatefulWidget {
 }
 
 class _PageEditorState extends State<PageEditor> {
+  final FocusNode _focusNodes = FocusNode();
   late QuillController _controller;
   late StreamSubscription _documentChangesSubscription;
   late StreamSubscription _pageSubscription;
+  late ScrollController _scrollController;
 
   Page? page;
 
+  TextSelection? _selection;
+  Snippet? _atSnippet;
+
   @override
   void initState() {
+    // Scroll controller
+    _scrollController = ScrollController();
     // Initialize controller
     _controller = QuillController.basic();
     // Listen to delta changes with _onLocalChange
@@ -124,6 +132,17 @@ class _PageEditorState extends State<PageEditor> {
 
   void _onSelectionChanged(TextSelection selection) {
     //Logs.d('${selection.baseOffset}');
+    if (selection.baseOffset != selection.extentOffset) {
+      // Selecting text
+      _selection = selection;
+    } else {
+      // Positioning cursor
+      if (page == null) return;
+      // Find local snippet
+      setState(() {
+        _atSnippet = page!.findSnippet(selection.baseOffset);
+      });
+    }
   }
 
   void _onInsert(int skip, String text) {
@@ -209,7 +228,7 @@ class _PageEditorState extends State<PageEditor> {
           child: Text(
             'Page ${widget.pageId}',
             style: TextStyle(
-              color: Utils.nodeBorderColor,
+              color: Utils.graphSettings.nodeBorderColor,
               fontWeight: FontWeight.bold,
               fontSize: 18.0,
             ),
@@ -226,13 +245,23 @@ class _PageEditorState extends State<PageEditor> {
                   padding: const EdgeInsets.fromLTRB(8.0, 0.0, 8.0, 8.0),
                   child: MouseRegion(
                     cursor: SystemMouseCursors.text,
-                    child: QuillEditor.basic(
+                    child: QuillEditor(
                       controller: _controller,
                       readOnly: false,
+                      expands: true,
+                      autoFocus: false,
+                      focusNode: _focusNodes,
+                      padding: EdgeInsets.zero,
+                      scrollable: true,
+                      scrollController: _scrollController,
                     ),
                   ),
                 ),
         ),
+        if (_atSnippet != null)
+          Tile(
+            child: Text(_atSnippet!.text),
+          ),
       ],
     );
   }
