@@ -40,7 +40,8 @@ class _ChapterGraphState extends State<ChapterGraph> {
       ..subtreeSeparation = (150)
       ..orientation = (BuchheimWalkerConfiguration.ORIENTATION_TOP_BOTTOM);
 
-    Algorithm algorithm = BuchheimWalkerAlgorithm(builder, ArrowEdgeRenderer());
+    //Algorithm algorithm = BuchheimWalkerAlgorithm(builder, ArrowEdgeRenderer());
+    Algorithm algorithm = BuchheimWalkerAlgorithm(builder, TreeEdgeRenderer(builder));
 
     return [graph, algorithm];
   }

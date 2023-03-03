@@ -29,12 +29,7 @@ class Chapter {
           1,
           id,
           storyId,
-          [
-            TextSnippet('Olá. '),
-            ChoiceSnippet('Isto é uma escolha.', 2),
-            TextSnippet(' '),
-            ImageSnippet('Isto é uma imagem.', '')
-          ],
+          [TextSnippet('Olá. '), ChoiceSnippet('Isto é uma escolha.', 2), TextSnippet(' '), ImageSnippet('Isto é uma imagem.', '')],
           uid,
         ),
       ],
@@ -56,6 +51,11 @@ class Chapter {
     ));
     graph.addConnection(id, newId);
     return newId;
+  }
+
+  /// Connect page [from] to [to].
+  bool connectPages(int from, int to) {
+    return graph.addConnection(from, to);
   }
 
   /// Check if page is last in chapter.

@@ -9,7 +9,6 @@ import 'package:teia/services/chapter_edit_service.dart';
 import 'package:teia/utils/loading.dart';
 import 'package:teia/utils/logs.dart';
 import 'package:teia/utils/utils.dart';
-import 'package:teia/views/misc/tile.dart';
 import 'dart:math' as math;
 import 'package:tuple/tuple.dart';
 
@@ -130,21 +129,6 @@ class _PageEditorState extends State<PageEditor> {
     if (firstFecth) setState(() {});
   }
 
-  void _onSelectionChanged(TextSelection selection) {
-    //Logs.d('${selection.baseOffset}');
-    if (selection.baseOffset != selection.extentOffset) {
-      // Selecting text
-      _selection = selection;
-    } else {
-      // Positioning cursor
-      if (page == null) return;
-      // Find local snippet
-      setState(() {
-        _atSnippet = page!.findSnippet(selection.baseOffset);
-      });
-    }
-  }
-
   void _onInsert(int skip, String text) {
     if (page == null) {
       Logs.e('Trying to insert on a null Page!');
@@ -218,6 +202,53 @@ class _PageEditorState extends State<PageEditor> {
     ChapterEditService.pageUpdate(page!, AuthenticationService.uid);
   }
 
+  void _showTextSelectionControls() {
+    final RenderBox overlay = Overlay.of(context).context.findRenderObject() as RenderBox;
+
+    showMenu(
+      context: context,
+      items: [PlusMinusEntry()],
+      position: RelativeRect.fromRect(
+          _tapPosition & const Size(40, 40), // smaller rect, the touch area
+          Offset.zero & overlay.size   // Bigger rect, the entire screen
+      )
+    )
+    // This is how you handle user selection
+    .then<void>((int delta) {
+      // delta would be null if user taps on outside the popup menu
+      // (causing it to close without making selection)
+      if (delta == null) return;
+
+      setState(() {
+        _count = _count + delta;
+      });
+    });
+
+    // Another option:
+    //
+    // final delta = await showMenu(...);
+    //
+    // Then process `delta` however you want.
+    // Remember to make the surrounding function `async`, that is:
+    //
+    // void _showCustomMenu() async { ... }
+  }
+
+  void _onSelectionChanged(TextSelection selection) {
+    //Logs.d('${selection.baseOffset}');
+    if (selection.baseOffset != selection.extentOffset) {
+      // Selecting text
+      _selection = selection;
+    } else {
+      // Positioning cursor
+      if (page == null) return;
+      // Find local snippet
+      setState(() {
+        _atSnippet = page!.findSnippet(selection.baseOffset);
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -244,7 +275,7 @@ class _PageEditorState extends State<PageEditor> {
               : Padding(
                   padding: const EdgeInsets.fromLTRB(8.0, 0.0, 8.0, 8.0),
                   child: MouseRegion(
-                    cursor: SystemMouseCursors.text,
+                    //cursor: SystemMouseCursors.text,
                     child: QuillEditor(
                       controller: _controller,
                       readOnly: false,
@@ -254,14 +285,12 @@ class _PageEditorState extends State<PageEditor> {
                       padding: EdgeInsets.zero,
                       scrollable: true,
                       scrollController: _scrollController,
+                      textSelectionControls: MaterialTextSelectionControls(),
+                      floatingCursorDisabled: true,
                     ),
                   ),
                 ),
         ),
-        if (_atSnippet != null)
-          Tile(
-            child: Text(_atSnippet!.text),
-          ),
       ],
     );
   }
