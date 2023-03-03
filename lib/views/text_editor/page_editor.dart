@@ -9,6 +9,7 @@ import 'package:teia/services/chapter_edit_service.dart';
 import 'package:teia/utils/loading.dart';
 import 'package:teia/utils/logs.dart';
 import 'package:teia/utils/utils.dart';
+import 'package:teia/views/misc/tile.dart';
 import 'dart:math' as math;
 import 'package:tuple/tuple.dart';
 
@@ -202,52 +203,44 @@ class _PageEditorState extends State<PageEditor> {
     ChapterEditService.pageUpdate(page!, AuthenticationService.uid);
   }
 
-  void _showTextSelectionControls() {
-    final RenderBox overlay = Overlay.of(context).context.findRenderObject() as RenderBox;
-
-    showMenu(
-      context: context,
-      items: [PlusMinusEntry()],
-      position: RelativeRect.fromRect(
-          _tapPosition & const Size(40, 40), // smaller rect, the touch area
-          Offset.zero & overlay.size   // Bigger rect, the entire screen
-      )
-    )
-    // This is how you handle user selection
-    .then<void>((int delta) {
-      // delta would be null if user taps on outside the popup menu
-      // (causing it to close without making selection)
-      if (delta == null) return;
-
-      setState(() {
-        _count = _count + delta;
-      });
-    });
-
-    // Another option:
-    //
-    // final delta = await showMenu(...);
-    //
-    // Then process `delta` however you want.
-    // Remember to make the surrounding function `async`, that is:
-    //
-    // void _showCustomMenu() async { ... }
-  }
+  static const Map<String, IconData> _options = {
+    'Settings': Icons.favorite_border,
+    'Share': Icons.bookmark_border,
+    'Logout': Icons.share,
+  };
 
   void _onSelectionChanged(TextSelection selection) {
     //Logs.d('${selection.baseOffset}');
     if (selection.baseOffset != selection.extentOffset) {
       // Selecting text
-      _selection = selection;
+      setState(() {
+        _atSnippet = null;
+        _selection = selection;
+      });
     } else {
       // Positioning cursor
       if (page == null) return;
       // Find local snippet
       setState(() {
+        _selection = null;
         _atSnippet = page!.findSnippet(selection.baseOffset);
       });
     }
   }
+
+  Widget _textSelectionOptions() => Tile(
+        padding: EdgeInsets.zero,
+        color: Colors.white,
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Wrap(
+            children: const [
+              Chip(label: Text('Choice')),
+              Chip(label: Text('Image')),
+            ],
+          ),
+        ),
+      );
 
   @override
   Widget build(BuildContext context) {
@@ -286,10 +279,21 @@ class _PageEditorState extends State<PageEditor> {
                       scrollable: true,
                       scrollController: _scrollController,
                       textSelectionControls: MaterialTextSelectionControls(),
-                      floatingCursorDisabled: true,
                     ),
                   ),
                 ),
+        ),
+        AnimatedSize(
+          duration: const Duration(milliseconds: 250),
+          curve: Curves.decelerate,
+          child: _selection != null
+              ? Row(
+                  mainAxisSize: MainAxisSize.max,
+                  children: [
+                    Expanded(child: _textSelectionOptions()),
+                  ],
+                )
+              : Row(children: const [SizedBox.shrink()]),
         ),
       ],
     );
