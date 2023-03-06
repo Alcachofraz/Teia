@@ -17,10 +17,12 @@ class Tile extends StatefulWidget {
   final Color? clickColor;
   final Color? hoverColor;
   final GestureTapCallback? onTap;
+  final double? elevation;
 
   const Tile({
     Key? key,
     this.padding,
+    this.elevation,
     this.color = Colors.white,
     this.radiusTopLeft = 0.0,
     this.radiusTopRight = 0.0,
@@ -54,6 +56,7 @@ class _TileState extends State<Tile> {
     return Card(
       margin: widget.padding,
       color: widget.color,
+      elevation: widget.elevation,
       shape: RoundedRectangleBorder(
         borderRadius: borderRadius,
         side: widget.borderSide,

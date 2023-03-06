@@ -95,6 +95,7 @@ class _ChapterEditorScreenState extends State<ChapterEditorScreen> {
                       children: [
                         Tile(
                           padding: EdgeInsets.zero,
+                          elevation: 0.0,
                           child: const Icon(
                             Icons.keyboard_arrow_right_rounded,
                             size: Utils.collapseButtonSize,

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:flutter/material.dart' hide Page;
 import 'package:teia/models/page.dart';
@@ -9,7 +10,6 @@ import 'package:teia/services/chapter_edit_service.dart';
 import 'package:teia/utils/loading.dart';
 import 'package:teia/utils/logs.dart';
 import 'package:teia/utils/utils.dart';
-import 'package:teia/views/misc/tile.dart';
 import 'dart:math' as math;
 import 'package:tuple/tuple.dart';
 
@@ -228,19 +228,41 @@ class _PageEditorState extends State<PageEditor> {
     }
   }
 
-  Widget _textSelectionOptions() => Tile(
+  Widget _textSelectionOptions() => const SizedBox
+      .shrink(); /* Tile(
         padding: EdgeInsets.zero,
-        color: Colors.white,
+        color: Utils.graphSettings.backgroundColor,
+        elevation: 0.0,
+        radiusTopLeft: 16.0,
+        radiusTopRight: 16.0,
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Wrap(
-            children: const [
-              Chip(label: Text('Choice')),
-              Chip(label: Text('Image')),
+            spacing: 8.0,
+            runSpacing: 8.0,
+            children: [
+              Tile(
+                radiusAll: 100,
+                color: Colors.white,
+                child: const Padding(
+                  padding: EdgeInsets.all(4.0),
+                  child: Text('Choice'),
+                ),
+                onTap: () {},
+              ),
+              Tile(
+                radiusAll: 100,
+                color: Colors.white,
+                child: const Padding(
+                  padding: EdgeInsets.all(4.0),
+                  child: Text('Image'),
+                ),
+                onTap: () {},
+              ),
             ],
           ),
         ),
-      );
+      );*/
 
   @override
   Widget build(BuildContext context) {
@@ -278,12 +300,15 @@ class _PageEditorState extends State<PageEditor> {
                       padding: EdgeInsets.zero,
                       scrollable: true,
                       scrollController: _scrollController,
-                      textSelectionControls: MaterialTextSelectionControls(),
+                      onTapDown: (details, position) {
+                        log((_selection == null).toString());
+                        return true;
+                      },
                     ),
                   ),
                 ),
         ),
-        AnimatedSize(
+        /*AnimatedSize(
           duration: const Duration(milliseconds: 250),
           curve: Curves.decelerate,
           child: _selection != null
@@ -293,8 +318,12 @@ class _PageEditorState extends State<PageEditor> {
                     Expanded(child: _textSelectionOptions()),
                   ],
                 )
-              : Row(children: const [SizedBox.shrink()]),
-        ),
+              : Row(
+                  children: const [
+                    SizedBox.shrink(),
+                  ],
+                ),
+        ),*/
       ],
     );
   }
