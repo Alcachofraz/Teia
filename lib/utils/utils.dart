@@ -31,6 +31,10 @@ class Utils {
   static const double textEditorDefaultWeight = 0.5;
   static const double textEditorMaximumWeight = 0.85;
   static const double textEditorMinimumWeight = 0.45;
+  static const double loosePagesMenuDefaultHeight = 0.5;
+  static const double loosePagesMenuMaximumHeight = 0.8;
+  static const double loosePagesMenuMinimumHeight = 0.35;
+  static const double dividerThickness = 16.0;
   static const int textEditorAnimationDuration = 300;
   static const double collapseButtonSize = 32;
   static const List<String> snippetColors = ['#f57c00', '#4caf50', '#2196f3'];

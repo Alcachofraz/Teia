@@ -20,22 +20,45 @@ class ChapterEditorScreen extends StatefulWidget {
 class _ChapterEditorScreenState extends State<ChapterEditorScreen> {
   final Chapter _chapter = Chapter.create(1, 'storyId', 'My chapter', AuthenticationService.uid);
   late double textEditorWeight;
+  late double loosePagesMenuHeight;
   int? selectedPageId;
   bool showingLoosePages = false;
   final FocusNode pageEditorFocusNode = FocusNode();
 
-  final MultiSplitViewController _multiSplitViewController = MultiSplitViewController(
+  final MultiSplitViewController _textEditorMultiSplitViewController = MultiSplitViewController(
     areas: [
       Area(minimalWeight: 1 - Utils.textEditorMaximumWeight, weight: 1 - Utils.textEditorDefaultWeight),
       Area(minimalWeight: Utils.textEditorMinimumWeight, weight: Utils.textEditorDefaultWeight),
     ],
   );
 
+  final MultiSplitViewController _loosePagesMultiSplitViewController = MultiSplitViewController(
+    areas: [
+      Area(minimalWeight: 1 - Utils.loosePagesMenuMaximumHeight, weight: 1 - Utils.loosePagesMenuDefaultHeight),
+      Area(minimalWeight: Utils.loosePagesMenuMinimumHeight, weight: Utils.loosePagesMenuDefaultHeight),
+    ],
+  );
+
   @override
   void initState() {
     textEditorWeight = Utils.textEditorDefaultWeight;
+    loosePagesMenuHeight = Utils.loosePagesMenuDefaultHeight;
     super.initState();
   }
+
+  Widget _dividerBuilder(bool vertical, axis, index, resizable, dragging, highlighted, themeData) => resizable
+      ? Container(
+          color: dragging ? Colors.grey[300] : Colors.grey[100],
+          child: RotatedBox(
+            quarterTurns: vertical ? 0 : 1,
+            child: Icon(
+              Icons.drag_indicator,
+              size: Utils.dividerThickness,
+              color: highlighted ? Colors.grey[600] : Colors.grey[400],
+            ),
+          ),
+        )
+      : const SizedBox.shrink();
 
   Widget _chapterGraph() => ChapterGraph(
         chapter: _chapter,
@@ -76,42 +99,69 @@ class _ChapterEditorScreenState extends State<ChapterEditorScreen> {
   Widget _loosePages() => AnimatedPositioned(
         duration: const Duration(milliseconds: Utils.textEditorAnimationDuration),
         curve: Curves.decelerate,
-        bottom: showingLoosePages ? 0 : -(MediaQuery.of(context).size.height / 2),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Tile(
-              padding: EdgeInsets.zero,
-              onTap: () {
-                setState(() {
-                  showingLoosePages = !showingLoosePages;
-                });
-              },
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(8.0, 8.0, 16.0, 8.0),
-                child: Row(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.only(right: 4.0),
-                      child: Icon(showingLoosePages ? Icons.arrow_downward : Icons.arrow_upward),
+        bottom: showingLoosePages ? 0 : -(MediaQuery.of(context).size.height * loosePagesMenuHeight) + 48.0,
+        child: AnimatedSize(
+          duration: const Duration(milliseconds: Utils.textEditorAnimationDuration),
+          curve: Curves.decelerate,
+          child: SizedBox(
+            width: MediaQuery.of(context).size.width * (1 - textEditorWeight),
+            height: MediaQuery.of(context).size.height,
+            child: MultiSplitViewTheme(
+              data: MultiSplitViewThemeData(dividerThickness: Utils.dividerThickness),
+              child: MultiSplitView(
+                axis: Axis.vertical,
+                resizable: showingLoosePages,
+                onWeightChange: () {
+                  setState(() {
+                    loosePagesMenuHeight = _loosePagesMultiSplitViewController.areas[1].weight!;
+                  });
+                },
+                dividerBuilder: (axis, index, resizable, dragging, highlighted, themeData) =>
+                    _dividerBuilder(false, axis, index, resizable, dragging, highlighted, themeData),
+                controller: _loosePagesMultiSplitViewController,
+                children: [
+                  const SizedBox.shrink(),
+                  Container(
+                    color: Colors.white,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      mainAxisSize: MainAxisSize.max,
+                      children: [
+                        TextButton(
+                          onPressed: () => setState(() {
+                            showingLoosePages = !showingLoosePages;
+                          }),
+                          child: Padding(
+                            padding: const EdgeInsets.fromLTRB(8.0, 8.0, 16.0, 8.0),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.max,
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.only(right: 4.0),
+                                  child: Icon(showingLoosePages ? Icons.arrow_downward : Icons.arrow_upward),
+                                ),
+                                const Expanded(
+                                    child: Text(
+                                  'All pages',
+                                  textAlign: TextAlign.left,
+                                )),
+                              ],
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          child: ListView(
+                            children: const [],
+                          ),
+                        ),
+                      ],
                     ),
-                    const Text('All pages'),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
-            Container(
-              decoration: const BoxDecoration(
-                color: Colors.white,
-              ),
-              width: MediaQuery.of(context).size.width * (1 - Utils.textEditorDefaultWeight),
-              height: MediaQuery.of(context).size.height / 2,
-              child: ListView(
-                children: const [],
-              ),
-            ),
-          ],
+          ),
         ),
       );
 
@@ -122,46 +172,51 @@ class _ChapterEditorScreenState extends State<ChapterEditorScreen> {
         child: SizedBox(
           width: MediaQuery.of(context).size.width,
           height: MediaQuery.of(context).size.height,
-          child: MultiSplitView(
-            controller: _multiSplitViewController,
-            onWeightChange: () {
-              setState(() {
-                textEditorWeight = _multiSplitViewController.areas[1].weight!;
-              });
-            },
-            children: [
-              const SizedBox.shrink(),
-              Container(
-                color: Colors.white,
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  mainAxisSize: MainAxisSize.max,
-                  children: [
-                    Tile(
-                      padding: EdgeInsets.zero,
-                      elevation: 0.0,
-                      child: const Icon(
-                        Icons.keyboard_arrow_right_rounded,
-                        size: Utils.collapseButtonSize,
+          child: MultiSplitViewTheme(
+            data: MultiSplitViewThemeData(dividerThickness: Utils.dividerThickness),
+            child: MultiSplitView(
+              controller: _textEditorMultiSplitViewController,
+              onWeightChange: () {
+                setState(() {
+                  textEditorWeight = _textEditorMultiSplitViewController.areas[1].weight!;
+                });
+              },
+              dividerBuilder: (axis, index, resizable, dragging, highlighted, themeData) =>
+                  _dividerBuilder(true, axis, index, resizable, dragging, highlighted, themeData),
+              children: [
+                const SizedBox.shrink(),
+                Container(
+                  color: Colors.white,
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    mainAxisSize: MainAxisSize.max,
+                    children: [
+                      Tile(
+                        padding: EdgeInsets.zero,
+                        elevation: 0.0,
+                        child: const Icon(
+                          Icons.keyboard_arrow_right_rounded,
+                          size: Utils.collapseButtonSize,
+                        ),
+                        onTap: () {
+                          setState(() {
+                            selectedPageId = null;
+                          });
+                        },
                       ),
-                      onTap: () {
-                        setState(() {
-                          selectedPageId = null;
-                        });
-                      },
-                    ),
-                    selectedPageId != null
-                        ? Expanded(
-                            child: PageEditor(
-                              pageId: selectedPageId!.toString(),
-                              focusNode: pageEditorFocusNode,
-                            ),
-                          )
-                        : const SizedBox.shrink(),
-                  ],
+                      selectedPageId != null
+                          ? Expanded(
+                              child: PageEditor(
+                                pageId: selectedPageId!.toString(),
+                                focusNode: pageEditorFocusNode,
+                              ),
+                            )
+                          : const SizedBox.shrink(),
+                    ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       );
