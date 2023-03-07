@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:developer';
 
 import 'package:flutter/material.dart' hide Page;
 import 'package:teia/models/page.dart';
@@ -10,7 +9,7 @@ import 'package:teia/services/chapter_edit_service.dart';
 import 'package:teia/utils/loading.dart';
 import 'package:teia/utils/logs.dart';
 import 'package:teia/utils/utils.dart';
-import 'dart:math' as math;
+import 'package:teia/views/misc/tile.dart';
 import 'package:tuple/tuple.dart';
 
 class PageEditor extends StatefulWidget {
@@ -130,84 +129,27 @@ class _PageEditorState extends State<PageEditor> {
     if (firstFecth) setState(() {});
   }
 
+  /// On document insert.
   void _onInsert(int skip, String text) {
     if (page == null) {
       Logs.e('Trying to insert on a null Page!');
       return;
     }
-    int aux = 0; // Current snippet first character index
-    for (Snippet snippet in page!.snippets) {
-      // Length of current snippet
-      int snippetLength = snippet.text.length;
-      if (skip >= aux && skip <= aux + snippetLength) {
-        // If skip (number of characters to skip before start inserting), is
-        // inside this snippet ([aux + snippetLength] is the last character
-        // of this snippet)
-
-        // Text before the text to insert
-        String textBefore = snippet.text.substring(0, skip - aux);
-        // Text after the text to insert
-        String textAfter = snippet.text.substring(skip - aux, snippetLength);
-        // Concatenate and assign all text
-        snippet.text = textBefore + text + textAfter;
-        break;
-      }
-      aux += snippetLength;
-    }
+    page!.insert(skip, text);
     //page!.snippets.removeWhere((s) => s.text.isEmpty);
     ChapterEditService.pageUpdate(page!, AuthenticationService.uid);
   }
 
+  /// On document delete.
   void _onDelete(int skip, int length) {
     if (page == null) {
       Logs.e('Trying to insert on a null Page!');
       return;
     }
-    int aux = 0; // Current snippet first character index
-    int deleted = 0; // Deleted characters so far
-    for (Snippet snippet in page!.snippets) {
-      int snippetLength = snippet.text.length; // Current snippet length
-      if (deleted != 0) {
-        // If already started deleting
-
-        // Index of last character to remove in THIS SNIPPET
-        int end = math.min(length - deleted, snippetLength);
-        // Remove designated text
-        snippet.text = snippet.text.substring(end, snippetLength);
-        // Update deleted
-        deleted += end;
-      } else if (skip >= aux && skip <= aux + snippetLength) {
-        // If skip (number of characters to skip before start deleting), is
-        // inside this snippet ([aux + snippetLength] is the last character
-        // of this snippet)
-
-        // Index of first character to remove
-        int start = skip - aux;
-        // Text before the text to remove (to keep)
-        String textBefore = snippet.text.substring(0, start);
-        // Index of last character to remove in THIS SNIPPET
-        int end = math.min(start + length, snippetLength);
-        // Text before the text to remove (to keep)
-        String textAfter = snippet.text.substring(end, snippetLength);
-        // Concatenate and assign all text to keep
-        snippet.text = textBefore + textAfter;
-        // Update deleted
-        deleted += end - start;
-      }
-      // If already deleted all, break out
-      if (deleted == length) break;
-      // Increment aux to next snippet
-      aux += snippetLength;
-    }
+    page!.delete(skip, length);
     //page!.snippets.removeWhere((s) => s.text.isEmpty);
     ChapterEditService.pageUpdate(page!, AuthenticationService.uid);
   }
-
-  static const Map<String, IconData> _options = {
-    'Settings': Icons.favorite_border,
-    'Share': Icons.bookmark_border,
-    'Logout': Icons.share,
-  };
 
   void _onSelectionChanged(TextSelection selection) {
     //Logs.d('${selection.baseOffset}');
@@ -228,8 +170,15 @@ class _PageEditorState extends State<PageEditor> {
     }
   }
 
-  Widget _textSelectionOptions() => const SizedBox
-      .shrink(); /* Tile(
+  void _onAddChoice() {
+    page!.createSnippet(_selection!.baseOffset, _selection!.extentOffset, url: '');
+  }
+
+  void _onAddImage() {
+    page!.createSnippet(_selection!.baseOffset, _selection!.extentOffset, id: 0);
+  }
+
+  Widget _textSelectionOptions() => Tile(
         padding: EdgeInsets.zero,
         color: Utils.graphSettings.backgroundColor,
         elevation: 0.0,
@@ -244,25 +193,25 @@ class _PageEditorState extends State<PageEditor> {
               Tile(
                 radiusAll: 100,
                 color: Colors.white,
+                onTap: _onAddChoice,
                 child: const Padding(
                   padding: EdgeInsets.all(4.0),
                   child: Text('Choice'),
                 ),
-                onTap: () {},
               ),
               Tile(
                 radiusAll: 100,
                 color: Colors.white,
+                onTap: _onAddImage,
                 child: const Padding(
                   padding: EdgeInsets.all(4.0),
                   child: Text('Image'),
                 ),
-                onTap: () {},
               ),
             ],
           ),
         ),
-      );*/
+      );
 
   @override
   Widget build(BuildContext context) {
@@ -300,15 +249,12 @@ class _PageEditorState extends State<PageEditor> {
                       padding: EdgeInsets.zero,
                       scrollable: true,
                       scrollController: _scrollController,
-                      onTapDown: (details, position) {
-                        log((_selection == null).toString());
-                        return true;
-                      },
+                      onImagePaste: (bytes) => Future.value(null),
                     ),
                   ),
                 ),
         ),
-        /*AnimatedSize(
+        AnimatedSize(
           duration: const Duration(milliseconds: 250),
           curve: Curves.decelerate,
           child: _selection != null
@@ -323,7 +269,7 @@ class _PageEditorState extends State<PageEditor> {
                     SizedBox.shrink(),
                   ],
                 ),
-        ),*/
+        ),
       ],
     );
   }

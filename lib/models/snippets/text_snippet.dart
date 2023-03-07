@@ -8,4 +8,9 @@ class TextSnippet extends Snippet {
         'text': text,
         'type': 0,
       };
+
+  @override
+  Snippet deepCopy({String? text}) {
+    return TextSnippet(text ?? this.text);
+  }
 }

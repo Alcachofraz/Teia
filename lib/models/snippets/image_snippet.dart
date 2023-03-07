@@ -10,4 +10,9 @@ class ImageSnippet extends Snippet {
         'type': 2,
         'url': imageUrl,
       };
+
+  @override
+  Snippet deepCopy({String? text}) {
+    return ImageSnippet(text ?? this.text, imageUrl);
+  }
 }

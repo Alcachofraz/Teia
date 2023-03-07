@@ -4,6 +4,7 @@ import 'package:teia/models/snippets/image_snippet.dart';
 import 'package:teia/models/snippets/snippet.dart';
 import 'package:teia/models/snippets/text_snippet.dart';
 import 'package:teia/utils/utils.dart';
+import 'dart:math' as math;
 
 class Page {
   final int id;
@@ -72,6 +73,134 @@ class Page {
       });
     } catch (e) {
       return snippets.last;
+    }
+  }
+
+  /// Create a snippet from [from] to [to].
+  void createSnippet(int from, int to, {String? url, int? id}) {
+    assert(url != null || id != null);
+    List<Snippet> newSnippets = [];
+    int aux = 0; // Current snippet first character index
+    bool insideSelection = false;
+    String textAccumulated = '';
+    for (Snippet snippet in snippets) {
+      // Length of current snippet
+      String text = snippet.text;
+      int snippetLength = text.length;
+      // Index of first character of the new snippet, relative to the current snippet
+      int? start;
+      // Index of last character of the new snippet
+      int end = math.min(to - aux, snippetLength);
+
+      if (from >= aux && from <= aux + snippetLength) {
+        // If skip (number of characters to skip before new snippet), is
+        // inside this snippet ([aux + snippetLength] is the last character
+        // of this snippet)
+
+        start = from - aux;
+
+        // Text before new snippet
+        String textBefore = text.substring(0, start);
+
+        // Assign text before new snippet to current snippet
+        newSnippets.add(snippet.deepCopy(text: textBefore));
+
+        // Inside selection
+        insideSelection = true;
+      }
+      if (insideSelection) {
+        // Text inside new snippet
+        String textInside = text.substring(start ?? 0, end);
+        // Add to accumulated text
+        textAccumulated += textInside;
+
+        // Text after snippet (if any)
+        String textAfter = text.substring(end, snippetLength);
+
+        // If new snippet ends before/exactly at current snippet
+        if (to - aux <= snippetLength) {
+          // Add new snippet
+          if (url != null) {
+            newSnippets.add(ImageSnippet(textAccumulated, url));
+          } else if (id != null) {
+            newSnippets.add(ChoiceSnippet(textAccumulated, id));
+          }
+          // If new snipept ends before current snippet
+          if (to - aux < snippetLength) {
+            // Add snippet with the rest of the text
+            newSnippets.add(snippet.deepCopy(text: textAfter));
+          }
+          insideSelection = false;
+        }
+      } else {
+        newSnippets.add(snippet);
+      }
+      aux += snippetLength;
+    }
+    snippets.replaceRange(0, snippets.length, newSnippets);
+  }
+
+  /// Insert [text] into index [skip] of this page.
+  void insert(int skip, String text) {
+    int aux = 0; // Current snippet first character index
+    for (Snippet snippet in snippets) {
+      // Length of current snippet
+      int snippetLength = snippet.text.length;
+      if (skip >= aux && skip <= aux + snippetLength) {
+        // If skip (number of characters to skip before start inserting), is
+        // inside this snippet ([aux + snippetLength] is the last character
+        // of this snippet)
+
+        int start = skip - aux;
+        // Text before the text to insert
+        String textBefore = snippet.text.substring(0, start);
+        // Text after the text to insert
+        String textAfter = snippet.text.substring(start, snippetLength);
+        // Concatenate and assign all text
+        snippet.text = textBefore + text + textAfter;
+        break;
+      }
+      aux += snippetLength;
+    }
+  }
+
+  /// Delete [length] characters at index [skip] of this page.
+  void delete(int skip, int length) {
+    int aux = 0; // Current snippet first character index
+    int deleted = 0; // Deleted characters so far
+    for (Snippet snippet in snippets) {
+      int snippetLength = snippet.text.length; // Current snippet length
+      if (deleted != 0) {
+        // If already started deleting
+
+        // Index of last character to remove in THIS SNIPPET
+        int end = math.min(length - deleted, snippetLength);
+        // Remove designated text
+        snippet.text = snippet.text.substring(end, snippetLength);
+        // Update deleted
+        deleted += end;
+      } else if (skip >= aux && skip <= aux + snippetLength) {
+        // If skip (number of characters to skip before start deleting), is
+        // inside this snippet ([aux + snippetLength] is the last character
+        // of this snippet)
+
+        // Index of first character to remove
+        int start = skip - aux;
+        // Text before the text to remove (to keep)
+        String textBefore = snippet.text.substring(0, start);
+        // Index of last character to remove in THIS SNIPPET
+        int end = math.min(start + length, snippetLength);
+        // Text before the text to remove (to keep)
+        String textAfter = snippet.text.substring(end, snippetLength);
+        // Concatenate and assign all text to keep
+        snippet.text = textBefore + textAfter;
+        // Update deleted
+        deleted += end - start;
+      }
+      // If already deleted all, break out
+      if (deleted == length) break;
+      // Increment aux to next snippet
+      aux += snippetLength;
     }
   }
 

@@ -39,14 +39,14 @@ class Utils {
 
   static void init() {
     graphSettings = ChapterGraphSettings(
-      backgroundColor: swatch(const Color(0xffded2ba)),
-      nodeInsideColor: swatch(const Color(0xfff5f2eb)),
-      nodeBorderColor: swatch(const Color(0xff3c321d)),
-      nodeTextColor: swatch(const Color(0xff3c321d)),
-      nodeIconColor: swatch(const Color(0xff3c321d)),
-      nodeHoverSplashColor: swatch(const Color(0xfff0ebe0)),
-      nodeClickSplashColor: swatch(const Color(0xfff0ebe0)),
-      arrowColor: swatch(const Color(0xff3c321d)),
+      backgroundColor: swatch(Colors.grey[100]!),
+      nodeInsideColor: swatch(Colors.white),
+      nodeBorderColor: swatch(Colors.black),
+      nodeTextColor: swatch(Colors.black),
+      nodeIconColor: swatch(Colors.black),
+      nodeHoverSplashColor: swatch(Colors.grey[100]!),
+      nodeClickSplashColor: swatch(Colors.grey[100]!),
+      arrowColor: swatch(Colors.black),
       padding: 50.0,
     );
   }

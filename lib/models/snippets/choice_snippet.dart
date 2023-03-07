@@ -10,4 +10,9 @@ class ChoiceSnippet extends Snippet {
         'type': 1,
         'choice': pageId,
       };
+
+  @override
+  Snippet deepCopy({String? text}) {
+    return ChoiceSnippet(text ?? this.text, pageId);
+  }
 }

@@ -18,6 +18,7 @@ class Tile extends StatefulWidget {
   final Color? hoverColor;
   final GestureTapCallback? onTap;
   final double? elevation;
+  final Border? border;
 
   const Tile({
     Key? key,
@@ -38,6 +39,7 @@ class Tile extends StatefulWidget {
     this.clickColor,
     this.hoverColor,
     this.onTap,
+    this.border,
   }) : super(key: key);
 
   @override
@@ -57,18 +59,20 @@ class _TileState extends State<Tile> {
       margin: widget.padding,
       color: widget.color,
       elevation: widget.elevation,
-      shape: RoundedRectangleBorder(
-        borderRadius: borderRadius,
-        side: widget.borderSide,
-      ),
+      shape: widget.border ??
+          RoundedRectangleBorder(
+            borderRadius: borderRadius,
+            side: widget.borderSide,
+          ),
       child: Material(
         color: Colors.transparent,
         child: InkWell(
           hoverColor: widget.hoverColor,
           splashColor: widget.clickColor,
-          customBorder: RoundedRectangleBorder(
-            borderRadius: borderRadius,
-          ),
+          customBorder: widget.border ??
+              RoundedRectangleBorder(
+                borderRadius: borderRadius,
+              ),
           onTap: widget.onTap,
           child: widget.child,
         ),
