@@ -22,6 +22,7 @@ class _ChapterEditorScreenState extends State<ChapterEditorScreen> {
   late double textEditorWeight;
   int? selectedPageId;
   bool showingLoosePages = false;
+  final FocusNode pageEditorFocusNode = FocusNode();
 
   final MultiSplitViewController _multiSplitViewController = MultiSplitViewController(
     areas: [
@@ -153,6 +154,7 @@ class _ChapterEditorScreenState extends State<ChapterEditorScreen> {
                         ? Expanded(
                             child: PageEditor(
                               pageId: selectedPageId!.toString(),
+                              focusNode: pageEditorFocusNode,
                             ),
                           )
                         : const SizedBox.shrink(),

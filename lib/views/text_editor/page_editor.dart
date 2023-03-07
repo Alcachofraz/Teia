@@ -14,10 +14,12 @@ import 'package:tuple/tuple.dart';
 
 class PageEditor extends StatefulWidget {
   final String pageId;
+  final FocusNode? focusNode;
 
   const PageEditor({
     super.key,
     required this.pageId,
+    this.focusNode,
   });
 
   @override
@@ -25,7 +27,6 @@ class PageEditor extends StatefulWidget {
 }
 
 class _PageEditorState extends State<PageEditor> {
-  final FocusNode _focusNodes = FocusNode();
   late QuillController _controller;
   late StreamSubscription _documentChangesSubscription;
   late StreamSubscription _pageSubscription;
@@ -245,7 +246,7 @@ class _PageEditorState extends State<PageEditor> {
                       readOnly: false,
                       expands: true,
                       autoFocus: false,
-                      focusNode: _focusNodes,
+                      focusNode: widget.focusNode ?? FocusNode(),
                       padding: EdgeInsets.zero,
                       scrollable: true,
                       scrollController: _scrollController,
