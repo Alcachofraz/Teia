@@ -100,66 +100,67 @@ class _ChapterEditorScreenState extends State<ChapterEditorScreen> {
         duration: const Duration(milliseconds: Utils.textEditorAnimationDuration),
         curve: Curves.decelerate,
         bottom: showingLoosePages ? 0 : -(MediaQuery.of(context).size.height * loosePagesMenuHeight) + 48.0,
-        child: AnimatedSize(
-          duration: const Duration(milliseconds: Utils.textEditorAnimationDuration),
-          curve: Curves.decelerate,
-          child: SizedBox(
-            width: MediaQuery.of(context).size.width * (1 - textEditorWeight),
-            height: MediaQuery.of(context).size.height,
-            child: MultiSplitViewTheme(
-              data: MultiSplitViewThemeData(dividerThickness: Utils.dividerThickness),
-              child: MultiSplitView(
-                axis: Axis.vertical,
-                resizable: showingLoosePages,
-                onWeightChange: () {
-                  setState(() {
-                    loosePagesMenuHeight = _loosePagesMultiSplitViewController.areas[1].weight!;
-                  });
-                },
-                dividerBuilder: (axis, index, resizable, dragging, highlighted, themeData) =>
-                    _dividerBuilder(false, axis, index, resizable, dragging, highlighted, themeData),
-                controller: _loosePagesMultiSplitViewController,
-                children: [
-                  const SizedBox.shrink(),
-                  Container(
-                    color: Colors.white,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      mainAxisSize: MainAxisSize.max,
-                      children: [
-                        TextButton(
-                          onPressed: () => setState(() {
-                            showingLoosePages = !showingLoosePages;
-                          }),
-                          child: Padding(
-                            padding: const EdgeInsets.fromLTRB(8.0, 8.0, 16.0, 8.0),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.max,
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.only(right: 4.0),
-                                  child: Icon(showingLoosePages ? Icons.arrow_downward : Icons.arrow_upward),
+        child: SizedBox(
+          width: MediaQuery.of(context).size.width * (1 - textEditorWeight),
+          height: MediaQuery.of(context).size.height,
+          child: MultiSplitViewTheme(
+            data: MultiSplitViewThemeData(dividerThickness: Utils.dividerThickness),
+            child: MultiSplitView(
+              axis: Axis.vertical,
+              resizable: showingLoosePages,
+              onWeightChange: () {
+                setState(() {
+                  loosePagesMenuHeight = _loosePagesMultiSplitViewController.areas[1].weight!;
+                });
+              },
+              dividerBuilder: (axis, index, resizable, dragging, highlighted, themeData) =>
+                  _dividerBuilder(false, axis, index, resizable, dragging, highlighted, themeData),
+              controller: _loosePagesMultiSplitViewController,
+              children: [
+                const SizedBox.shrink(),
+                Container(
+                  color: Colors.white,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    mainAxisSize: MainAxisSize.max,
+                    children: [
+                      Tile(
+                        padding: EdgeInsets.zero,
+                        elevation: 0.0,
+                        onTap: () => setState(() {
+                          showingLoosePages = !showingLoosePages;
+                        }),
+                        child: Padding(
+                          padding: const EdgeInsets.fromLTRB(8.0, 8.0, 16.0, 8.0),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.max,
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.only(right: 4.0),
+                                child: RotatedBox(
+                                  quarterTurns: 1,
+                                  child: Icon(showingLoosePages ? Icons.chevron_right : Icons.chevron_left),
                                 ),
-                                const Expanded(
-                                    child: Text(
-                                  'All pages',
-                                  textAlign: TextAlign.left,
-                                )),
-                              ],
-                            ),
+                              ),
+                              const Expanded(
+                                  child: Text(
+                                'All pages',
+                                textAlign: TextAlign.left,
+                              )),
+                            ],
                           ),
                         ),
-                        Expanded(
-                          child: ListView(
-                            children: const [],
-                          ),
+                      ),
+                      Expanded(
+                        child: ListView(
+                          children: const [],
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         ),
