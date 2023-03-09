@@ -1,7 +1,11 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart' hide Page;
 import 'package:teia/models/chapter.dart';
+import 'package:teia/models/page.dart';
 import 'package:teia/screens/chapter_graph.dart';
 import 'package:teia/services/authentication_service.dart';
+import 'package:teia/services/chapter_edit_service.dart';
 import 'package:teia/views/text_editor/page_editor.dart';
 import 'package:teia/utils/utils.dart';
 import 'package:teia/views/misc/screen_wrapper.dart';
@@ -10,17 +14,25 @@ import 'package:multi_split_view/multi_split_view.dart';
 
 class ChapterEditorScreen extends StatefulWidget {
   final bool picking;
+  final String chapterId;
+  final String storyId;
 
-  const ChapterEditorScreen({Key? key, this.picking = false}) : super(key: key);
+  const ChapterEditorScreen({
+    Key? key,
+    required this.storyId,
+    required this.chapterId,
+    this.picking = false,
+  }) : super(key: key);
 
   @override
   State<ChapterEditorScreen> createState() => _ChapterEditorScreenState();
 }
 
 class _ChapterEditorScreenState extends State<ChapterEditorScreen> {
-  final Chapter _chapter = Chapter.create(1, 'storyId', 'My chapter', AuthenticationService.uid);
+  Chapter _chapter = Chapter.create(1, 'storyId', 'My chapter', AuthenticationService.uid);
   late double textEditorWeight;
   late double loosePagesMenuHeight;
+  late StreamSubscription _chapterSubscription;
   int? selectedPageId;
   bool showingLoosePages = false;
   final FocusNode pageEditorFocusNode = FocusNode();
@@ -43,7 +55,12 @@ class _ChapterEditorScreenState extends State<ChapterEditorScreen> {
   void initState() {
     textEditorWeight = Utils.textEditorDefaultWeight;
     loosePagesMenuHeight = Utils.loosePagesMenuDefaultHeight;
+    _chapterSubscription = ChapterEditService.chapterStream(widget.storyId, widget.chapterId).listen((chapter) => setState(() => _chapter = chapter));
     super.initState();
+  }
+
+  void _pageSet({String? uid}) {
+    ChapterEditService.pageSet(page, uid: uid);
   }
 
   Widget _dividerBuilder(bool vertical, axis, index, resizable, dragging, highlighted, themeData) => resizable
@@ -63,9 +80,19 @@ class _ChapterEditorScreenState extends State<ChapterEditorScreen> {
   Widget _chapterGraph() => ChapterGraph(
         chapter: _chapter,
         createPage: (pageId) {
+          // Update local
           setState(() {
-            _chapter.addPage(pageId, AuthenticationService.uid);
+            _chapter.addPage(pageId, uid: AuthenticationService.uid);
           });
+          ChapterEditService.pageSet(
+            Page(
+              pageId,
+              int.parse(widget.chapterId),
+              widget.storyId,
+              [],
+              null,
+            ),
+          );
         },
         clickPage: (pageId) {
           if (selectedPageId != null) {
