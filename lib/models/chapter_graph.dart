@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 class ChapterGraph {
   final Map<int, List<int>> _nodes;
 
@@ -7,6 +5,19 @@ class ChapterGraph {
 
   /// Nodes getter
   get nodes => _nodes;
+
+  /// Map Page constructor. Instantiate a page from a
+  /// Map<String, dynamic> object.
+  factory ChapterGraph.fromMap(Map<int, List<int>>? map) {
+    if (map == null) return ChapterGraph({});
+    return ChapterGraph(map);
+  }
+
+  /// Map Page constructor. Instantiate a page from a
+  /// Map<String, dynamic> object.
+  factory ChapterGraph.empty() {
+    return ChapterGraph({});
+  }
 
   /// Execute [action] for each connection of the graph.
   /// * [action] Action (function) to execute for start and end (nodes) ID's of the connection.
@@ -23,7 +34,7 @@ class ChapterGraph {
   /// * [end] End node ID (page ID).
   /// Returns false if [start] doesn't exist or if nodes is null.
   bool addConnection(int start, int end) {
-    log('$start to $end');
+    //log('$start to $end');
     if (_nodes.containsKey(start)) {
       _nodes[start]!.add(end);
       _nodes[end] = [];

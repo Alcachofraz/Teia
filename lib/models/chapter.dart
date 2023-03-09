@@ -1,21 +1,15 @@
 import 'package:teia/models/chapter_graph.dart';
-import 'package:teia/models/page.dart';
-import 'package:teia/models/snippets/choice_snippet.dart';
-import 'package:teia/models/snippets/image_snippet.dart';
-import 'package:teia/models/snippets/text_snippet.dart';
 
 class Chapter {
   int id;
   String storyId;
   String title;
-  List<Page> pages;
   ChapterGraph graph;
 
   Chapter(
     this.id,
     this.storyId,
     this.title,
-    this.pages,
     this.graph,
   );
 
@@ -24,33 +18,29 @@ class Chapter {
       id,
       storyId,
       title,
-      [
-        Page(
-          1,
-          id,
-          storyId,
-          [TextSnippet('Olá. '), ChoiceSnippet('Isto é uma escolha.', 2), TextSnippet(' '), ImageSnippet('Isto é uma imagem.', '')],
-          uid,
-        ),
-      ],
       ChapterGraph({1: []}),
+    );
+  }
+
+  /// Map Page constructor. Instantiate a page from a
+  /// Map<String, dynamic> object.
+  factory Chapter.fromMap(Map<String, dynamic>? map) {
+    if (map == null) return Chapter(-1, '', '', ChapterGraph.empty());
+    return Chapter(
+      map['id'] as int,
+      map['storyId'] as String,
+      map['title'] as String,
+      ChapterGraph.fromMap(map['graph'] as Map<int, List<int>>),
     );
   }
 
   /// Create a new page.
   /// * [id] parent id.
-  /// Returns the created page id.
-  int addPage(int id, String uid) {
-    int newId = pages.length + 1;
-    pages.add(Page(
-      newId,
-      id,
-      storyId,
-      [TextSnippet('')],
-      uid,
-    ));
+  /// Returns the updated graph.
+  ChapterGraph addPage(int id, {String? uid}) {
+    int newId = graph.numberOfPages() + 1;
     graph.addConnection(id, newId);
-    return newId;
+    return graph;
   }
 
   /// Connect page [from] to [to].
@@ -63,4 +53,7 @@ class Chapter {
   bool isFinalPage(int id) {
     return graph.isLeaf(id);
   }
+
+  /// Convert this chapter to a Map<String, dynamic> object.
+  Map<String, dynamic> toMap() => {'id': id, 'storyId': storyId, 'title': title, 'graph': graph.nodes};
 }

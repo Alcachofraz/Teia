@@ -138,7 +138,7 @@ class _PageEditorState extends State<PageEditor> {
     }
     page!.insert(skip, text);
     //page!.snippets.removeWhere((s) => s.text.isEmpty);
-    ChapterEditService.pageUpdate(page!, AuthenticationService.uid);
+    ChapterEditService.pageSet(page!, uid: AuthenticationService.uid);
   }
 
   /// On document delete.
@@ -149,7 +149,7 @@ class _PageEditorState extends State<PageEditor> {
     }
     page!.delete(skip, length);
     //page!.snippets.removeWhere((s) => s.text.isEmpty);
-    ChapterEditService.pageUpdate(page!, AuthenticationService.uid);
+    ChapterEditService.pageSet(page!, uid: AuthenticationService.uid);
   }
 
   void _onSelectionChanged(TextSelection selection) {

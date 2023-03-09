@@ -235,8 +235,7 @@ class Page {
   /// Convert get a list of mapped snippets (instead of
   /// Snippet objects). Each snippets is converted to a
   /// Map<String, dynamic> object.
-  List<Map<String, dynamic>> snippetsToMap() =>
-      snippets.map<Map<String, dynamic>>((snippet) => snippet.toMap()).toList();
+  List<Map<String, dynamic>> snippetsToMap() => snippets.map<Map<String, dynamic>>((snippet) => snippet.toMap()).toList();
 
   /// Convert this page to a Map<String, dynamic> object.
   Map<String, dynamic> toMap() => {'id': id, 'chapterId': chapterId, 'storyId': storyId, 'snippets': snippetsToMap()};
