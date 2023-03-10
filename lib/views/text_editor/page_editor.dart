@@ -15,11 +15,13 @@ import 'package:tuple/tuple.dart';
 class PageEditor extends StatefulWidget {
   final String pageId;
   final FocusNode? focusNode;
+  final Function(Page page)? pushPageToRemote;
 
   const PageEditor({
     super.key,
     required this.pageId,
     this.focusNode,
+    this.pushPageToRemote,
   });
 
   @override
@@ -43,6 +45,7 @@ class _PageEditorState extends State<PageEditor> {
     _scrollController = ScrollController();
     // Initialize controller
     _controller = QuillController.basic();
+
     // Listen to delta changes with _onLocalChange
     _documentChangesSubscription = _controller.document.changes.listen(_onLocalChange);
     // Listen to selection changes with _onSelectionChanged
@@ -58,6 +61,10 @@ class _PageEditorState extends State<PageEditor> {
     _documentChangesSubscription.cancel();
     _controller.dispose();
     super.dispose();
+  }
+
+  void _pushPageToRemote(Page? page) {
+    if (widget.pushPageToRemote != null && page != null) widget.pushPageToRemote!(page);
   }
 
   /// Currently totally replaces the document, initializing it again.
@@ -137,8 +144,8 @@ class _PageEditorState extends State<PageEditor> {
       return;
     }
     page!.insert(skip, text);
-    //page!.snippets.removeWhere((s) => s.text.isEmpty);
-    ChapterEditService.pageSet(page!, uid: AuthenticationService.uid);
+    page!.clearEmptySnippets();
+    _pushPageToRemote(page);
   }
 
   /// On document delete.
@@ -148,8 +155,8 @@ class _PageEditorState extends State<PageEditor> {
       return;
     }
     page!.delete(skip, length);
-    //page!.snippets.removeWhere((s) => s.text.isEmpty);
-    ChapterEditService.pageSet(page!, uid: AuthenticationService.uid);
+    page!.clearEmptySnippets();
+    _pushPageToRemote(page);
   }
 
   void _onSelectionChanged(TextSelection selection) {
@@ -173,10 +180,14 @@ class _PageEditorState extends State<PageEditor> {
 
   void _onAddChoice() {
     page!.createSnippet(_selection!.baseOffset, _selection!.extentOffset, url: '');
+    _updateDocumentWithDelta(page!.toDelta(), false);
+    _pushPageToRemote(page);
   }
 
   void _onAddImage() {
     page!.createSnippet(_selection!.baseOffset, _selection!.extentOffset, id: 0);
+    _updateDocumentWithDelta(page!.toDelta(), false);
+    _pushPageToRemote(page);
   }
 
   Widget _textSelectionOptions() => Tile(
@@ -262,7 +273,9 @@ class _PageEditorState extends State<PageEditor> {
               ? Row(
                   mainAxisSize: MainAxisSize.max,
                   children: [
-                    Expanded(child: _textSelectionOptions()),
+                    Expanded(
+                      child: _textSelectionOptions(),
+                    ),
                   ],
                 )
               : Row(

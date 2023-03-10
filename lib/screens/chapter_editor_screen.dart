@@ -2,8 +2,9 @@ import 'dart:async';
 
 import 'package:flutter/material.dart' hide Page;
 import 'package:teia/models/chapter.dart';
+import 'package:teia/models/chapter_graph.dart';
 import 'package:teia/models/page.dart';
-import 'package:teia/screens/chapter_graph.dart';
+import 'package:teia/screens/chapter_graph_view.dart';
 import 'package:teia/services/authentication_service.dart';
 import 'package:teia/services/chapter_edit_service.dart';
 import 'package:teia/views/text_editor/page_editor.dart';
@@ -55,12 +56,13 @@ class _ChapterEditorScreenState extends State<ChapterEditorScreen> {
   void initState() {
     textEditorWeight = Utils.textEditorDefaultWeight;
     loosePagesMenuHeight = Utils.loosePagesMenuDefaultHeight;
-    _chapterSubscription = ChapterEditService.chapterStream(widget.storyId, widget.chapterId).listen((chapter) => setState(() => _chapter = chapter));
+    _chapterSubscription = ChapterEditService.chapterStream(widget.storyId, widget.chapterId)
+        .listen((chapter) => setState(() => _chapter = chapter));
     super.initState();
   }
 
-  void _pageSet({String? uid}) {
-    ChapterEditService.pageSet(page, uid: uid);
+  void pushPageToRemote(Page page) {
+    ChapterEditService.pageSet(page, AuthenticationService.uid);
   }
 
   Widget _dividerBuilder(bool vertical, axis, index, resizable, dragging, highlighted, themeData) => resizable
@@ -77,14 +79,13 @@ class _ChapterEditorScreenState extends State<ChapterEditorScreen> {
         )
       : const SizedBox.shrink();
 
-  Widget _chapterGraph() => ChapterGraph(
+  Widget _chapterGraph() => ChapterGraphView(
         chapter: _chapter,
         createPage: (pageId) {
+          ChapterGraph graph = _chapter.addPage(pageId, uid: AuthenticationService.uid);
           // Update local
-          setState(() {
-            _chapter.addPage(pageId, uid: AuthenticationService.uid);
-          });
-          ChapterEditService.pageSet(
+          setState(() {});
+          ChapterEditService.pageCreate(
             Page(
               pageId,
               int.parse(widget.chapterId),
@@ -92,6 +93,7 @@ class _ChapterEditorScreenState extends State<ChapterEditorScreen> {
               [],
               null,
             ),
+            graph,
           );
         },
         clickPage: (pageId) {
@@ -237,6 +239,7 @@ class _ChapterEditorScreenState extends State<ChapterEditorScreen> {
                               child: PageEditor(
                                 pageId: selectedPageId!.toString(),
                                 focusNode: pageEditorFocusNode,
+                                pushPageToRemote: pushPageToRemote,
                               ),
                             )
                           : const SizedBox.shrink(),

@@ -65,14 +65,23 @@ class Page {
   }
 
   /// Find the snippet that contains the character at [index].
-  Snippet findSnippet(int index) {
+  Snippet? findSnippet(int index) {
     int skipped = 0;
     try {
       return snippets.firstWhere((snippet) {
         return (skipped += snippet.text.length) >= index;
       });
     } catch (e) {
-      return snippets.last;
+      return snippets.isEmpty ? null : snippets.last;
+    }
+  }
+
+  /// Clear empty snippets (snippets with empty text)
+  void clearEmptySnippets() {
+    snippets.removeWhere((s) => s.text.isEmpty);
+    if (snippets.isEmpty) snippets.add(TextSnippet(''));
+    if (!snippets.last.text.endsWith('\n')) {
+      snippets.last.text += '\n';
     }
   }
 
@@ -138,10 +147,13 @@ class Page {
       aux += snippetLength;
     }
     snippets.replaceRange(0, snippets.length, newSnippets);
+    clearEmptySnippets();
   }
 
   /// Insert [text] into index [skip] of this page.
   void insert(int skip, String text) {
+    // If no snippets, add empty snippet
+    if (snippets.isEmpty) snippets.add(TextSnippet(''));
     int aux = 0; // Current snippet first character index
     for (Snippet snippet in snippets) {
       // Length of current snippet
@@ -235,7 +247,8 @@ class Page {
   /// Convert get a list of mapped snippets (instead of
   /// Snippet objects). Each snippets is converted to a
   /// Map<String, dynamic> object.
-  List<Map<String, dynamic>> snippetsToMap() => snippets.map<Map<String, dynamic>>((snippet) => snippet.toMap()).toList();
+  List<Map<String, dynamic>> snippetsToMap() =>
+      snippets.map<Map<String, dynamic>>((snippet) => snippet.toMap()).toList();
 
   /// Convert this page to a Map<String, dynamic> object.
   Map<String, dynamic> toMap() => {'id': id, 'chapterId': chapterId, 'storyId': storyId, 'snippets': snippetsToMap()};

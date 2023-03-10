@@ -48,7 +48,8 @@ dependencies:
   flutter_quill: ^6.3.2
   quill_delta: ^3.0.0-nullsafety.2
   logger: ^1.2.2
-  tuple: ^2.0.1  
+  tuple: ^2.0.1
+  fleather: ^1.6.0
 
 dev_dependencies:
   flutter_test:

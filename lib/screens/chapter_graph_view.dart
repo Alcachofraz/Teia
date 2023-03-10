@@ -4,12 +4,12 @@ import 'package:teia/models/chapter.dart';
 import 'package:teia/utils/utils.dart';
 import 'package:teia/views/graph_page_node.dart';
 
-class ChapterGraph extends StatefulWidget {
+class ChapterGraphView extends StatefulWidget {
   final Chapter chapter;
   final Function(int)? createPage;
   final Function(int)? clickPage;
 
-  const ChapterGraph({
+  const ChapterGraphView({
     Key? key,
     required this.chapter,
     this.createPage,
@@ -17,10 +17,10 @@ class ChapterGraph extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  State<ChapterGraph> createState() => _ChapterGraphState();
+  State<ChapterGraphView> createState() => _ChapterGraphViewState();
 }
 
-class _ChapterGraphState extends State<ChapterGraph> {
+class _ChapterGraphViewState extends State<ChapterGraphView> {
   /// Returns a list with [Graph, BuchheimWalkerAlgorithm];
   List<dynamic> buildGraph(Chapter chapter) {
     Graph graph = Graph()..isTree = true;

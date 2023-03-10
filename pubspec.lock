@@ -137,6 +137,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.0.2"
+  csslib:
+    dependency: transitive
+    description:
+      name: csslib
+      sha256: b36c7f7e24c0bdf1bf9a3da461c837d1de64b9f8beb190c9011d8c72a3dfd745
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.17.2"
   cupertino_icons:
     dependency: "direct main"
     description:
@@ -305,6 +313,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.2.3+30"
+  fleather:
+    dependency: "direct main"
+    description:
+      name: fleather
+      sha256: "6de8a4667103f07ba7394ad4e4fc256cfaa3e54820bbfbf034ec0595eed8eff9"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.6.0"
   flutter:
     dependency: "direct main"
     description: flutter
@@ -517,6 +533,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.1.1"
+  html:
+    dependency: transitive
+    description:
+      name: html
+      sha256: "79d498e6d6761925a34ee5ea8fa6dfef38607781d2fa91e37523474282af55cb"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.15.2"
   http:
     dependency: transitive
     description:
@@ -621,6 +645,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.1.0"
+  parchment:
+    dependency: transitive
+    description:
+      name: parchment
+      sha256: "3e252a9aac2aef1abc1c4b2745a6e919774351ace306b99f5f989d62fafcc6f3"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.6.0"
   pasteboard:
     dependency: transitive
     description:
