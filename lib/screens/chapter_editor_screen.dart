@@ -216,7 +216,7 @@ class _ChapterEditorScreenState extends State<ChapterEditorScreen> {
               children: [
                 const SizedBox.shrink(),
                 Container(
-                  color: Colors.white,
+                  color: Utils.pageEditorBackgroundColor,
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     mainAxisSize: MainAxisSize.max,
@@ -224,6 +224,7 @@ class _ChapterEditorScreenState extends State<ChapterEditorScreen> {
                       Tile(
                         padding: EdgeInsets.zero,
                         elevation: 0.0,
+                        color: Utils.pageEditorBackgroundColor,
                         child: const Icon(
                           Icons.keyboard_arrow_right_rounded,
                           size: Utils.collapseButtonSize,

@@ -50,6 +50,7 @@ dependencies:
   logger: ^1.2.2
   tuple: ^2.0.1
   fleather: ^1.6.0
+  super_editor: ^0.2.3+1
 
 dev_dependencies:
   flutter_test:

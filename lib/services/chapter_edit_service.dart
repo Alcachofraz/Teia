@@ -33,7 +33,12 @@ class ChapterEditService {
 
   static Future<void> chapterSet(Chapter chapter) async {
     //Logs.d('Sending $page');
-    FirebaseUtils.firestore.collection('stories').doc(chapter.storyId).collection('chapters').doc(chapter.id.toString()).set(chapter.toMap());
+    FirebaseUtils.firestore
+        .collection('stories')
+        .doc(chapter.storyId)
+        .collection('chapters')
+        .doc(chapter.id.toString())
+        .set(chapter.toMap());
   }
 
   static Future<void> pageSet(Page page, String uid) async {
@@ -65,7 +70,12 @@ class ChapterEditService {
       ...{'lastModifierUid': null},
     });
 
-    FirebaseUtils.firestore.collection('stories').doc(page.storyId).collection('chapters').doc(page.chapterId.toString()).update({
+    FirebaseUtils.firestore
+        .collection('stories')
+        .doc(page.storyId)
+        .collection('chapters')
+        .doc(page.chapterId.toString())
+        .update({
       'graph': newGraph.nodes,
     });
   }

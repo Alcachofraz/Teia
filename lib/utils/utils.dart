@@ -39,11 +39,14 @@ class Utils {
   static const double collapseButtonSize = 32;
   static const List<String> snippetColors = ['#f57c00', '#4caf50', '#2196f3'];
 
+  static late final Color pageEditorBackgroundColor;
+  static late final Color pageEditorSheetColor;
+
   static const textEditorStyle = TextStyle();
 
   static void init() {
     graphSettings = ChapterGraphSettings(
-      backgroundColor: swatch(Colors.grey[100]!),
+      backgroundColor: swatch(Colors.grey[200]!),
       nodeInsideColor: swatch(Colors.white),
       nodeBorderColor: swatch(Colors.black),
       nodeTextColor: swatch(Colors.black),
@@ -53,6 +56,8 @@ class Utils {
       arrowColor: swatch(Colors.black),
       padding: 50.0,
     );
+    pageEditorBackgroundColor = swatch(Colors.grey[100]!);
+    pageEditorSheetColor = swatch(Colors.white);
   }
 
   static String colorHex(Color color) =>

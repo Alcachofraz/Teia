@@ -160,7 +160,6 @@ class _PageEditorState extends State<PageEditor> {
   }
 
   void _onSelectionChanged(TextSelection selection) {
-    //Logs.d('${selection.baseOffset}');
     if (selection.baseOffset != selection.extentOffset) {
       // Selecting text
       setState(() {
@@ -249,19 +248,23 @@ class _PageEditorState extends State<PageEditor> {
           child: page == null
               ? loadingRotate()
               : Padding(
-                  padding: const EdgeInsets.fromLTRB(8.0, 0.0, 8.0, 8.0),
+                  padding: const EdgeInsets.fromLTRB(0.0, 0.0, 16.0, 16.0),
                   child: MouseRegion(
-                    //cursor: SystemMouseCursors.text,
-                    child: QuillEditor(
-                      controller: _controller,
-                      readOnly: false,
-                      expands: true,
-                      autoFocus: false,
-                      focusNode: widget.focusNode ?? FocusNode(),
+                    cursor: SystemMouseCursors.text,
+                    child: Tile(
                       padding: EdgeInsets.zero,
-                      scrollable: true,
-                      scrollController: _scrollController,
-                      onImagePaste: (bytes) => Future.value(null),
+                      color: Utils.pageEditorSheetColor,
+                      child: QuillEditor(
+                        controller: _controller,
+                        readOnly: false,
+                        expands: true,
+                        autoFocus: false,
+                        focusNode: widget.focusNode ?? FocusNode(),
+                        padding: EdgeInsets.zero,
+                        scrollable: true,
+                        scrollController: _scrollController,
+                        onImagePaste: (bytes) => Future.value(null),
+                      ),
                     ),
                   ),
                 ),
