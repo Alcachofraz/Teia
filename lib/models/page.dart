@@ -3,6 +3,7 @@ import 'package:teia/models/snippets/choice_snippet.dart';
 import 'package:teia/models/snippets/image_snippet.dart';
 import 'package:teia/models/snippets/snippet.dart';
 import 'package:teia/models/snippets/text_snippet.dart';
+import 'package:teia/utils/logs.dart';
 import 'package:teia/utils/utils.dart';
 import 'dart:math' as math;
 
@@ -76,9 +77,22 @@ class Page {
     }
   }
 
-  /// Clear empty snippets (snippets with empty text)
-  void clearEmptySnippets() {
+  /// Clear empty snippets (snippets with empty text) and join
+  /// consecutive snippets
+  void normalizeSnippets() {
+    // Remove empty snipepts
     snippets.removeWhere((s) => s.text.isEmpty);
+    // Join consecutive snippets
+    List<Snippet> newSnippets = [];
+    for (Snippet snippet in snippets) {
+      if (newSnippets.isNotEmpty && newSnippets.last.joinable(snippet)) {
+        newSnippets.last.text += snippet.text;
+      } else {
+        newSnippets.add(snippet);
+      }
+    }
+    snippets.replaceRange(0, snippets.length, newSnippets);
+    // Check for anomalies
     if (snippets.isEmpty) snippets.add(TextSnippet(''));
     if (!snippets.last.text.endsWith('\n')) {
       snippets.last.text += '\n';
@@ -147,7 +161,44 @@ class Page {
       aux += snippetLength;
     }
     snippets.replaceRange(0, snippets.length, newSnippets);
-    clearEmptySnippets();
+    normalizeSnippets();
+  }
+
+  /// Insert [snippetToInsert] into index [skip] of this page.
+  void insertSnippet(int skip, Snippet snippetToInsert) {
+    List<Snippet> newSnippets = [];
+    int aux = 0; // Current snippet first character index
+    //Logs.d(snippets.map((e) => e.toMap().toString()));
+    for (Snippet snippet in snippets) {
+      // Length of current snippet
+      String text = snippet.text;
+      int snippetLength = text.length;
+      // Index of first character of the new snippet, relative to the current snippet
+      //log('skip: $skip, aux: $aux, snippetLength: $snippetLength');
+      if (skip >= aux && skip <= aux + snippetLength) {
+        // If skip (number of characters to skip before start inserting), is
+        // inside this snippet ([aux + snippetLength] is the last character
+        // of this snippet)
+
+        int start = skip - aux;
+        // Text before the text to insert
+        String textBefore = text.substring(0, start);
+        // Text after the text to insert
+        String textAfter = text.substring(start, snippetLength);
+        Logs.d('textBefore: $textBefore, snippet: ${snippetToInsert.text}, textAfter: $textAfter');
+        // Add before snippet
+        newSnippets.add(snippet.deepCopy(text: textBefore));
+        // Add inserting snippet
+        newSnippets.add(snippetToInsert);
+        // Add after snippet
+        newSnippets.add(snippet.deepCopy(text: textAfter));
+        break;
+      } else {
+        newSnippets.add(snippet);
+      }
+      aux += snippetLength;
+    }
+    snippets.replaceRange(0, snippets.length, newSnippets);
   }
 
   /// Insert [text] into index [skip] of this page.
@@ -235,7 +286,10 @@ class Page {
         ret.push(Operation.fromJson(
           {
             "insert": snippet.text,
-            "attributes": {"color": snippetColors![index]},
+            "attributes": {
+              ...{"color": snippetColors![index]},
+              ...{"link": snippet.deepCopy()},
+            },
           },
         ));
         if (++index >= snippetColors.length) index = 0;

@@ -45,7 +45,6 @@ class _PageEditorState extends State<PageEditor> {
     _scrollController = ScrollController();
     // Initialize controller
     _controller = QuillController.basic();
-
     // Listen to delta changes with _onLocalChange
     _documentChangesSubscription = _controller.document.changes.listen(_onLocalChange);
     // Listen to selection changes with _onSelectionChanged
@@ -64,6 +63,7 @@ class _PageEditorState extends State<PageEditor> {
   }
 
   void _pushPageToRemote(Page? page) {
+    Logs.d('Sending:\n${page.toString()}');
     if (widget.pushPageToRemote != null && page != null) widget.pushPageToRemote!(page);
   }
 
@@ -92,16 +92,27 @@ class _PageEditorState extends State<PageEditor> {
     if (page == null) return;
     // Characters to skip.
     int skip = 0;
+    Logs.d(event.item2.toList().map((e) => e.toJson()));
     for (Operation op in event.item2.toList()) {
       if (op.isRetain) {
         skip += op.value as int;
       } else if (op.isInsert) {
-        _onInsert(skip, op.value as String);
-        break;
+        String text = op.value as String;
+        Snippet? snippet = op.attributes?["link"];
+        if (snippet != null) {
+          snippet.text = text;
+          _onInsertSnippet(skip, snippet);
+        } else {
+          _onInsert(skip, text);
+        }
+        skip += text.length;
+        //break;
       } else if (op.isDelete) {
-        _onDelete(skip, op.value as int);
-        break;
-        // Break out, because the an event never contains
+        int length = op.value as int;
+        _onDelete(skip, length);
+        skip -= length;
+        //break;
+        // Break out, because an event never contains
         // two insert and/or delete operations. When iterating
         // the operations in an event's delta, if an insert is
         // reached, then it's guaranteed no inserts/deletes
@@ -137,25 +148,39 @@ class _PageEditorState extends State<PageEditor> {
     if (firstFecth) setState(() {});
   }
 
+  /// On document insert of snippet.
+  void _onInsertSnippet(int skip, Snippet snippet) {
+    Logs.d('Inserting Snippet($skip, ${snippet.toMap()})');
+    if (page == null) {
+      Logs.e('Trying to insert snippet on a null Page!');
+      return;
+    }
+    page!.insertSnippet(skip, snippet);
+    page!.normalizeSnippets();
+    _pushPageToRemote(page);
+  }
+
   /// On document insert.
   void _onInsert(int skip, String text) {
+    Logs.d('Inserting($skip, $text)');
     if (page == null) {
       Logs.e('Trying to insert on a null Page!');
       return;
     }
     page!.insert(skip, text);
-    page!.clearEmptySnippets();
+    page!.normalizeSnippets();
     _pushPageToRemote(page);
   }
 
   /// On document delete.
   void _onDelete(int skip, int length) {
+    Logs.d('Deleting($skip, $length)');
     if (page == null) {
       Logs.e('Trying to insert on a null Page!');
       return;
     }
     page!.delete(skip, length);
-    page!.clearEmptySnippets();
+    page!.normalizeSnippets();
     _pushPageToRemote(page);
   }
 
@@ -247,26 +272,39 @@ class _PageEditorState extends State<PageEditor> {
         Expanded(
           child: page == null
               ? loadingRotate()
-              : Padding(
-                  padding: const EdgeInsets.fromLTRB(0.0, 0.0, 16.0, 16.0),
-                  child: MouseRegion(
-                    cursor: SystemMouseCursors.text,
-                    child: Tile(
-                      padding: EdgeInsets.zero,
-                      color: Utils.pageEditorSheetColor,
-                      child: QuillEditor(
-                        controller: _controller,
-                        readOnly: false,
-                        expands: true,
-                        autoFocus: false,
-                        focusNode: widget.focusNode ?? FocusNode(),
-                        padding: EdgeInsets.zero,
-                        scrollable: true,
-                        scrollController: _scrollController,
-                        onImagePaste: (bytes) => Future.value(null),
+              : Row(
+                  children: [
+                    Expanded(
+                      flex: 8,
+                      child: MouseRegion(
+                        cursor: SystemMouseCursors.text,
+                        child: Tile(
+                          elevation: 2.5,
+                          padding: EdgeInsets.zero,
+                          color: Utils.pageEditorSheetColor,
+                          child: Padding(
+                            padding: const EdgeInsets.fromLTRB(48.0, 44.0, 48.0, 48.0),
+                            child: QuillEditor(
+                              controller: _controller,
+                              readOnly: false,
+                              expands: true,
+                              autoFocus: false,
+                              focusNode: widget.focusNode ?? FocusNode(),
+                              padding: EdgeInsets.zero,
+                              scrollable: true,
+                              scrollController: _scrollController,
+                              onImagePaste: (bytes) => Future.value(null),
+                              onLaunchUrl: null,
+                            ),
+                          ),
+                        ),
                       ),
                     ),
-                  ),
+                    const Expanded(
+                      flex: 2,
+                      child: SizedBox.shrink(),
+                    ),
+                  ],
                 ),
         ),
         AnimatedSize(

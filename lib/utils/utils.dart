@@ -30,7 +30,7 @@ class Utils {
 
   static const double textEditorDefaultWeight = 0.5;
   static const double textEditorMaximumWeight = 0.85;
-  static const double textEditorMinimumWeight = 0.45;
+  static const double textEditorMinimumWeight = 0.5;
   static const double loosePagesMenuDefaultHeight = 0.5;
   static const double loosePagesMenuMaximumHeight = 0.8;
   static const double loosePagesMenuMinimumHeight = 0.35;
@@ -42,11 +42,11 @@ class Utils {
   static late final Color pageEditorBackgroundColor;
   static late final Color pageEditorSheetColor;
 
-  static const textEditorStyle = TextStyle();
+  static const textEditorStyle = TextStyle(fontFamily: 'Arial');
 
   static void init() {
     graphSettings = ChapterGraphSettings(
-      backgroundColor: swatch(Colors.grey[200]!),
+      backgroundColor: swatch(Colors.grey[100]!),
       nodeInsideColor: swatch(Colors.white),
       nodeBorderColor: swatch(Colors.black),
       nodeTextColor: swatch(Colors.black),
@@ -56,7 +56,7 @@ class Utils {
       arrowColor: swatch(Colors.black),
       padding: 50.0,
     );
-    pageEditorBackgroundColor = swatch(Colors.grey[100]!);
+    pageEditorBackgroundColor = swatch(Colors.grey[50]!);
     pageEditorSheetColor = swatch(Colors.white);
   }
 
