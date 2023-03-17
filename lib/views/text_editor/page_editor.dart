@@ -10,6 +10,9 @@ import 'package:teia/utils/loading.dart';
 import 'package:teia/utils/logs.dart';
 import 'package:teia/utils/utils.dart';
 import 'package:teia/views/misc/tile.dart';
+import 'package:teia/views/text_editor/cursor_block_embed.dart';
+import 'package:teia/views/text_editor/cursor_embed_builder.dart';
+import 'package:teia/views/text_editor/remote_cursor.dart';
 import 'package:tuple/tuple.dart';
 
 class PageEditor extends StatefulWidget {
@@ -85,6 +88,15 @@ class _PageEditorState extends State<PageEditor> {
     _documentChangesSubscription = _controller.document.changes.listen(_onLocalChange);
   }
 
+  void _updateRemoteCursors(List<RemoteCursor> cursors) {
+    for (RemoteCursor cursor in cursors) {
+      final block = BlockEmbed.custom(
+        CursorBlockEmbed.fromDocument(cursor.toString()),
+      );
+      _controller.replaceText(cursor.index, 0, block, null);
+    }
+  }
+
   /// Receive local document change.
   ///
   /// * [event] A tuple containing the deltas and change source.
@@ -144,7 +156,7 @@ class _PageEditorState extends State<PageEditor> {
     delta.push(Operation.insert('\n'));
     // Update document with receiving data
     _updateDocumentWithDelta(delta, firstFecth);
-
+    _updateRemoteCursors([RemoteCursor('Pedro', Colors.red, 1)]);
     if (firstFecth) setState(() {});
   }
 
@@ -295,6 +307,7 @@ class _PageEditorState extends State<PageEditor> {
                               scrollController: _scrollController,
                               onImagePaste: (bytes) => Future.value(null),
                               onLaunchUrl: null,
+                              embedBuilders: [CursorEmbedBuilder()],
                             ),
                           ),
                         ),
