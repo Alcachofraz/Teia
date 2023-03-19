@@ -1,19 +1,28 @@
 import 'package:teia/models/letter.dart';
 import 'package:collection/collection.dart';
 import 'package:sorted_list/sorted_list.dart';
+import 'package:flutter_quill/flutter_quill.dart';
+import 'package:teia/models/snippets/snippet.dart';
+import 'package:teia/models/snippets/text_snippet.dart';
 
 class EditingPage {
   final int id;
   final int chapterId;
   final String storyId;
-  final String? lastModifierUid;
+  String? lastModifierUid;
 
   final SortedList<Letter> letters;
 
-  static const int intMaxValue = 9223372036854775807;
+  static const int intMaxValue = 2147483647;
   static const int boundary = 10;
 
-  EditingPage(this.id, this.chapterId, this.storyId, this.letters, this.lastModifierUid);
+  EditingPage(
+    this.id,
+    this.chapterId,
+    this.storyId,
+    this.letters,
+    this.lastModifierUid,
+  );
 
   factory EditingPage.empty(int id, int chapterId, String storyId, {String? uid}) {
     return EditingPage(id, chapterId, storyId, SortedList<Letter>(), uid);
@@ -25,8 +34,7 @@ class EditingPage {
       map['id'] as int,
       map['chapterId'] as int,
       map['storyId'] as String,
-      SortedList<Letter>()
-        ..addAll(map['letters'].map<Letter>((letter) => Letter(letter['id'], letter['letter'])).toList()),
+      SortedList<Letter>()..addAll(map['letters'].map<Letter>((letter) => Letter.fromMap(letter)).toList()),
       map['lastModifierUid'] as String,
     );
   }
@@ -40,6 +48,13 @@ class EditingPage {
     }
     return ret;
   }
+
+  Snippet findSnippet(int index) {
+    //TODO
+    return TextSnippet('');
+  }
+
+  void createSnippet(int from, int to, {String? url, int? id}) {}
 
   List<int> generateId(List<int>? p, List<int>? q) {
     if (p != null) {
@@ -72,13 +87,27 @@ class EditingPage {
     }
   }
 
+  int? getLeftMostOffset(Letter letter) {
+    // Find letter
+    int ret = letters.indexOf(letter);
+    if (ret >= 0) {
+      return ret;
+    }
+    try {
+      Letter aux = letters.lastWhere((l) => l.compareTo(letter) < 0);
+      return letters.indexOf(aux);
+    } catch (e) {
+      return null;
+    }
+  }
+
   void insert(int skip, String text) {
     for (int i = 0; i < text.length; i++) {
       letters.add(
         Letter(
           generateId(
-            letters[skip + i].id,
-            letters[skip + i + 1].id,
+            skip + i - 1 <= 0 ? null : letters[skip + i - 1].id,
+            skip + i >= letters.length ? null : letters[skip + i].id,
           ),
           text[i],
         ),
@@ -88,5 +117,28 @@ class EditingPage {
 
   void delete(int skip, int length) {
     letters.removeRange(skip, skip + length);
+  }
+
+  Delta toDelta() {
+    return letters.fold<Delta>(Delta(), (delta, letter) => delta..insert(letter.letter));
+  }
+
+  Map<String, dynamic> toMap() => {
+        'id': id,
+        'chapterId': chapterId,
+        'storyId': storyId,
+        'letters': letters.map<Map<String, dynamic>>((letter) => letter.toMap()),
+        'lastModifierUid': lastModifierUid,
+      };
+
+  @override
+  String toString() {
+    return {
+      'id': id,
+      'chapterId': chapterId,
+      'storyId': storyId,
+      'letters': letters.length,
+      'lastModifierUid': lastModifierUid,
+    }.toString();
   }
 }

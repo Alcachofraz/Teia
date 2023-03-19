@@ -3,7 +3,8 @@ import 'dart:async';
 import 'package:flutter/material.dart' hide Page;
 import 'package:teia/models/chapter.dart';
 import 'package:teia/models/chapter_graph.dart';
-import 'package:teia/models/page.dart';
+import 'package:teia/models/editing_page.dart';
+import 'package:teia/models/letter.dart';
 import 'package:teia/screens/chapter_graph_view.dart';
 import 'package:teia/services/authentication_service.dart';
 import 'package:teia/services/chapter_edit_service.dart';
@@ -12,6 +13,7 @@ import 'package:teia/utils/utils.dart';
 import 'package:teia/views/misc/screen_wrapper.dart';
 import 'package:teia/views/misc/tile.dart';
 import 'package:multi_split_view/multi_split_view.dart';
+import 'package:sorted_list/sorted_list.dart';
 
 class ChapterEditorScreen extends StatefulWidget {
   final bool picking;
@@ -56,12 +58,11 @@ class _ChapterEditorScreenState extends State<ChapterEditorScreen> {
   void initState() {
     textEditorWeight = Utils.textEditorDefaultWeight;
     loosePagesMenuHeight = Utils.loosePagesMenuDefaultHeight;
-    _chapterSubscription = ChapterEditService.chapterStream(widget.storyId, widget.chapterId)
-        .listen((chapter) => setState(() => _chapter = chapter));
+    _chapterSubscription = ChapterEditService.chapterStream(widget.storyId, widget.chapterId).listen((chapter) => setState(() => _chapter = chapter));
     super.initState();
   }
 
-  void pushPageToRemote(Page page) {
+  void pushPageToRemote(EditingPage page) {
     ChapterEditService.pageSet(page, AuthenticationService.uid);
   }
 
@@ -86,11 +87,11 @@ class _ChapterEditorScreenState extends State<ChapterEditorScreen> {
           // Update local
           setState(() {});
           ChapterEditService.pageCreate(
-            Page(
+            EditingPage(
               pageId,
               int.parse(widget.chapterId),
               widget.storyId,
-              [],
+              SortedList<Letter>(),
               null,
             ),
             graph,

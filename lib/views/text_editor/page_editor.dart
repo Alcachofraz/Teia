@@ -1,8 +1,9 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart' hide Page;
-import 'package:teia/models/page.dart';
+import 'package:teia/models/editing_page.dart';
 import 'package:flutter_quill/flutter_quill.dart' hide Text;
+import 'package:teia/models/letter.dart';
 import 'package:teia/models/snippets/snippet.dart';
 import 'package:teia/services/authentication_service.dart';
 import 'package:teia/services/chapter_edit_service.dart';
@@ -18,7 +19,7 @@ import 'package:tuple/tuple.dart';
 class PageEditor extends StatefulWidget {
   final String pageId;
   final FocusNode? focusNode;
-  final Function(Page page)? pushPageToRemote;
+  final Function(EditingPage page)? pushPageToRemote;
 
   const PageEditor({
     super.key,
@@ -37,7 +38,7 @@ class _PageEditorState extends State<PageEditor> {
   late StreamSubscription _pageSubscription;
   late ScrollController _scrollController;
 
-  Page? page;
+  EditingPage? page;
 
   TextSelection? _selection;
   Snippet? _atSnippet;
@@ -65,24 +66,33 @@ class _PageEditorState extends State<PageEditor> {
     super.dispose();
   }
 
-  void _pushPageToRemote(Page? page) {
+  void _pushPageToRemote(EditingPage? page) {
     Logs.d('Sending:\n${page.toString()}');
     if (widget.pushPageToRemote != null && page != null) widget.pushPageToRemote!(page);
   }
 
   /// Currently totally replaces the document, initializing it again.
-  void _updateDocumentWithDelta(Delta delta, bool firstFecth) {
-    // Store current selection
-    final selection = _controller.selection;
+  void _updateDocumentWithDelta(Delta delta, Letter? letterCursorAt) {
     // Cancel previous subscription to changes
     _documentChangesSubscription.cancel();
     // Initialize the document with the specified delta
     _controller.document = Document.fromDelta(delta);
     // Set selection to stored state
-    if (firstFecth) {
+    if (letterCursorAt == null) {
       _controller.moveCursorToEnd();
     } else {
-      _controller.updateSelection(selection, ChangeSource.LOCAL);
+      int? id = page!.getLeftMostOffset(letterCursorAt);
+      if (id == null) {
+        _controller.moveCursorToEnd();
+      } else {
+        _controller.updateSelection(
+          TextSelection(
+            baseOffset: id,
+            extentOffset: id,
+          ),
+          ChangeSource.LOCAL,
+        );
+      }
     }
     // Restart subscription to changes
     _documentChangesSubscription = _controller.document.changes.listen(_onLocalChange);
@@ -110,13 +120,7 @@ class _PageEditorState extends State<PageEditor> {
         skip += op.value as int;
       } else if (op.isInsert) {
         String text = op.value as String;
-        Snippet? snippet = op.attributes?["link"];
-        if (snippet != null) {
-          snippet.text = text;
-          _onInsertSnippet(skip, snippet);
-        } else {
-          _onInsert(skip, text);
-        }
+        _onInsert(skip, text);
         skip += text.length;
         //break;
       } else if (op.isDelete) {
@@ -142,12 +146,28 @@ class _PageEditorState extends State<PageEditor> {
   /// Receive remote document change (Page object).
   ///
   /// * [page] Page object containing the new [snippets] and the [lastModifierUid]
-  void _onRemoteChange(Page page) {
-    // Ignore changes made by the user himself, as long
+  void _onRemoteChange(EditingPage page) {
+    bool firstFetch = this.page == null;
+    if (page.lastModifierUid == AuthenticationService.uid && !firstFetch) return;
+    // Update page
+    this.page = page;
+    Delta delta = Delta.fromOperations([Operation.delete(_controller.document.length)]);
+    // Get page delta
+    delta.concat(page.toDelta());
+    // Append new line (to soothe the Quill Document =-=)
+    delta.push(Operation.insert('\n'));
+    _controller.document.compose(delta, ChangeSource.REMOTE);
+    if (firstFetch) setState(() {});
+
+    /*// Ignore changes made by the user himself, as long
     // as it's not the first fetch.
     // If current editing page is null, it's the first fetch
-    bool firstFecth = this.page == null;
-    if (page.lastModifierUid == AuthenticationService.uid && !firstFecth) return;
+    bool firstFetch = this.page == null;
+    if (page.lastModifierUid == AuthenticationService.uid && !firstFetch) return;
+    Letter? letterCursorAt;
+    if (!firstFetch) {
+      letterCursorAt = page.letters[_controller.selection.baseOffset];
+    }
     // Update page
     this.page = page;
     // Get page delta
@@ -155,13 +175,13 @@ class _PageEditorState extends State<PageEditor> {
     // Append new line (to soothe the Quill Document =-=)
     delta.push(Operation.insert('\n'));
     // Update document with receiving data
-    _updateDocumentWithDelta(delta, firstFecth);
-    _updateRemoteCursors([RemoteCursor('Pedro', Colors.red, 1)]);
-    if (firstFecth) setState(() {});
+    _updateDocumentWithDelta(delta, letterCursorAt);
+    //_updateRemoteCursors([RemoteCursor('Pedro', Colors.red, 1)]);
+    if (firstFetch) setState(() {});*/
   }
 
   /// On document insert of snippet.
-  void _onInsertSnippet(int skip, Snippet snippet) {
+  /*void _onInsertSnippet(int skip, Snippet snippet) {
     Logs.d('Inserting Snippet($skip, ${snippet.toMap()})');
     if (page == null) {
       Logs.e('Trying to insert snippet on a null Page!');
@@ -170,7 +190,7 @@ class _PageEditorState extends State<PageEditor> {
     page!.insertSnippet(skip, snippet);
     page!.normalizeSnippets();
     _pushPageToRemote(page);
-  }
+  }*/
 
   /// On document insert.
   void _onInsert(int skip, String text) {
@@ -180,7 +200,7 @@ class _PageEditorState extends State<PageEditor> {
       return;
     }
     page!.insert(skip, text);
-    page!.normalizeSnippets();
+    //page!.normalizeSnippets();
     _pushPageToRemote(page);
   }
 
@@ -192,7 +212,7 @@ class _PageEditorState extends State<PageEditor> {
       return;
     }
     page!.delete(skip, length);
-    page!.normalizeSnippets();
+    //page!.normalizeSnippets();
     _pushPageToRemote(page);
   }
 
@@ -216,13 +236,13 @@ class _PageEditorState extends State<PageEditor> {
 
   void _onAddChoice() {
     page!.createSnippet(_selection!.baseOffset, _selection!.extentOffset, url: '');
-    _updateDocumentWithDelta(page!.toDelta(), false);
+    _updateDocumentWithDelta(page!.toDelta(), null /* TODO: change to current */);
     _pushPageToRemote(page);
   }
 
   void _onAddImage() {
     page!.createSnippet(_selection!.baseOffset, _selection!.extentOffset, id: 0);
-    _updateDocumentWithDelta(page!.toDelta(), false);
+    _updateDocumentWithDelta(page!.toDelta(), null /* TODO: change to current */);
     _pushPageToRemote(page);
   }
 
