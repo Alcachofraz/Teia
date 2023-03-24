@@ -28,9 +28,7 @@ class ChapterGraphSettings {
 class Utils {
   static late ChapterGraphSettings graphSettings;
 
-  static const double textEditorDefaultWeight = 0.5;
-  static const double textEditorMaximumWeight = 0.85;
-  static const double textEditorMinimumWeight = 0.5;
+  static const double textEditorDefaultWeight = 0.6;
   static const double loosePagesMenuDefaultHeight = 0.5;
   static const double loosePagesMenuMaximumHeight = 0.8;
   static const double loosePagesMenuMinimumHeight = 0.35;

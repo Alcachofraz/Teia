@@ -1,8 +1,13 @@
-abstract class Snippet {
-  String text;
-  Snippet(this.text);
-  Snippet deepCopy({String? text});
-  bool joinable(Snippet snippet);
+import 'package:teia/models/letter.dart';
 
-  toMap();
+abstract class Snippet {
+  LetterId from;
+  LetterId to;
+  Snippet(
+    this.from,
+    this.to,
+  );
+  Snippet deepCopy({LetterId? from, LetterId? to});
+  bool joinable(Snippet snippet);
+  Map<String, dynamic> toMap();
 }

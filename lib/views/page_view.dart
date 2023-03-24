@@ -1,18 +1,13 @@
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart' hide Page;
-import 'package:teia/models/page.dart';
-import 'package:teia/models/snippets/choice_snippet.dart';
-import 'package:teia/models/snippets/text_snippet.dart';
-import 'package:teia/models/snippets/snippet.dart';
 
 class PageView extends StatefulWidget {
-  final Page page;
+  //final Page page;
   final Function()? onChoice;
   final Function()? onImage;
   final Function()? onSecret;
   const PageView({
     super.key,
-    required this.page,
+    //required this.page,
     required this.onChoice,
     required this.onImage,
     required this.onSecret,
@@ -27,7 +22,7 @@ class _PageViewState extends State<PageView> {
 
   @override
   void initState() {
-    for (Snippet snippet in widget.page.snippets) {
+    /*for (Snippet snippet in widget.page.snippets) {
       if (snippet is TextSnippet) {
         snippets.add(TextSpan(text: snippet.text));
       } else if (snippet is ChoiceSnippet) {
@@ -41,7 +36,7 @@ class _PageViewState extends State<PageView> {
           recognizer: TapGestureRecognizer()..onTap = widget.onImage,
         ));
       }
-    }
+    }*/
     super.initState();
   }
 

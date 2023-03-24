@@ -40,13 +40,6 @@ class _ChapterEditorScreenState extends State<ChapterEditorScreen> {
   bool showingLoosePages = false;
   final FocusNode pageEditorFocusNode = FocusNode();
 
-  final MultiSplitViewController _textEditorMultiSplitViewController = MultiSplitViewController(
-    areas: [
-      Area(minimalWeight: 1 - Utils.textEditorMaximumWeight, weight: 1 - Utils.textEditorDefaultWeight),
-      Area(minimalWeight: Utils.textEditorMinimumWeight, weight: Utils.textEditorDefaultWeight),
-    ],
-  );
-
   final MultiSplitViewController _loosePagesMultiSplitViewController = MultiSplitViewController(
     areas: [
       Area(minimalWeight: 1 - Utils.loosePagesMenuMaximumHeight, weight: 1 - Utils.loosePagesMenuDefaultHeight),
@@ -58,7 +51,8 @@ class _ChapterEditorScreenState extends State<ChapterEditorScreen> {
   void initState() {
     textEditorWeight = Utils.textEditorDefaultWeight;
     loosePagesMenuHeight = Utils.loosePagesMenuDefaultHeight;
-    _chapterSubscription = ChapterEditService.chapterStream(widget.storyId, widget.chapterId).listen((chapter) => setState(() => _chapter = chapter));
+    _chapterSubscription = ChapterEditService.chapterStream(widget.storyId, widget.chapterId)
+        .listen((chapter) => setState(() => _chapter = chapter));
     super.initState();
   }
 
@@ -92,6 +86,7 @@ class _ChapterEditorScreenState extends State<ChapterEditorScreen> {
               int.parse(widget.chapterId),
               widget.storyId,
               SortedList<Letter>(),
+              [],
               null,
             ),
             graph,
@@ -201,53 +196,37 @@ class _ChapterEditorScreenState extends State<ChapterEditorScreen> {
         curve: Curves.decelerate,
         right: selectedPageId == null ? -(MediaQuery.of(context).size.width * textEditorWeight) : 0,
         child: SizedBox(
-          width: MediaQuery.of(context).size.width,
+          width: MediaQuery.of(context).size.width * textEditorWeight,
           height: MediaQuery.of(context).size.height,
-          child: MultiSplitViewTheme(
-            data: MultiSplitViewThemeData(dividerThickness: Utils.dividerThickness),
-            child: MultiSplitView(
-              controller: _textEditorMultiSplitViewController,
-              onWeightChange: () {
-                setState(() {
-                  textEditorWeight = _textEditorMultiSplitViewController.areas[1].weight!;
-                });
-              },
-              dividerBuilder: (axis, index, resizable, dragging, highlighted, themeData) =>
-                  _dividerBuilder(true, axis, index, resizable, dragging, highlighted, themeData),
+          child: Container(
+            color: Utils.pageEditorBackgroundColor,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              mainAxisSize: MainAxisSize.max,
               children: [
-                const SizedBox.shrink(),
-                Container(
+                Tile(
+                  padding: EdgeInsets.zero,
+                  elevation: 0.0,
                   color: Utils.pageEditorBackgroundColor,
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    mainAxisSize: MainAxisSize.max,
-                    children: [
-                      Tile(
-                        padding: EdgeInsets.zero,
-                        elevation: 0.0,
-                        color: Utils.pageEditorBackgroundColor,
-                        child: const Icon(
-                          Icons.keyboard_arrow_right_rounded,
-                          size: Utils.collapseButtonSize,
-                        ),
-                        onTap: () {
-                          setState(() {
-                            selectedPageId = null;
-                          });
-                        },
-                      ),
-                      selectedPageId != null
-                          ? Expanded(
-                              child: PageEditor(
-                                pageId: selectedPageId!.toString(),
-                                focusNode: pageEditorFocusNode,
-                                pushPageToRemote: pushPageToRemote,
-                              ),
-                            )
-                          : const SizedBox.shrink(),
-                    ],
+                  child: const Icon(
+                    Icons.keyboard_arrow_right_rounded,
+                    size: Utils.collapseButtonSize,
                   ),
+                  onTap: () {
+                    setState(() {
+                      selectedPageId = null;
+                    });
+                  },
                 ),
+                selectedPageId != null
+                    ? Expanded(
+                        child: PageEditor(
+                          pageId: selectedPageId!.toString(),
+                          focusNode: pageEditorFocusNode,
+                          pushPageToRemote: pushPageToRemote,
+                        ),
+                      )
+                    : const SizedBox.shrink(),
               ],
             ),
           ),
