@@ -1,17 +1,22 @@
+import 'package:teia/models/letter.dart';
 import 'package:teia/models/snippets/snippet.dart';
 
 class TextSnippet extends Snippet {
-  TextSnippet(String text) : super(text);
+  TextSnippet(
+    LetterId from,
+    LetterId to,
+  ) : super(from, to);
 
   @override
   Map<String, dynamic> toMap() => {
-        'text': text,
+        'from': from.id,
+        'to': to.id,
         'type': 0,
       };
 
   @override
-  Snippet deepCopy({String? text}) {
-    return TextSnippet(text ?? this.text);
+  Snippet deepCopy({String? text, LetterId? from, LetterId? to}) {
+    return TextSnippet(from ?? this.from, to ?? this.to);
   }
 
   @override
@@ -21,9 +26,14 @@ class TextSnippet extends Snippet {
 
   @override
   bool operator ==(Object other) {
-    return (other is Snippet) && other.text == text;
+    return (other is Snippet) && other.from == from && other.to == to;
   }
 
   @override
-  int get hashCode => text.hashCode + 0;
+  int get hashCode => from.hashCode + to.hashCode + 0;
+
+  @override
+  String toString() {
+    return '{from: $from, to: $to}';
+  }
 }

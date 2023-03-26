@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:flutter/material.dart' hide Page;
 import 'package:teia/models/editing_page.dart';
 import 'package:flutter_quill/flutter_quill.dart' hide Text;
-import 'package:teia/models/letter.dart';
 import 'package:teia/models/snippets/snippet.dart';
 import 'package:teia/services/authentication_service.dart';
 import 'package:teia/services/chapter_management_service.dart';
@@ -67,35 +66,17 @@ class _PageEditorState extends State<PageEditor> {
   }
 
   void _pushPageToRemote(EditingPage? page) {
-    Logs.d('Sending:\n${page.toString()}');
+    //Logs.d('Sending:\n${page.toString()}');
     if (widget.pushPageToRemote != null && page != null) widget.pushPageToRemote!(page);
   }
 
-  /// Currently totally replaces the document, initializing it again.
-  void _updateDocumentWithDelta(Delta delta, Letter? letterCursorAt) {
-    // Cancel previous subscription to changes
-    _documentChangesSubscription.cancel();
-    // Initialize the document with the specified delta
-    _controller.document = Document.fromDelta(delta);
-    // Set selection to stored state
-    if (letterCursorAt == null) {
-      _controller.moveCursorToEnd();
-    } else {
-      int? id = page!.getLeftMostOffset(letterCursorAt);
-      if (id == null) {
-        _controller.moveCursorToEnd();
-      } else {
-        _controller.updateSelection(
-          TextSelection(
-            baseOffset: id,
-            extentOffset: id,
-          ),
-          ChangeSource.LOCAL,
-        );
-      }
-    }
-    // Restart subscription to changes
-    _documentChangesSubscription = _controller.document.changes.listen(_onLocalChange);
+  void _replaceDelta(Delta currentDelta, Delta newDelta) {
+    Delta diff = currentDelta.diff(newDelta);
+    _controller.compose(
+      diff,
+      const TextSelection(baseOffset: 0, extentOffset: 0),
+      ChangeSource.REMOTE,
+    );
   }
 
   void _updateRemoteCursors(List<RemoteCursor> cursors) {
@@ -111,34 +92,27 @@ class _PageEditorState extends State<PageEditor> {
   ///
   /// * [event] A tuple containing the deltas and change source.
   void _onLocalChange(Tuple3<Delta, Delta, ChangeSource> event) {
-    if (page == null) return;
+    // If not page yet or change is remote, do nothing
+    if (page == null || event.item3 == ChangeSource.REMOTE) return;
     // Characters to skip.
     int skip = 0;
-    Logs.d(event.item2.toList().map((e) => e.toJson()));
+    // Iterate all operations
     for (Operation op in event.item2.toList()) {
       if (op.isRetain) {
+        // If retaining, add to skip
         skip += op.value as int;
       } else if (op.isInsert) {
+        // If inserting, call _onInsert() with current skip
         String text = op.value as String;
         _onInsert(skip, text);
+        // Add he inserted text length to skip
         skip += text.length;
-        //break;
       } else if (op.isDelete) {
+        // If deleting, call _onDelete() with current skip
         int length = op.value as int;
         _onDelete(skip, length);
+        // Remove the deleting text length from skip
         skip -= length;
-        //break;
-        // Break out, because an event never contains
-        // two insert and/or delete operations. When iterating
-        // the operations in an event's delta, if an insert is
-        // reached, then it's guaranteed no inserts/deletes
-        // are to follow.
-        //
-        // This is the same as saying the user can't ever delete
-        // and insert in an unique event, even when he selects text
-        // and writes. That scenaro, for example, would originate
-        // two events instead. One for the delete operation, and
-        // one for the insert operation.
       }
     }
   }
@@ -148,53 +122,27 @@ class _PageEditorState extends State<PageEditor> {
   /// * [page] Page object containing the new [snippets] and the [lastModifierUid]
   void _onRemoteChange(EditingPage page) {
     bool firstFetch = this.page == null;
-    if (page.lastModifierUid == AuthenticationService.uid && !firstFetch) return;
-    // Update page
-    this.page = page;
-    Delta delta = Delta.fromOperations([Operation.delete(_controller.document.length)]);
-    // Get page delta
-    delta.concat(page.toDelta());
-    // Append new line (to soothe the Quill Document =-=)
-    delta.push(Operation.insert('\n'));
-    _controller.document.compose(delta, ChangeSource.REMOTE);
-    if (firstFetch) setState(() {});
-
-    /*// Ignore changes made by the user himself, as long
-    // as it's not the first fetch.
-    // If current editing page is null, it's the first fetch
-    bool firstFetch = this.page == null;
-    if (page.lastModifierUid == AuthenticationService.uid && !firstFetch) return;
-    Letter? letterCursorAt;
-    if (!firstFetch) {
-      letterCursorAt = page.letters[_controller.selection.baseOffset];
-    }
-    // Update page
-    this.page = page;
-    // Get page delta
-    Delta delta = page.toDelta();
-    // Append new line (to soothe the Quill Document =-=)
-    delta.push(Operation.insert('\n'));
-    // Update document with receiving data
-    _updateDocumentWithDelta(delta, letterCursorAt);
-    //_updateRemoteCursors([RemoteCursor('Pedro', Colors.red, 1)]);
-    if (firstFetch) setState(() {});*/
-  }
-
-  /// On document insert of snippet.
-  /*void _onInsertSnippet(int skip, Snippet snippet) {
-    Logs.d('Inserting Snippet($skip, ${snippet.toMap()})');
-    if (page == null) {
-      Logs.e('Trying to insert snippet on a null Page!');
+    if (firstFetch) {
+      Delta delta = page.toDelta();
+      if (delta.isNotEmpty) {
+        _controller.compose(
+          delta,
+          const TextSelection(baseOffset: 0, extentOffset: 0),
+          ChangeSource.REMOTE,
+        );
+      }
+      setState(() {});
+    } else if (page.lastModifierUid == AuthenticationService.uid) {
       return;
+    } else {
+      _replaceDelta(this.page!.toDelta(), page.toDelta());
     }
-    page!.insertSnippet(skip, snippet);
-    page!.normalizeSnippets();
-    _pushPageToRemote(page);
-  }*/
+    this.page = page;
+  }
 
   /// On document insert.
   void _onInsert(int skip, String text) {
-    Logs.d('Inserting($skip, $text)');
+    //Logs.d('Inserting($skip, $text)');
     if (page == null) {
       Logs.e('Trying to insert on a null Page!');
       return;
@@ -206,7 +154,7 @@ class _PageEditorState extends State<PageEditor> {
 
   /// On document delete.
   void _onDelete(int skip, int length) {
-    Logs.d('Deleting($skip, $length)');
+    //Logs.d('Deleting($skip, $length)');
     if (page == null) {
       Logs.e('Trying to insert on a null Page!');
       return;
@@ -229,57 +177,90 @@ class _PageEditorState extends State<PageEditor> {
       // Find local snippet
       setState(() {
         _selection = null;
-        _atSnippet = page!.findSnippet(selection.baseOffset);
+        _atSnippet = page!.findSnippetByIndex(selection.baseOffset);
       });
     }
   }
 
   void _onAddChoice() {
-    page!.createSnippet(_selection!.baseOffset, _selection!.extentOffset, url: '');
-    _updateDocumentWithDelta(page!.toDelta(), null /* TODO: change to current */);
+    if (_selection == null) return;
+    Delta currentDelta = page!.toDelta();
+    page!.createSnippet(_selection!.baseOffset, _selection!.extentOffset - 1, url: '');
+    _replaceDelta(currentDelta, page!.toDelta());
     _pushPageToRemote(page);
   }
 
   void _onAddImage() {
-    page!.createSnippet(_selection!.baseOffset, _selection!.extentOffset, id: 0);
-    _updateDocumentWithDelta(page!.toDelta(), null /* TODO: change to current */);
+    if (_selection == null) return;
+    Delta currentDelta = page!.toDelta();
+    page!.createSnippet(_selection!.baseOffset, _selection!.extentOffset - 1, id: 0);
+    _replaceDelta(currentDelta, page!.toDelta());
     _pushPageToRemote(page);
   }
 
-  Widget _textSelectionOptions() => Tile(
-        padding: EdgeInsets.zero,
-        color: Utils.graphSettings.backgroundColor,
-        elevation: 0.0,
-        radiusTopLeft: 16.0,
-        radiusTopRight: 16.0,
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Wrap(
-            spacing: 8.0,
-            runSpacing: 8.0,
-            children: [
-              Tile(
-                radiusAll: 100,
-                color: Colors.white,
-                onTap: _onAddChoice,
-                child: const Padding(
-                  padding: EdgeInsets.all(4.0),
-                  child: Text('Choice'),
-                ),
-              ),
-              Tile(
-                radiusAll: 100,
-                color: Colors.white,
-                onTap: _onAddImage,
-                child: const Padding(
-                  padding: EdgeInsets.all(4.0),
-                  child: Text('Image'),
+  Widget _textOptions() {
+    return Stack(
+      children: const [],
+    );
+
+    /*Column(
+      children: [
+        Tile(
+          color: _selection == null ? Colors.grey[100]! : Utils.pageEditorSheetColor,
+          padding: const EdgeInsets.fromLTRB(16.0, 0.0, 24.0, 0.0),
+          onTap: _selection == null
+              ? null
+              : () {
+                  _onAddChoice();
+                },
+          child: Row(
+            children: const [
+              Expanded(
+                child: Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: Text('Add Choice'),
                 ),
               ),
             ],
           ),
         ),
-      );
+        Tile(
+          color: _selection == null ? Colors.grey[100]! : Utils.pageEditorSheetColor,
+          padding: const EdgeInsets.fromLTRB(16.0, 16.0, 24.0, 0.0),
+          onTap: _selection == null
+              ? null
+              : () {
+                  _onAddImage();
+                },
+          child: Row(
+            children: const [
+              Expanded(
+                child: Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: Text('Add Image'),
+                ),
+              ),
+            ],
+          ),
+        ),
+        if (_atSnippet != null)
+          Tile(
+            color: Utils.pageEditorSheetColor,
+            padding: const EdgeInsets.fromLTRB(16.0, 16.0, 24.0, 0.0),
+            child: Row(
+              children: const [
+                Expanded(
+                  child: Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child: Text('At Snippet'),
+                  ),
+                ),
+              ],
+            ),
+          ),
+      ],
+    );*/
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -307,7 +288,7 @@ class _PageEditorState extends State<PageEditor> {
               : Row(
                   children: [
                     Expanded(
-                      flex: 8,
+                      flex: 4,
                       child: MouseRegion(
                         cursor: SystemMouseCursors.text,
                         child: Tile(
@@ -333,28 +314,10 @@ class _PageEditorState extends State<PageEditor> {
                         ),
                       ),
                     ),
-                    const Expanded(
-                      flex: 2,
-                      child: SizedBox.shrink(),
-                    ),
-                  ],
-                ),
-        ),
-        AnimatedSize(
-          duration: const Duration(milliseconds: 250),
-          curve: Curves.decelerate,
-          child: _selection != null
-              ? Row(
-                  mainAxisSize: MainAxisSize.max,
-                  children: [
                     Expanded(
-                      child: _textSelectionOptions(),
+                      flex: 2,
+                      child: _textOptions(),
                     ),
-                  ],
-                )
-              : Row(
-                  children: const [
-                    SizedBox.shrink(),
                   ],
                 ),
         ),

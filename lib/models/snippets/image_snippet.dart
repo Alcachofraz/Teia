@@ -1,19 +1,25 @@
+import 'package:teia/models/letter.dart';
 import 'package:teia/models/snippets/snippet.dart';
 
 class ImageSnippet extends Snippet {
   String url;
-  ImageSnippet(String text, this.url) : super(text);
+  ImageSnippet(
+    LetterId from,
+    LetterId to,
+    this.url,
+  ) : super(from, to);
 
   @override
   Map<String, dynamic> toMap() => {
-        'text': text,
+        'from': from.id,
+        'to': to.id,
         'type': 2,
         'url': url,
       };
 
   @override
-  Snippet deepCopy({String? text}) {
-    return ImageSnippet(text ?? this.text, url);
+  Snippet deepCopy({String? text, LetterId? from, LetterId? to}) {
+    return ImageSnippet(from ?? this.from, to ?? this.to, url);
   }
 
   @override
@@ -23,9 +29,14 @@ class ImageSnippet extends Snippet {
 
   @override
   bool operator ==(Object other) {
-    return (other is ImageSnippet) && other.text == text && other.url == url;
+    return (other is ImageSnippet) && other.url == url && other.from == from && other.to == to;
   }
 
   @override
-  int get hashCode => text.hashCode + url.hashCode + 2;
+  int get hashCode => url.hashCode + from.hashCode + to.hashCode + 2;
+
+  @override
+  String toString() {
+    return '{from: $from, to: $to, url: $url}';
+  }
 }
