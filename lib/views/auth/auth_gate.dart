@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterfire_ui/auth.dart';
+import 'package:teia/services/user_management_service.dart';
 
 class AuthGate extends StatelessWidget {
   final StatefulWidget landingScreen;
@@ -18,6 +19,7 @@ class AuthGate extends StatelessWidget {
             ],
           );
         }
+        UserManagementService.tryCreateUser(snapshot.data!);
         return landingScreen;
       },
     );

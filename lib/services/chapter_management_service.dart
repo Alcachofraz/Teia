@@ -3,7 +3,7 @@ import 'package:teia/models/chapter_graph.dart';
 import 'package:teia/models/editing_page.dart';
 import 'package:teia/services/firebase/firestore_utils.dart';
 
-class ChapterEditService {
+class ChapterManagementService {
   static Stream<Chapter> chapterStream(
     String storyId,
     String chapterId,

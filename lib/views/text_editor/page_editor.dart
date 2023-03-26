@@ -6,7 +6,7 @@ import 'package:flutter_quill/flutter_quill.dart' hide Text;
 import 'package:teia/models/letter.dart';
 import 'package:teia/models/snippets/snippet.dart';
 import 'package:teia/services/authentication_service.dart';
-import 'package:teia/services/chapter_edit_service.dart';
+import 'package:teia/services/chapter_management_service.dart';
 import 'package:teia/utils/loading.dart';
 import 'package:teia/utils/logs.dart';
 import 'package:teia/utils/utils.dart';
@@ -54,7 +54,7 @@ class _PageEditorState extends State<PageEditor> {
     // Listen to selection changes with _onSelectionChanged
     _controller.onSelectionChanged = _onSelectionChanged;
     // Listen to cloud document changes with _onRemoteChange
-    _pageSubscription = ChapterEditService.pageStream('1', '1', widget.pageId).listen(_onRemoteChange);
+    _pageSubscription = ChapterManagementService.pageStream('1', '1', widget.pageId).listen(_onRemoteChange);
     super.initState();
   }
 

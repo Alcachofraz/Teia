@@ -7,7 +7,7 @@ import 'package:teia/models/editing_page.dart';
 import 'package:teia/models/letter.dart';
 import 'package:teia/screens/chapter_graph_view.dart';
 import 'package:teia/services/authentication_service.dart';
-import 'package:teia/services/chapter_edit_service.dart';
+import 'package:teia/services/chapter_management_service.dart';
 import 'package:teia/views/text_editor/page_editor.dart';
 import 'package:teia/utils/utils.dart';
 import 'package:teia/views/misc/screen_wrapper.dart';
@@ -58,12 +58,13 @@ class _ChapterEditorScreenState extends State<ChapterEditorScreen> {
   void initState() {
     textEditorWeight = Utils.textEditorDefaultWeight;
     loosePagesMenuHeight = Utils.loosePagesMenuDefaultHeight;
-    _chapterSubscription = ChapterEditService.chapterStream(widget.storyId, widget.chapterId).listen((chapter) => setState(() => _chapter = chapter));
+    _chapterSubscription =
+        ChapterManagementService.chapterStream(widget.storyId, widget.chapterId).listen((chapter) => setState(() => _chapter = chapter));
     super.initState();
   }
 
   void pushPageToRemote(EditingPage page) {
-    ChapterEditService.pageSet(page, AuthenticationService.uid);
+    ChapterManagementService.pageSet(page, AuthenticationService.uid);
   }
 
   Widget _dividerBuilder(bool vertical, axis, index, resizable, dragging, highlighted, themeData) => resizable
@@ -86,7 +87,7 @@ class _ChapterEditorScreenState extends State<ChapterEditorScreen> {
           ChapterGraph graph = _chapter.addPage(pageId, uid: AuthenticationService.uid);
           // Update local
           setState(() {});
-          ChapterEditService.pageCreate(
+          ChapterManagementService.pageCreate(
             EditingPage(
               pageId,
               int.parse(widget.chapterId),
