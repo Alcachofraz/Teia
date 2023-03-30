@@ -1,4 +1,5 @@
 import 'package:teia/models/chapter_graph.dart';
+import 'package:teia/utils/logs.dart';
 
 class Chapter {
   int id;
@@ -30,7 +31,7 @@ class Chapter {
       map['id'] as int,
       map['storyId'] as String,
       map['title'] as String,
-      ChapterGraph.fromMap(map['graph'] as Map<int, List<int>>),
+      ChapterGraph.fromMap(Map<String, dynamic>.from(map['graph']).map((key, value) => MapEntry(int.parse(key), List<int>.from(value)))),
     );
   }
 
@@ -38,8 +39,12 @@ class Chapter {
   /// * [id] parent id.
   /// Returns the updated graph.
   ChapterGraph addPage(int id, {String? uid}) {
+    Logs.d(id);
     int newId = graph.numberOfPages() + 1;
+    Logs.d(newId);
+    Logs.d(graph);
     graph.addConnection(id, newId);
+    Logs.d(graph);
     return graph;
   }
 

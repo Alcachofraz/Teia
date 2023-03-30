@@ -51,7 +51,7 @@ class EditingPage {
             return TextSnippet(from, to);
         }
       }).toList(),
-      map['lastModifierUid'] as String,
+      map['lastModifierUid'] as String?,
     );
   }
 

@@ -52,21 +52,24 @@ class ChapterManagementService {
   }
 
   static Future<void> pageCreate(EditingPage page, ChapterGraph newGraph) async {
-    //Logs.d('Sending $page');
-    FirebaseUtils.firestore
-        .collection('stories')
-        .doc(page.storyId)
-        .collection('chapters')
-        .doc(page.chapterId.toString())
-        .collection('pages')
-        .doc(page.id.toString())
-        .set({
-      ...page.toMap(),
-      ...{'lastModifierUid': null},
-    });
-
-    FirebaseUtils.firestore.collection('stories').doc(page.storyId).collection('chapters').doc(page.chapterId.toString()).update({
-      'graph': newGraph.nodes,
+    FirebaseUtils.firestore.runTransaction((transaction) async {
+      transaction.update(
+        FirebaseUtils.firestore.collection('stories').doc(page.storyId).collection('chapters').doc(page.chapterId.toString()),
+        {'graph': newGraph.toMap()},
+      );
+      transaction.update(
+        FirebaseUtils.firestore
+            .collection('stories')
+            .doc(page.storyId)
+            .collection('chapters')
+            .doc(page.chapterId.toString())
+            .collection('pages')
+            .doc(page.id.toString()),
+        {
+          ...page.toMap(),
+          ...{'lastModifierUid': null},
+        },
+      );
     });
   }
 

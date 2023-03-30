@@ -56,4 +56,12 @@ class ChapterGraph {
     if (children == null) return true;
     return children.isEmpty;
   }
+
+  // To map.
+  Map<int, List<int>> toMap() => _nodes;
+
+  @override
+  String toString() {
+    return _nodes.toString();
+  }
 }
