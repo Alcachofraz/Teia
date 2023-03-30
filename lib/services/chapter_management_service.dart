@@ -33,7 +33,12 @@ class ChapterManagementService {
 
   static Future<void> chapterSet(Chapter chapter) async {
     //Logs.d('Sending $page');
-    FirebaseUtils.firestore.collection('stories').doc(chapter.storyId).collection('chapters').doc(chapter.id.toString()).set(chapter.toMap());
+    FirebaseUtils.firestore
+        .collection('stories')
+        .doc(chapter.storyId)
+        .collection('chapters')
+        .doc(chapter.id.toString())
+        .set(chapter.toMap());
   }
 
   static Future<void> pageSet(EditingPage page, String uid) async {
@@ -54,10 +59,14 @@ class ChapterManagementService {
   static Future<void> pageCreate(EditingPage page, ChapterGraph newGraph) async {
     FirebaseUtils.firestore.runTransaction((transaction) async {
       transaction.update(
-        FirebaseUtils.firestore.collection('stories').doc(page.storyId).collection('chapters').doc(page.chapterId.toString()),
+        FirebaseUtils.firestore
+            .collection('stories')
+            .doc(page.storyId)
+            .collection('chapters')
+            .doc(page.chapterId.toString()),
         {'graph': newGraph.toMap()},
       );
-      transaction.update(
+      transaction.set(
         FirebaseUtils.firestore
             .collection('stories')
             .doc(page.storyId)

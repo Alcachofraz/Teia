@@ -8,7 +8,6 @@ import 'package:teia/models/letter.dart';
 import 'package:teia/screens/chapter_graph_view.dart';
 import 'package:teia/services/authentication_service.dart';
 import 'package:teia/services/chapter_management_service.dart';
-import 'package:teia/utils/loading.dart';
 import 'package:teia/views/text_editor/page_editor.dart';
 import 'package:teia/utils/utils.dart';
 import 'package:teia/views/misc/screen_wrapper.dart';
@@ -33,7 +32,7 @@ class ChapterEditorScreen extends StatefulWidget {
 }
 
 class _ChapterEditorScreenState extends State<ChapterEditorScreen> {
-  Chapter? _chapter;
+  Chapter _chapter = Chapter.create(1, 'storyId', 'My chapter', AuthenticationService.uid);
   late double textEditorWeight;
   late double loosePagesMenuHeight;
   late StreamSubscription _chapterSubscription;
@@ -52,64 +51,13 @@ class _ChapterEditorScreenState extends State<ChapterEditorScreen> {
   void initState() {
     textEditorWeight = Utils.textEditorDefaultWeight;
     loosePagesMenuHeight = Utils.loosePagesMenuDefaultHeight;
-    _chapterSubscription =
-        ChapterManagementService.chapterStream(widget.storyId, widget.chapterId).listen((chapter) => setState(() => _chapter = chapter));
+    _chapterSubscription = ChapterManagementService.chapterStream(widget.storyId, widget.chapterId)
+        .listen((chapter) => setState(() => _chapter = chapter));
     super.initState();
   }
 
-  @override
-  void dispose() {
-    _chapterSubscription.cancel();
-    super.dispose();
-  }
-
-  void _pushPageToRemote(EditingPage page) {
+  void pushPageToRemote(EditingPage page) {
     ChapterManagementService.pageSet(page, AuthenticationService.uid);
-  }
-
-  void _clickPage(pageId) {
-    if (selectedPageId != null) {
-      // If a page is already selected
-      if (selectedPageId == pageId) {
-        // If selected the same page, do nothing.
-        return;
-      }
-      // Deselect page
-      setState(() {
-        selectedPageId = null;
-      });
-      // After animation, select new page
-      Future.delayed(
-        const Duration(milliseconds: Utils.textEditorAnimationDuration),
-        () {
-          setState(() {
-            selectedPageId = pageId;
-          });
-        },
-      );
-    } else {
-      // If no page is currently selected
-      setState(() {
-        selectedPageId = pageId;
-      });
-    }
-  }
-
-  void _createPage(pageId) {
-    ChapterGraph graph = _chapter!.addPage(pageId, uid: AuthenticationService.uid);
-    // Update local
-    setState(() {});
-    ChapterManagementService.pageCreate(
-      EditingPage(
-        pageId,
-        int.parse(widget.chapterId),
-        widget.storyId,
-        SortedList<Letter>(),
-        [],
-        null,
-      ),
-      graph,
-    );
   }
 
   Widget _dividerBuilder(bool vertical, axis, index, resizable, dragging, highlighted, themeData) => resizable
@@ -126,13 +74,53 @@ class _ChapterEditorScreenState extends State<ChapterEditorScreen> {
         )
       : const SizedBox.shrink();
 
-  Widget _chapterGraph() => _chapter == null
-      ? loadingRotate()
-      : ChapterGraphView(
-          chapter: _chapter!,
-          createPage: _createPage,
-          clickPage: _clickPage,
-        );
+  Widget _chapterGraph() => ChapterGraphView(
+        chapter: _chapter,
+        createPage: (pageId) {
+          ChapterGraph graph = _chapter.addPage(pageId, uid: AuthenticationService.uid);
+
+          // Update local
+          setState(() {});
+          ChapterManagementService.pageCreate(
+            EditingPage(
+              pageId,
+              int.parse(widget.chapterId),
+              widget.storyId,
+              SortedList<Letter>(),
+              [],
+              null,
+            ),
+            graph,
+          );
+        },
+        clickPage: (pageId) {
+          if (selectedPageId != null) {
+            // If a page is already selected
+            if (selectedPageId == pageId) {
+              // If selected the same page, do nothing.
+              return;
+            }
+            // Deselect page
+            setState(() {
+              selectedPageId = null;
+            });
+            // After animation, select new page
+            Future.delayed(
+              const Duration(milliseconds: Utils.textEditorAnimationDuration),
+              () {
+                setState(() {
+                  selectedPageId = pageId;
+                });
+              },
+            );
+          } else {
+            // If no page is currently selected
+            setState(() {
+              selectedPageId = pageId;
+            });
+          }
+        },
+      );
 
   Widget _loosePages() => AnimatedPositioned(
         duration: const Duration(milliseconds: Utils.textEditorAnimationDuration),
@@ -236,7 +224,7 @@ class _ChapterEditorScreenState extends State<ChapterEditorScreen> {
                         child: PageEditor(
                           pageId: selectedPageId!.toString(),
                           focusNode: pageEditorFocusNode,
-                          pushPageToRemote: _pushPageToRemote,
+                          pushPageToRemote: pushPageToRemote,
                         ),
                       )
                     : const SizedBox.shrink(),
