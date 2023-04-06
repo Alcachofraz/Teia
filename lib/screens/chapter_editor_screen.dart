@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:flutter/material.dart' hide Page;
 import 'package:teia/models/chapter.dart';
-import 'package:teia/models/chapter_graph.dart';
 import 'package:teia/models/editing_page.dart';
 import 'package:teia/models/letter.dart';
 import 'package:teia/screens/chapter_graph_view.dart';
@@ -52,8 +51,8 @@ class _ChapterEditorScreenState extends State<ChapterEditorScreen> {
   void initState() {
     textEditorWeight = Utils.textEditorDefaultWeight;
     loosePagesMenuHeight = Utils.loosePagesMenuDefaultHeight;
-    _chapterSubscription =
-        ChapterManagementService.chapterStream(widget.storyId, widget.chapterId).listen((chapter) => setState(() => _chapter = chapter));
+    _chapterSubscription = ChapterManagementService.chapterStream(widget.storyId, widget.chapterId)
+        .listen((chapter) => setState(() => _chapter = chapter));
     super.initState();
   }
 
@@ -96,19 +95,19 @@ class _ChapterEditorScreenState extends State<ChapterEditorScreen> {
   }
 
   void _createPage(pageId) {
-    ChapterGraph graph = _chapter!.addPage(pageId, uid: AuthenticationService.uid);
+    int newId = _chapter!.addPage(pageId, uid: AuthenticationService.uid);
     // Update local
     setState(() {});
     ChapterManagementService.pageCreate(
       EditingPage(
-        pageId,
+        newId,
         int.parse(widget.chapterId),
         widget.storyId,
         SortedList<Letter>(),
         [],
         null,
       ),
-      graph,
+      _chapter!.graph,
     );
   }
 
