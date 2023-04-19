@@ -1,7 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart' hide Page;
 import 'package:teia/firebase_options.dart';
-import 'package:teia/screens/chapter_editor_screen.dart';
+import 'package:teia/screens/chapter_editor_screen/chapter_editor_screen.dart';
 import 'package:teia/utils/swatch.dart';
 
 import 'package:teia/utils/utils.dart';

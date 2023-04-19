@@ -6,6 +6,8 @@ import 'package:teia/views/graph_page_node.dart';
 
 class ChapterGraphView extends StatefulWidget {
   final Chapter chapter;
+  final double? width;
+  final double? height;
   final Function(int)? createPage;
   final Function(int)? clickPage;
 
@@ -13,6 +15,8 @@ class ChapterGraphView extends StatefulWidget {
     Key? key,
     required this.chapter,
     this.createPage,
+    this.width,
+    this.height,
     this.clickPage,
   }) : super(key: key);
 
@@ -43,7 +47,10 @@ class _ChapterGraphViewState extends State<ChapterGraphView> {
     //Algorithm algorithm = BuchheimWalkerAlgorithm(builder, ArrowEdgeRenderer());
     Algorithm algorithm = BuchheimWalkerAlgorithm(builder, TreeEdgeRenderer(builder));
 
-    return [graph, algorithm];
+    return [
+      graph,
+      algorithm
+    ];
   }
 
   @override
@@ -52,34 +59,38 @@ class _ChapterGraphViewState extends State<ChapterGraphView> {
     Graph graph = result[0];
     Algorithm algorithm = result[1];
 
-    return InteractiveViewer(
-      minScale: 0.5,
-      maxScale: 4.0,
-      boundaryMargin: const EdgeInsets.all(double.infinity),
-      constrained: false,
-      child: Center(
-        child: GraphView(
-          graph: graph,
-          algorithm: algorithm,
-          paint: Paint()
-            ..color = Utils.graphSettings.arrowColor
-            ..strokeWidth = 1.5
-            ..style = PaintingStyle.stroke,
-          builder: (Node node) {
-            return Padding(
-              padding: const EdgeInsets.only(left: 10.0, right: 10.0, bottom: 10.0),
-              child: GraphPageNode(
-                id: node.key!.value as int,
-                insideColor: Utils.graphSettings.nodeInsideColor,
-                borderColor: Utils.graphSettings.nodeBorderColor,
-                hoverColor: Utils.graphSettings.nodeHoverSplashColor,
-                clickColor: Utils.graphSettings.nodeClickSplashColor,
-                iconColor: Utils.graphSettings.nodeIconColor,
-                clickPage: widget.clickPage,
-                createPage: widget.createPage,
-              ),
-            );
-          },
+    return SizedBox(
+      width: widget.width,
+      height: widget.height,
+      child: InteractiveViewer(
+        minScale: 0.5,
+        maxScale: 4.0,
+        boundaryMargin: const EdgeInsets.all(double.infinity),
+        constrained: false,
+        child: Center(
+          child: GraphView(
+            graph: graph,
+            algorithm: algorithm,
+            paint: Paint()
+              ..color = Utils.graphSettings.arrowColor
+              ..strokeWidth = 1.5
+              ..style = PaintingStyle.stroke,
+            builder: (Node node) {
+              return Padding(
+                padding: const EdgeInsets.only(left: 10.0, right: 10.0, bottom: 10.0),
+                child: GraphPageNode(
+                  id: node.key!.value as int,
+                  insideColor: Utils.graphSettings.nodeInsideColor,
+                  borderColor: Utils.graphSettings.nodeBorderColor,
+                  hoverColor: Utils.graphSettings.nodeHoverSplashColor,
+                  clickColor: Utils.graphSettings.nodeClickSplashColor,
+                  iconColor: Utils.graphSettings.nodeIconColor,
+                  clickPage: widget.clickPage,
+                  createPage: widget.createPage,
+                ),
+              );
+            },
+          ),
         ),
       ),
     );

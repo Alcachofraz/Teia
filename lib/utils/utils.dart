@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:teia/utils/swatch.dart';
+import 'dart:html';
 
 class ChapterGraphSettings {
   final Color backgroundColor;
@@ -28,6 +29,9 @@ class ChapterGraphSettings {
 class Utils {
   static late ChapterGraphSettings graphSettings;
 
+  static late double width;
+  static late double height;
+
   static const double textEditorDefaultWeight = 0.6;
   static const double loosePagesMenuDefaultHeight = 0.5;
   static const double loosePagesMenuMaximumHeight = 0.8;
@@ -35,7 +39,11 @@ class Utils {
   static const double dividerThickness = 16.0;
   static const int textEditorAnimationDuration = 300;
   static const double collapseButtonSize = 32;
-  static const List<String> snippetColors = ['#f57c00', '#4caf50', '#2196f3'];
+  static const List<String> snippetColors = [
+    '#f57c00',
+    '#4caf50',
+    '#2196f3'
+  ];
 
   static late final Color pageEditorBackgroundColor;
   static late final Color pageEditorSheetColor;
@@ -56,8 +64,9 @@ class Utils {
     );
     pageEditorBackgroundColor = swatch(Colors.grey[50]!);
     pageEditorSheetColor = swatch(Colors.white);
+    width = window.screen?.width?.toDouble() ?? 1920;
+    height = window.screen?.height?.toDouble() ?? 1080;
   }
 
-  static String colorHex(Color color) =>
-      '#${color.red.toRadixString(16).padLeft(2, '0')}${color.green.toRadixString(16).padLeft(2, '0')}${color.blue.toRadixString(16).padLeft(2, '0')}';
+  static String colorHex(Color color) => '#${color.red.toRadixString(16).padLeft(2, '0')}${color.green.toRadixString(16).padLeft(2, '0')}${color.blue.toRadixString(16).padLeft(2, '0')}';
 }
