@@ -32,7 +32,9 @@ class Utils {
   static late double width;
   static late double height;
 
-  static const double textEditorDefaultWeight = 0.6;
+  static const double textEditorWeight = 0.64;
+  static const double maxWidthShowOnlyEditor = 1080;
+  static const double maxWidthShowOnlyEditorPage = 640;
   static const double loosePagesMenuDefaultHeight = 0.5;
   static const double loosePagesMenuMaximumHeight = 0.8;
   static const double loosePagesMenuMinimumHeight = 0.35;

@@ -14,17 +14,20 @@ import 'package:teia/views/text_editor/cursor_block_embed.dart';
 import 'package:teia/views/text_editor/cursor_embed_builder.dart';
 import 'package:teia/views/text_editor/remote_cursor.dart';
 import 'package:tuple/tuple.dart';
+import 'package:universal_html/html.dart';
 
 class PageEditor extends StatefulWidget {
   final String pageId;
   final FocusNode? focusNode;
   final Function(EditingPage page)? pushPageToRemote;
+  final Size screenSize;
 
   const PageEditor({
     super.key,
     required this.pageId,
     this.focusNode,
     this.pushPageToRemote,
+    required this.screenSize,
   });
 
   @override
@@ -54,6 +57,10 @@ class _PageEditorState extends State<PageEditor> {
     _controller.onSelectionChanged = _onSelectionChanged;
     // Listen to cloud document changes with _onRemoteChange
     _pageSubscription = ChapterManagementService.pageStream('1', '1', widget.pageId).listen(_onRemoteChange);
+
+    // Prevent default event handler
+    document.onContextMenu.listen((event) => event.preventDefault());
+
     super.initState();
   }
 
@@ -264,28 +271,12 @@ class _PageEditorState extends State<PageEditor> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.fromLTRB(8.0, 18.0, 16.0, 0.0),
-          child: Text(
-            'Page ${widget.pageId}',
-            style: TextStyle(
-              color: Utils.graphSettings.nodeBorderColor,
-              fontWeight: FontWeight.bold,
-              fontSize: 18.0,
-            ),
-          ),
-        ),
-        const Padding(
-          padding: EdgeInsets.fromLTRB(8.0, 8.0, 0.0, 8.0),
-          child: Divider(),
-        ),
-        Expanded(
-          child: page == null
-              ? loadingRotate()
-              : Row(
+    return Expanded(
+      child: page == null
+          ? loadingRotate()
+          : Stack(
+              children: [
+                Row(
                   children: [
                     Expanded(
                       flex: 4,
@@ -308,20 +299,32 @@ class _PageEditorState extends State<PageEditor> {
                               scrollController: _scrollController,
                               onImagePaste: (bytes) => Future.value(null),
                               onLaunchUrl: null,
-                              embedBuilders: [CursorEmbedBuilder()],
+                              embedBuilders: [
+                                CursorEmbedBuilder()
+                              ],
                             ),
                           ),
                         ),
                       ),
                     ),
-                    Expanded(
-                      flex: 2,
-                      child: _textOptions(),
-                    ),
+                    widget.screenSize.width > Utils.maxWidthShowOnlyEditorPage
+                        ? Expanded(
+                            flex: 2,
+                            child: _textOptions(),
+                          )
+                        : const SizedBox(
+                            width: Utils.collapseButtonSize,
+                          )
                   ],
                 ),
-        ),
-      ],
+                Positioned(
+                  right: (widget.screenSize.width * Utils.textEditorWeight) - ,
+                  child: FloatingActionButton(
+                    onPressed: () {},
+                  ),
+                ),
+              ],
+            ),
     );
   }
 }

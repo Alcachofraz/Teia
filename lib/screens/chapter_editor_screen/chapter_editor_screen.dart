@@ -49,7 +49,7 @@ class _ChapterEditorScreenState extends State<ChapterEditorScreen> {
 
   @override
   void initState() {
-    textEditorWeight = Utils.textEditorDefaultWeight;
+    textEditorWeight = Utils.textEditorWeight;
     loosePagesMenuHeight = Utils.loosePagesMenuDefaultHeight;
     _chapterSubscription = ChapterManagementService.chapterStream(widget.storyId, widget.chapterId).listen((chapter) => setState(() => _chapter = chapter));
     super.initState();
@@ -124,25 +124,25 @@ class _ChapterEditorScreenState extends State<ChapterEditorScreen> {
         )
       : const SizedBox.shrink();
 
-  Widget _chapterGraph({double? width, double? height}) => _chapter == null
+  Widget _chapterGraph(Size size) => _chapter == null
       ? loadingRotate()
       : ChapterGraphView(
           chapter: _chapter!,
           createPage: _createPage,
           clickPage: _clickPage,
-          width: width,
-          height: height,
+          width: size.width,
+          height: size.height,
         );
 
-  Widget _pageEditor({required double width, double? height}) => Stack(
+  Widget _pageEditor(Size size) => Stack(
         children: [
           AnimatedPositioned(
             duration: const Duration(milliseconds: Utils.textEditorAnimationDuration),
             curve: Curves.decelerate,
-            right: selectedPageId == null ? -width : 0,
+            right: selectedPageId == null ? -size.width * (size.width > Utils.maxWidthShowOnlyEditor ? textEditorWeight : 1.0) : 0,
             child: SizedBox(
-              width: width,
-              height: height,
+              width: size.width * (size.width > Utils.maxWidthShowOnlyEditor ? textEditorWeight : 1.0),
+              height: size.height,
               child: Container(
                 color: Utils.pageEditorBackgroundColor,
                 child: Row(
@@ -165,10 +165,31 @@ class _ChapterEditorScreenState extends State<ChapterEditorScreen> {
                     ),
                     selectedPageId != null
                         ? Expanded(
-                            child: PageEditor(
-                              pageId: selectedPageId!.toString(),
-                              focusNode: pageEditorFocusNode,
-                              pushPageToRemote: _pushPageToRemote,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.fromLTRB(8.0, 18.0, 16.0, 0.0),
+                                  child: Text(
+                                    'Page ${selectedPageId!}',
+                                    style: TextStyle(
+                                      color: Utils.graphSettings.nodeBorderColor,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 18.0,
+                                    ),
+                                  ),
+                                ),
+                                const Padding(
+                                  padding: EdgeInsets.fromLTRB(8.0, 8.0, 0.0, 8.0),
+                                  child: Divider(),
+                                ),
+                                PageEditor(
+                                  pageId: selectedPageId!.toString(),
+                                  focusNode: pageEditorFocusNode,
+                                  pushPageToRemote: _pushPageToRemote,
+                                  screenSize: size,
+                                ),
+                              ],
                             ),
                           )
                         : const SizedBox.shrink(),
@@ -182,15 +203,15 @@ class _ChapterEditorScreenState extends State<ChapterEditorScreen> {
 
   @override
   Widget build(BuildContext context) {
+    var screenSize = MediaQuery.of(context).size;
     return ScrollableStaticScaffold(
-        backgroundColor: Utils.graphSettings.backgroundColor,
-        body: Column(
-          children: [
-            Expanded(
-                child: Container(
-              color: Colors.red,
-            )),
-          ],
-        ));
+      backgroundColor: Utils.graphSettings.backgroundColor,
+      body: Stack(
+        children: [
+          _chapterGraph(screenSize),
+          _pageEditor(screenSize),
+        ],
+      ),
+    );
   }
 }

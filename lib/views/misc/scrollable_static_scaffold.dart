@@ -1,8 +1,6 @@
 import "package:flutter/gestures.dart";
 import "package:flutter/material.dart";
 
-import "package:teia/utils/utils.dart";
-
 class ScrollableStaticScaffold extends StatefulWidget {
   /// If true, user may flip the screen horizontally, and the layout
   /// will be automatically adjusted.
@@ -306,28 +304,7 @@ class _ScrollableStaticScaffoldState extends State<ScrollableStaticScaffold> {
       },
       child: SafeArea(
         child: Scaffold(
-          body: Scrollbar(
-            controller: verticalScrollController,
-            thumbVisibility: true,
-            trackVisibility: true,
-            child: Scrollbar(
-              controller: horizontalScrollController,
-              thumbVisibility: true,
-              trackVisibility: true,
-              child: SingleChildScrollView(
-                controller: verticalScrollController,
-                child: SingleChildScrollView(
-                  controller: horizontalScrollController,
-                  scrollDirection: Axis.horizontal,
-                  child: SizedBox(
-                    width: Utils.width,
-                    height: Utils.height,
-                    child: widget.body,
-                  ),
-                ),
-              ),
-            ),
-          ),
+          body: widget.body,
           appBar: widget.appBar,
           floatingActionButton: widget.floatingActionButton,
           floatingActionButtonLocation: widget.floatingActionButtonLocation,
