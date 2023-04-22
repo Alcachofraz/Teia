@@ -49,9 +49,10 @@ class _ChapterEditorScreenState extends State<ChapterEditorScreen> {
 
   @override
   void initState() {
-    textEditorWeight = Utils.textEditorWeight;
+    textEditorWeight = Utils.editorWeight;
     loosePagesMenuHeight = Utils.loosePagesMenuDefaultHeight;
-    _chapterSubscription = ChapterManagementService.chapterStream(widget.storyId, widget.chapterId).listen((chapter) => setState(() => _chapter = chapter));
+    _chapterSubscription =
+        ChapterManagementService.chapterStream(widget.storyId, widget.chapterId).listen((chapter) => setState(() => _chapter = chapter));
     super.initState();
   }
 

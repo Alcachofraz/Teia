@@ -32,20 +32,18 @@ class Utils {
   static late double width;
   static late double height;
 
-  static const double textEditorWeight = 0.64;
+  static const double editorWeight = 0.64;
+  static const double editorPageWeight = 0.64;
   static const double maxWidthShowOnlyEditor = 1080;
   static const double maxWidthShowOnlyEditorPage = 640;
+  static const double textOptionsWidth = 40;
   static const double loosePagesMenuDefaultHeight = 0.5;
   static const double loosePagesMenuMaximumHeight = 0.8;
   static const double loosePagesMenuMinimumHeight = 0.35;
   static const double dividerThickness = 16.0;
   static const int textEditorAnimationDuration = 300;
   static const double collapseButtonSize = 32;
-  static const List<String> snippetColors = [
-    '#f57c00',
-    '#4caf50',
-    '#2196f3'
-  ];
+  static const List<String> snippetColors = ['#f57c00', '#4caf50', '#2196f3'];
 
   static late final Color pageEditorBackgroundColor;
   static late final Color pageEditorSheetColor;
@@ -70,5 +68,6 @@ class Utils {
     height = window.screen?.height?.toDouble() ?? 1080;
   }
 
-  static String colorHex(Color color) => '#${color.red.toRadixString(16).padLeft(2, '0')}${color.green.toRadixString(16).padLeft(2, '0')}${color.blue.toRadixString(16).padLeft(2, '0')}';
+  static String colorHex(Color color) =>
+      '#${color.red.toRadixString(16).padLeft(2, '0')}${color.green.toRadixString(16).padLeft(2, '0')}${color.blue.toRadixString(16).padLeft(2, '0')}';
 }

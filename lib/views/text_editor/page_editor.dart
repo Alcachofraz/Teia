@@ -45,6 +45,10 @@ class _PageEditorState extends State<PageEditor> {
   TextSelection? _selection;
   Snippet? _atSnippet;
 
+  late double textEditorWeight;
+  late double pageWeight;
+  late double compensation;
+
   @override
   void initState() {
     // Scroll controller
@@ -205,12 +209,27 @@ class _PageEditorState extends State<PageEditor> {
     _pushPageToRemote(page);
   }
 
-  Widget _textOptions() {
+  Widget _comments() {
     return Stack(
       children: const [],
     );
+  }
 
-    /*Column(
+  Widget _textOptions() {
+    return Positioned(
+      right: (widget.screenSize.width * textEditorWeight - Utils.collapseButtonSize) * (1 - pageWeight) + compensation,
+      child: SizedBox(
+        width: Utils.textOptionsWidth,
+        child: FittedBox(
+          child: FloatingActionButton(
+            onPressed: () {},
+          ),
+        ),
+      ),
+    );
+  }
+
+  /*Column(
       children: [
         Tile(
           color: _selection == null ? Colors.grey[100]! : Utils.pageEditorSheetColor,
@@ -267,10 +286,12 @@ class _PageEditorState extends State<PageEditor> {
           ),
       ],
     );*/
-  }
 
   @override
   Widget build(BuildContext context) {
+    textEditorWeight = (widget.screenSize.width < Utils.maxWidthShowOnlyEditor) ? 1.0 : Utils.editorWeight;
+    pageWeight = (widget.screenSize.width < Utils.maxWidthShowOnlyEditorPage) ? 1.0 : Utils.editorPageWeight;
+    compensation = pageWeight == 1.0 ? Utils.collapseButtonSize - Utils.textOptionsWidth / 2 : -Utils.textOptionsWidth / 2;
     return Expanded(
       child: page == null
           ? loadingRotate()
@@ -279,7 +300,7 @@ class _PageEditorState extends State<PageEditor> {
                 Row(
                   children: [
                     Expanded(
-                      flex: 4,
+                      flex: Utils.editorPageWeight * 100 as int,
                       child: MouseRegion(
                         cursor: SystemMouseCursors.text,
                         child: Tile(
@@ -299,9 +320,7 @@ class _PageEditorState extends State<PageEditor> {
                               scrollController: _scrollController,
                               onImagePaste: (bytes) => Future.value(null),
                               onLaunchUrl: null,
-                              embedBuilders: [
-                                CursorEmbedBuilder()
-                              ],
+                              embedBuilders: [CursorEmbedBuilder()],
                             ),
                           ),
                         ),
@@ -309,20 +328,15 @@ class _PageEditorState extends State<PageEditor> {
                     ),
                     widget.screenSize.width > Utils.maxWidthShowOnlyEditorPage
                         ? Expanded(
-                            flex: 2,
-                            child: _textOptions(),
+                            flex: (1 - Utils.editorPageWeight) * 100 as int,
+                            child: _comments(),
                           )
                         : const SizedBox(
                             width: Utils.collapseButtonSize,
                           )
                   ],
                 ),
-                Positioned(
-                  right: (widget.screenSize.width * Utils.textEditorWeight) - ,
-                  child: FloatingActionButton(
-                    onPressed: () {},
-                  ),
-                ),
+                _textOptions(),
               ],
             ),
     );
