@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:flutter/material.dart' hide Page;
 import 'package:teia/models/editing_page.dart';
@@ -9,10 +10,12 @@ import 'package:teia/services/chapter_management_service.dart';
 import 'package:teia/utils/loading.dart';
 import 'package:teia/utils/logs.dart';
 import 'package:teia/utils/utils.dart';
+import 'package:teia/views/misc/tap_icon.dart';
 import 'package:teia/views/misc/tile.dart';
 import 'package:teia/views/text_editor/cursor_block_embed.dart';
 import 'package:teia/views/text_editor/cursor_embed_builder.dart';
 import 'package:teia/views/text_editor/remote_cursor.dart';
+import 'package:teia/views/text_editor/snippet_info_card.dart';
 import 'package:tuple/tuple.dart';
 import 'package:universal_html/html.dart';
 
@@ -39,6 +42,7 @@ class _PageEditorState extends State<PageEditor> {
   late StreamSubscription _documentChangesSubscription;
   late StreamSubscription _pageSubscription;
   late ScrollController _scrollController;
+  FocusNode focus = FocusNode();
 
   EditingPage? page;
 
@@ -48,6 +52,7 @@ class _PageEditorState extends State<PageEditor> {
   late double textEditorWeight;
   late double pageWeight;
   late double compensation;
+  double _lineOffset = 24;
 
   @override
   void initState() {
@@ -88,6 +93,19 @@ class _PageEditorState extends State<PageEditor> {
       const TextSelection(baseOffset: 0, extentOffset: 0),
       ChangeSource.REMOTE,
     );
+  }
+
+  void _updateLineOffset(String textUntilCursor) {
+    TextPainter painter = TextPainter(
+      textDirection: TextDirection.ltr,
+      text: TextSpan(
+        style: Utils.textEditorStyle,
+        text: textUntilCursor,
+      ),
+    );
+    painter.layout();
+
+    _lineOffset = painter.height;
   }
 
   void _updateRemoteCursors(List<RemoteCursor> cursors) {
@@ -181,6 +199,7 @@ class _PageEditorState extends State<PageEditor> {
       setState(() {
         _atSnippet = null;
         _selection = selection;
+        /*_updateLineOffset();*/
       });
     } else {
       // Positioning cursor
@@ -193,15 +212,15 @@ class _PageEditorState extends State<PageEditor> {
     }
   }
 
-  void _onAddChoice() {
+  void _onAddImage() {
     if (_selection == null) return;
     Delta currentDelta = page!.toDelta();
-    page!.createSnippet(_selection!.baseOffset, _selection!.extentOffset - 1, url: '');
+    page!.createSnippet(_selection!.baseOffset, _selection!.extentOffset - 1, url: 'https://picsum.photos/200');
     _replaceDelta(currentDelta, page!.toDelta());
     _pushPageToRemote(page);
   }
 
-  void _onAddImage() {
+  void _onAddChoice() {
     if (_selection == null) return;
     Delta currentDelta = page!.toDelta();
     page!.createSnippet(_selection!.baseOffset, _selection!.extentOffset - 1, id: 0);
@@ -210,21 +229,47 @@ class _PageEditorState extends State<PageEditor> {
   }
 
   Widget _comments() {
-    return Stack(
-      children: const [],
+    log(_atSnippet.toString());
+    return Column(
+      children: [
+        if (_atSnippet != null) SnippetInfoCard(snippet: _atSnippet!, page: page!),
+      ],
     );
   }
 
   Widget _textOptions() {
     return Positioned(
       right: (widget.screenSize.width * textEditorWeight - Utils.collapseButtonSize) * (1 - pageWeight) + compensation,
-      child: SizedBox(
-        width: Utils.textOptionsWidth,
-        child: FittedBox(
-          child: FloatingActionButton(
-            onPressed: () {},
-          ),
-        ),
+      top: _lineOffset,
+      child: AnimatedSwitcher(
+        duration: const Duration(milliseconds: 300),
+        child: _selection != null
+            ? Tile(
+                padding: EdgeInsets.zero,
+                radiusAll: 64,
+                elevation: 8,
+                child: Column(
+                  children: [
+                    TapIcon(
+                      icon: const Icon(Icons.add),
+                      onTap: () {
+                        _onAddImage();
+                      },
+                    ),
+                    TapIcon(
+                      icon: const Icon(Icons.home),
+                      onTap: () {},
+                    ),
+                    TapIcon(
+                      icon: const Icon(Icons.search),
+                      onTap: () {},
+                    ),
+                  ],
+                ),
+              )
+            : const SizedBox.shrink(
+                key: ValueKey<int>(1),
+              ),
       ),
     );
   }
@@ -303,25 +348,26 @@ class _PageEditorState extends State<PageEditor> {
                       flex: Utils.editorPageWeight * 100 as int,
                       child: MouseRegion(
                         cursor: SystemMouseCursors.text,
+                        //onHover: (details) => _lineOffset = details.position.dy,
                         child: Tile(
                           elevation: 2.5,
                           padding: EdgeInsets.zero,
                           color: Utils.pageEditorSheetColor,
-                          child: Padding(
+                          child: QuillEditor(
+                            controller: _controller,
+                            customStyleBuilder: (attribute) => Utils.textEditorStyle,
+                            readOnly: false,
+                            expands: true,
+                            autoFocus: false,
+                            focusNode: focus,
                             padding: const EdgeInsets.fromLTRB(48.0, 44.0, 48.0, 48.0),
-                            child: QuillEditor(
-                              controller: _controller,
-                              readOnly: false,
-                              expands: true,
-                              autoFocus: false,
-                              focusNode: widget.focusNode ?? FocusNode(),
-                              padding: EdgeInsets.zero,
-                              scrollable: true,
-                              scrollController: _scrollController,
-                              onImagePaste: (bytes) => Future.value(null),
-                              onLaunchUrl: null,
-                              embedBuilders: [CursorEmbedBuilder()],
-                            ),
+                            scrollable: true,
+                            scrollController: _scrollController,
+                            onImagePaste: (bytes) => Future.value(null),
+                            onLaunchUrl: null,
+                            embedBuilders: [
+                              CursorEmbedBuilder()
+                            ],
                           ),
                         ),
                       ),
