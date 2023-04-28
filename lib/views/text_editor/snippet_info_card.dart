@@ -17,6 +17,12 @@ class SnippetInfoCard extends StatefulWidget {
 }
 
 class _SnippetInfoCardState extends State<SnippetInfoCard> {
+  bool expanded = false;
+
+  Widget _getContent(Snippet snipept) {
+    if (snippet)
+  }
+
   @override
   Widget build(BuildContext context) {
     String text = '';
@@ -31,10 +37,17 @@ class _SnippetInfoCardState extends State<SnippetInfoCard> {
     }
     return Tile(
       padding: EdgeInsets.zero,
-      child: Column(
-        children: [
-          Text(text),
-        ],
+      child: ExpansionTile(
+        title: expanded
+            ? _getContent(widget.snippet)
+            : 
+                    _getHeader(widget.snippet),
+                  
+              
+        onExpansionChanged: (value) => setState(() {
+          expanded = value;
+        }),
+        children: const [],
       ),
     );
   }
