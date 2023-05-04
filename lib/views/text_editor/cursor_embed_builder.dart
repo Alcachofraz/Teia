@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart';
 import 'package:teia/views/text_editor/cursor_block_embed.dart';
@@ -17,8 +15,8 @@ class CursorEmbedBuilder implements EmbedBuilder {
     QuillController controller,
     Embed node,
     bool readOnly,
+    bool inline,
   ) {
-    log('yo');
     RemoteCursor cursor = RemoteCursor.fromString(CursorBlockEmbed(node.value.data).data);
     return Material(
       color: Colors.transparent,
@@ -34,4 +32,12 @@ class CursorEmbedBuilder implements EmbedBuilder {
       ),
     );
   }
+
+  @override
+  WidgetSpan buildWidgetSpan(Widget widget) {
+    return WidgetSpan(child: widget);
+  }
+
+  @override
+  bool get expanded => true;
 }

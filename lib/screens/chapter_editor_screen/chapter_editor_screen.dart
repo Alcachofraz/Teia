@@ -51,8 +51,7 @@ class _ChapterEditorScreenState extends State<ChapterEditorScreen> {
   void initState() {
     textEditorWeight = Utils.editorWeight;
     loosePagesMenuHeight = Utils.loosePagesMenuDefaultHeight;
-    _chapterSubscription =
-        ChapterManagementService.chapterStream(widget.storyId, widget.chapterId).listen((chapter) => setState(() => _chapter = chapter));
+    _chapterSubscription = ChapterManagementService.chapterStream(widget.storyId, widget.chapterId).listen((chapter) => setState(() => _chapter = chapter));
     super.initState();
   }
 
@@ -184,11 +183,13 @@ class _ChapterEditorScreenState extends State<ChapterEditorScreen> {
                                   padding: EdgeInsets.fromLTRB(8.0, 8.0, 0.0, 8.0),
                                   child: Divider(),
                                 ),
-                                PageEditor(
-                                  pageId: selectedPageId!.toString(),
-                                  focusNode: pageEditorFocusNode,
-                                  pushPageToRemote: _pushPageToRemote,
-                                  screenSize: size,
+                                Expanded(
+                                  child: PageEditor(
+                                    pageId: selectedPageId!.toString(),
+                                    focusNode: pageEditorFocusNode,
+                                    pushPageToRemote: _pushPageToRemote,
+                                    screenSize: size,
+                                  ),
                                 ),
                               ],
                             ),

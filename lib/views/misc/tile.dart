@@ -18,7 +18,7 @@ class Tile extends StatefulWidget {
   final Color? hoverColor;
   final GestureTapCallback? onTap;
   final double? elevation;
-  final Border? border;
+  final ShapeBorder? border;
 
   const Tile({
     Key? key,

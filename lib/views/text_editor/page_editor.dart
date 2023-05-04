@@ -16,7 +16,6 @@ import 'package:teia/views/text_editor/cursor_block_embed.dart';
 import 'package:teia/views/text_editor/cursor_embed_builder.dart';
 import 'package:teia/views/text_editor/remote_cursor.dart';
 import 'package:teia/views/text_editor/snippet_info_card.dart';
-import 'package:tuple/tuple.dart';
 import 'package:universal_html/html.dart';
 
 class PageEditor extends StatefulWidget {
@@ -120,13 +119,13 @@ class _PageEditorState extends State<PageEditor> {
   /// Receive local document change.
   ///
   /// * [event] A tuple containing the deltas and change source.
-  void _onLocalChange(Tuple3<Delta, Delta, ChangeSource> event) {
+  void _onLocalChange(DocChange change) {
     // If not page yet or change is remote, do nothing
-    if (page == null || event.item3 == ChangeSource.REMOTE) return;
+    if (page == null || change.source == ChangeSource.REMOTE) return;
     // Characters to skip.
     int skip = 0;
     // Iterate all operations
-    for (Operation op in event.item2.toList()) {
+    for (Operation op in change.change.toList()) {
       if (op.isRetain) {
         // If retaining, add to skip
         skip += op.value as int;
@@ -232,7 +231,11 @@ class _PageEditorState extends State<PageEditor> {
     log(_atSnippet.toString());
     return Column(
       children: [
-        if (_atSnippet != null) SnippetInfoCard(snippet: _atSnippet!, page: page!),
+        if (_atSnippet != null)
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16.0, 0.0, 16.0, 16.0),
+            child: SnippetInfoCard(snippet: _atSnippet!, page: page!),
+          ),
       ],
     );
   }
@@ -274,117 +277,60 @@ class _PageEditorState extends State<PageEditor> {
     );
   }
 
-  /*Column(
-      children: [
-        Tile(
-          color: _selection == null ? Colors.grey[100]! : Utils.pageEditorSheetColor,
-          padding: const EdgeInsets.fromLTRB(16.0, 0.0, 24.0, 0.0),
-          onTap: _selection == null
-              ? null
-              : () {
-                  _onAddChoice();
-                },
-          child: Row(
-            children: const [
-              Expanded(
-                child: Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child: Text('Add Choice'),
-                ),
-              ),
-            ],
-          ),
-        ),
-        Tile(
-          color: _selection == null ? Colors.grey[100]! : Utils.pageEditorSheetColor,
-          padding: const EdgeInsets.fromLTRB(16.0, 16.0, 24.0, 0.0),
-          onTap: _selection == null
-              ? null
-              : () {
-                  _onAddImage();
-                },
-          child: Row(
-            children: const [
-              Expanded(
-                child: Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child: Text('Add Image'),
-                ),
-              ),
-            ],
-          ),
-        ),
-        if (_atSnippet != null)
-          Tile(
-            color: Utils.pageEditorSheetColor,
-            padding: const EdgeInsets.fromLTRB(16.0, 16.0, 24.0, 0.0),
-            child: Row(
-              children: const [
-                Expanded(
-                  child: Padding(
-                    padding: EdgeInsets.all(8.0),
-                    child: Text('At Snippet'),
-                  ),
-                ),
-              ],
-            ),
-          ),
-      ],
-    );*/
-
   @override
   Widget build(BuildContext context) {
     textEditorWeight = (widget.screenSize.width < Utils.maxWidthShowOnlyEditor) ? 1.0 : Utils.editorWeight;
     pageWeight = (widget.screenSize.width < Utils.maxWidthShowOnlyEditorPage) ? 1.0 : Utils.editorPageWeight;
     compensation = pageWeight == 1.0 ? Utils.collapseButtonSize - Utils.textOptionsWidth / 2 : -Utils.textOptionsWidth / 2;
-    return Expanded(
-      child: page == null
-          ? loadingRotate()
-          : Stack(
-              children: [
-                Row(
-                  children: [
-                    Expanded(
-                      flex: Utils.editorPageWeight * 100 as int,
-                      child: MouseRegion(
-                        cursor: SystemMouseCursors.text,
-                        //onHover: (details) => _lineOffset = details.position.dy,
-                        child: Tile(
-                          elevation: 2.5,
-                          padding: EdgeInsets.zero,
-                          color: Utils.pageEditorSheetColor,
-                          child: QuillEditor(
-                            controller: _controller,
-                            customStyleBuilder: (attribute) => Utils.textEditorStyle,
-                            readOnly: false,
-                            expands: true,
-                            autoFocus: false,
-                            focusNode: focus,
-                            padding: const EdgeInsets.fromLTRB(48.0, 44.0, 48.0, 48.0),
-                            scrollable: true,
-                            scrollController: _scrollController,
-                            onImagePaste: (bytes) => Future.value(null),
-                            onLaunchUrl: null,
-                            embedBuilders: [
-                              CursorEmbedBuilder()
-                            ],
+    return page == null
+        ? loadingRotate()
+        : Stack(
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    flex: Utils.editorPageWeight * 100 as int,
+                    child: Tile(
+                      elevation: 2.5,
+                      padding: EdgeInsets.zero,
+                      color: Utils.pageEditorSheetColor,
+                      child: Column(
+                        children: [
+                          Expanded(
+                            child: QuillEditor(
+                              controller: _controller,
+                              customStyleBuilder: (attribute) => Utils.textEditorStyle,
+                              readOnly: false,
+                              expands: true,
+                              paintCursorAboveText: true,
+                              scrollable: true,
+                              autoFocus: true,
+                              focusNode: focus,
+                              padding: const EdgeInsets.fromLTRB(48.0, 44.0, 48.0, 48.0),
+                              scrollController: _scrollController,
+                              onImagePaste: (bytes) => Future.value(null),
+                              onLaunchUrl: null,
+                              embedBuilders: [
+                                CursorEmbedBuilder()
+                              ],
+                            ),
                           ),
-                        ),
+                        ],
                       ),
                     ),
-                    widget.screenSize.width > Utils.maxWidthShowOnlyEditorPage
-                        ? Expanded(
-                            flex: (1 - Utils.editorPageWeight) * 100 as int,
-                            child: _comments(),
-                          )
-                        : const SizedBox(
-                            width: Utils.collapseButtonSize,
-                          )
-                  ],
-                ),
-                _textOptions(),
-              ],
-            ),
-    );
+                  ),
+                  widget.screenSize.width > Utils.maxWidthShowOnlyEditorPage
+                      ? Expanded(
+                          flex: (1 - Utils.editorPageWeight) * 100 as int,
+                          child: _comments(),
+                        )
+                      : const SizedBox(
+                          width: Utils.collapseButtonSize,
+                        )
+                ],
+              ),
+              _textOptions(),
+            ],
+          );
   }
 }
