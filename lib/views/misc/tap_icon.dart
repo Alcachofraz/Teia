@@ -27,36 +27,24 @@ class TapIcon extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-        type: MaterialType.transparency, //Makes it usable on any background color, thanks @IanSmith
-        child: Ink(
-          decoration: BoxDecoration(
-            border: borderWidth != null && borderColor != null ? Border.all(color: borderColor!, width: borderWidth!) : null,
-            color: backgroundColor,
-            shape: BoxShape.circle,
-          ),
-          child: InkWell(
-            hoverColor: hoverColor,
-            splashColor: clickColor,
-            borderRadius: BorderRadius.circular(1000.0), //Something large to ensure a circle
-            onTap: onTap,
-            child: Padding(
-              padding: EdgeInsets.all(splashRadius),
-              child: icon,
-            ),
-          ),
-        )); /*Material(
-      color: Colors.transparent,
-      child: InkWell(
-        customBorder: CircleBorder(
-          side: borderSide,
+      type: MaterialType.transparency, //Makes it usable on any background color, thanks @IanSmith
+      child: Ink(
+        decoration: BoxDecoration(
+          border: borderWidth != null && borderColor != null ? Border.all(color: borderColor!, width: borderWidth!) : null,
+          color: backgroundColor,
+          shape: BoxShape.circle,
         ),
-        onTap: onTap,
-        splashColor: Colors.grey.withOpacity(0.5),
-        child: Padding(
-          padding: EdgeInsets.all(splashRadius),
-          child: icon,
+        child: InkWell(
+          hoverColor: hoverColor,
+          splashColor: clickColor,
+          borderRadius: BorderRadius.circular(1000.0), //Something large to ensure a circle
+          onTap: onTap,
+          child: Padding(
+            padding: EdgeInsets.all(splashRadius),
+            child: FittedBox(child: icon),
+          ),
         ),
       ),
-    );*/
+    );
   }
 }

@@ -479,10 +479,10 @@ packages:
     dependency: "direct main"
     description:
       name: flutter_quill
-      sha256: "803d39a210f5aaa7b9d1a999ef1dac5fef4931916483f23a196fcc6e5cd75ee1"
+      sha256: "5b06f003dbc7a201a5b4bb907d62c8f5c66bcc2997247b5dced59c0cd550b51a"
       url: "https://pub.dev"
     source: hosted
-    version: "7.1.14"
+    version: "7.1.16+1"
   flutter_quill_extensions:
     dependency: "direct main"
     description:
@@ -617,10 +617,10 @@ packages:
     dependency: "direct main"
     description:
       name: graphview
-      sha256: "5559ed185b2e7ba1fbfc6b80864ad5236e8997e22c644fd169f2580d0f1249da"
+      sha256: bdba183583b23c30c71edea09ad5f0beef612572d3e39e855467a925bd08392f
       url: "https://pub.dev"
     source: hosted
-    version: "1.1.1"
+    version: "1.2.0"
   holding_gesture:
     dependency: transitive
     description:
@@ -733,6 +733,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.6.5"
+  just_the_tooltip:
+    dependency: "direct main"
+    description:
+      name: just_the_tooltip
+      sha256: "7a081133d57285bfb41b331f411006d57b433d7b35772e6155745f6a7a09cb82"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.0.12"
   linkify:
     dependency: transitive
     description:

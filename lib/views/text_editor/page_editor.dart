@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:developer';
 
 import 'package:flutter/material.dart' hide Page;
 import 'package:teia/models/editing_page.dart';
@@ -17,6 +16,7 @@ import 'package:teia/views/text_editor/cursor_embed_builder.dart';
 import 'package:teia/views/text_editor/remote_cursor.dart';
 import 'package:teia/views/text_editor/snippet_info_card.dart';
 import 'package:universal_html/html.dart';
+import 'package:just_the_tooltip/just_the_tooltip.dart';
 
 class PageEditor extends StatefulWidget {
   final String pageId;
@@ -125,9 +125,13 @@ class _PageEditorState extends State<PageEditor> {
     // Characters to skip.
     int skip = 0;
     // Iterate all operations
+    //log(change.change.toList().toString());
     for (Operation op in change.change.toList()) {
       if (op.isRetain) {
         // If retaining, add to skip
+        if (op.attributes != null && op.attributes!['color'] == null) {
+          _onNeglectSnippet(skip, op.length ?? 0);
+        }
         skip += op.value as int;
       } else if (op.isInsert) {
         // If inserting, call _onInsert() with current skip
@@ -192,6 +196,17 @@ class _PageEditorState extends State<PageEditor> {
     _pushPageToRemote(page);
   }
 
+  void _onNeglectSnippet(int skip, int length) {
+    //Logs.d('Inserting($skip, $text)');
+    if (page == null) {
+      Logs.e('Trying to insert on a null Page!');
+      return;
+    }
+    page!.forgetSnippets(skip, length);
+    //page!.normalizeSnippets();
+    _pushPageToRemote(page);
+  }
+
   void _onSelectionChanged(TextSelection selection) {
     if (selection.baseOffset != selection.extentOffset) {
       // Selecting text
@@ -209,6 +224,7 @@ class _PageEditorState extends State<PageEditor> {
         _atSnippet = page!.findSnippetByIndex(selection.baseOffset);
       });
     }
+    _controller.formatSelection(const ColorAttribute('#000000'));
   }
 
   void _onAddImage() {
@@ -228,7 +244,6 @@ class _PageEditorState extends State<PageEditor> {
   }
 
   Widget _comments() {
-    log(_atSnippet.toString());
     return Column(
       children: [
         if (_atSnippet != null)
@@ -241,8 +256,9 @@ class _PageEditorState extends State<PageEditor> {
   }
 
   Widget _textOptions() {
+    var lelftmargin = (((widget.screenSize.width * textEditorWeight) - (Utils.collapseButtonSize * (pageWeight == 1 ? 2 : 1))) * pageWeight) - Utils.textOptionsWidth / 2;
     return Positioned(
-      right: (widget.screenSize.width * textEditorWeight - Utils.collapseButtonSize) * (1 - pageWeight) + compensation,
+      left: lelftmargin,
       top: _lineOffset,
       child: AnimatedSwitcher(
         duration: const Duration(milliseconds: 300),
@@ -251,21 +267,57 @@ class _PageEditorState extends State<PageEditor> {
                 padding: EdgeInsets.zero,
                 radiusAll: 64,
                 elevation: 8,
+                width: Utils.textOptionsWidth,
                 child: Column(
                   children: [
-                    TapIcon(
-                      icon: const Icon(Icons.add),
-                      onTap: () {
-                        _onAddImage();
-                      },
+                    JustTheTooltip(
+                      waitDuration: const Duration(milliseconds: 1000),
+                      content: const Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child: Text(
+                          'Add a page link',
+                        ),
+                      ),
+                      child: TapIcon(
+                        icon: const Icon(
+                          Icons.add_link,
+                        ),
+                        onTap: () {
+                          _onAddChoice();
+                        },
+                      ),
                     ),
-                    TapIcon(
-                      icon: const Icon(Icons.home),
-                      onTap: () {},
+                    JustTheTooltip(
+                      waitDuration: const Duration(milliseconds: 1000),
+                      content: const Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child: Text(
+                          'Add an image link',
+                        ),
+                      ),
+                      child: TapIcon(
+                        icon: const Icon(
+                          Icons.add_photo_alternate_outlined,
+                        ),
+                        onTap: () {
+                          _onAddImage();
+                        },
+                      ),
                     ),
-                    TapIcon(
-                      icon: const Icon(Icons.search),
-                      onTap: () {},
+                    JustTheTooltip(
+                      waitDuration: const Duration(milliseconds: 1000),
+                      content: const Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child: Text(
+                          'Add a comment',
+                        ),
+                      ),
+                      child: TapIcon(
+                        icon: const Icon(
+                          Icons.comment_outlined,
+                        ),
+                        onTap: () {},
+                      ),
                     ),
                   ],
                 ),
@@ -297,22 +349,26 @@ class _PageEditorState extends State<PageEditor> {
                       child: Column(
                         children: [
                           Expanded(
-                            child: QuillEditor(
-                              controller: _controller,
-                              customStyleBuilder: (attribute) => Utils.textEditorStyle,
-                              readOnly: false,
-                              expands: true,
-                              paintCursorAboveText: true,
-                              scrollable: true,
-                              autoFocus: true,
-                              focusNode: focus,
-                              padding: const EdgeInsets.fromLTRB(48.0, 44.0, 48.0, 48.0),
-                              scrollController: _scrollController,
-                              onImagePaste: (bytes) => Future.value(null),
-                              onLaunchUrl: null,
-                              embedBuilders: [
-                                CursorEmbedBuilder()
-                              ],
+                            child: Padding(
+                              padding: const EdgeInsets.fromLTRB(24.0, 24.0, 24.0, 24.0),
+                              child: QuillEditor(
+                                controller: _controller,
+                                customStyleBuilder: (attribute) => Utils.textEditorStyle,
+                                readOnly: false,
+                                expands: true,
+                                paintCursorAboveText: true,
+                                placeholder: 'Once upon a time...',
+                                scrollable: true,
+                                autoFocus: true,
+                                focusNode: focus,
+                                padding: const EdgeInsets.fromLTRB(24.0, 20.0, 24.0, 24.0),
+                                scrollController: _scrollController,
+                                onImagePaste: (bytes) => Future.value(null),
+                                onLaunchUrl: null,
+                                embedBuilders: [
+                                  CursorEmbedBuilder()
+                                ],
+                              ),
                             ),
                           ),
                         ],

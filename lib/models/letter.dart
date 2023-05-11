@@ -28,6 +28,11 @@ class Letter extends Comparable<Letter> {
       'letter': letter,
     };
   }
+
+  @override
+  String toString() {
+    return '{$letter, $id}';
+  }
 }
 
 class LetterId extends Comparable<LetterId> {

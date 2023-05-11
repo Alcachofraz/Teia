@@ -55,26 +55,30 @@ class _TileState extends State<Tile> {
       bottomLeft: Radius.circular(widget.radiusAll == 0 ? widget.radiusBottomLeft : widget.radiusAll),
       bottomRight: Radius.circular(widget.radiusAll == 0 ? widget.radiusBottomRight : widget.radiusAll),
     );
-    return Card(
-      margin: widget.padding,
-      color: widget.color,
-      elevation: widget.elevation,
-      shape: widget.border ??
-          RoundedRectangleBorder(
-            borderRadius: borderRadius,
-            side: widget.borderSide,
+    return SizedBox(
+      width: widget.width,
+      height: widget.height,
+      child: Card(
+        margin: widget.padding,
+        color: widget.color,
+        elevation: widget.elevation,
+        shape: widget.border ??
+            RoundedRectangleBorder(
+              borderRadius: borderRadius,
+              side: widget.borderSide,
+            ),
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            hoverColor: widget.hoverColor,
+            splashColor: widget.clickColor,
+            customBorder: widget.border ??
+                RoundedRectangleBorder(
+                  borderRadius: borderRadius,
+                ),
+            onTap: widget.onTap,
+            child: widget.child,
           ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          hoverColor: widget.hoverColor,
-          splashColor: widget.clickColor,
-          customBorder: widget.border ??
-              RoundedRectangleBorder(
-                borderRadius: borderRadius,
-              ),
-          onTap: widget.onTap,
-          child: widget.child,
         ),
       ),
     );

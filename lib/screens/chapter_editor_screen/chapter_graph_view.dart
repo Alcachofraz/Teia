@@ -36,6 +36,10 @@ class _ChapterGraphViewState extends State<ChapterGraphView> {
         Node.Id(end),
       ),
     );
+    graph.addEdge(
+      Node.Id(2),
+      Node.Id(1),
+    );
 
     BuchheimWalkerConfiguration builder = BuchheimWalkerConfiguration();
     builder
@@ -44,12 +48,11 @@ class _ChapterGraphViewState extends State<ChapterGraphView> {
       ..subtreeSeparation = (150)
       ..orientation = (BuchheimWalkerConfiguration.ORIENTATION_TOP_BOTTOM);
 
-    //Algorithm algorithm = BuchheimWalkerAlgorithm(builder, ArrowEdgeRenderer());
     Algorithm algorithm = BuchheimWalkerAlgorithm(builder, TreeEdgeRenderer(builder));
 
     return [
       graph,
-      algorithm
+      builder
     ];
   }
 
@@ -73,7 +76,7 @@ class _ChapterGraphViewState extends State<ChapterGraphView> {
             algorithm: algorithm,
             paint: Paint()
               ..color = Utils.graphSettings.arrowColor
-              ..strokeWidth = 1.5
+              ..strokeWidth = 1.0
               ..style = PaintingStyle.stroke,
             builder: (Node node) {
               return Padding(

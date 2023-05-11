@@ -30,7 +30,7 @@ dependencies:
   flutter:
     sdk: flutter
   
-  graphview: ^1.1.1
+  graphview: ^1.2.0
   flutter_spinkit: ^5.1.0
   fluttertoast: ^8.1.2
   material_design_icons_flutter: ^6.0.7096
@@ -47,7 +47,7 @@ dependencies:
   get: ^4.6.5
 
   multi_split_view: ^2.3.1
-  flutter_quill: ^7.1.14
+  flutter_quill: ^7.1.16+1
   quill_delta: ^3.0.0-nullsafety.2
   logger: ^1.2.2
   tuple: ^2.0.1
@@ -56,6 +56,7 @@ dependencies:
   flutter_quill_extensions: ^0.3.1
   sorted_list: ^1.0.0
   universal_html: ^2.2.1
+  just_the_tooltip: ^0.0.12
 
 dev_dependencies:
   flutter_test:

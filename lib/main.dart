@@ -6,6 +6,8 @@ import 'package:teia/utils/swatch.dart';
 
 import 'package:teia/utils/utils.dart';
 
+import 'package:flutter/material.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   Utils.init();
