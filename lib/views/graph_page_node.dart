@@ -10,12 +10,14 @@ class GraphPageNode extends StatefulWidget {
   final Color? hoverColor;
   final Color? clickColor;
   final Color? iconColor;
+  final bool missingLinks;
   final Function(int)? createPage;
   final Function(int)? clickPage;
 
   const GraphPageNode({
     Key? key,
     required this.id,
+    required this.missingLinks,
     this.insideColor,
     this.borderColor,
     this.hoverColor,
@@ -50,9 +52,27 @@ class _GraphPageNodeState extends State<GraphPageNode> {
                 widget.clickPage!(widget.id);
               }
             },
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 24.0, horizontal: 28.0),
-              child: Text('Page ${widget.id}'),
+            child: Stack(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 24.0, horizontal: 28.0),
+                  child: Text('Page ${widget.id}'),
+                ),
+                if (widget.missingLinks)
+                  const Positioned.fill(
+                    child: Align(
+                      alignment: Alignment.bottomRight,
+                      child: Padding(
+                        padding: EdgeInsets.only(bottom: 4.0, right: 4.0),
+                        child: Icon(
+                          Icons.link_off_rounded,
+                          color: Colors.red,
+                          size: 18.0,
+                        ),
+                      ),
+                    ),
+                  ),
+              ],
             ),
           ),
         ),

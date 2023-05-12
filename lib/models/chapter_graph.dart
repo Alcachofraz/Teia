@@ -4,7 +4,7 @@ class ChapterGraph {
   ChapterGraph(this._nodes);
 
   /// Nodes getter
-  get nodes => _nodes;
+  Map<int, List<int>> get nodes => _nodes;
 
   /// Map Page constructor. Instantiate a page from a
   /// Map<String, dynamic> object.
