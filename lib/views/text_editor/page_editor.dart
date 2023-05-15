@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart' hide Page;
+import 'package:teia/models/chapter.dart';
 import 'package:teia/models/editing_page.dart';
 import 'package:flutter_quill/flutter_quill.dart' hide Text;
 import 'package:teia/models/snippets/snippet.dart';
@@ -23,6 +24,8 @@ class PageEditor extends StatefulWidget {
   final FocusNode? focusNode;
   final Function(EditingPage page)? pushPageToRemote;
   final Size screenSize;
+  final List<int> missingLinks;
+  final Chapter chapter;
 
   const PageEditor({
     super.key,
@@ -30,6 +33,8 @@ class PageEditor extends StatefulWidget {
     this.focusNode,
     this.pushPageToRemote,
     required this.screenSize,
+    this.missingLinks = const [],
+    required this.chapter,
   });
 
   @override
@@ -52,6 +57,10 @@ class _PageEditorState extends State<PageEditor> {
   late double pageWeight;
   late double compensation;
   double _lineOffset = 24;
+
+  List<int> missingLinks = [];
+  bool showingChoiceOption = false;
+  bool showingTextOption = false;
 
   @override
   void initState() {
@@ -256,7 +265,8 @@ class _PageEditorState extends State<PageEditor> {
   }
 
   Widget _textOptions() {
-    var lelftmargin = (((widget.screenSize.width * textEditorWeight) - (Utils.collapseButtonSize * (pageWeight == 1 ? 2 : 1))) * pageWeight) - Utils.textOptionsWidth / 2;
+    var lelftmargin = (((widget.screenSize.width * textEditorWeight) - (Utils.collapseButtonSize * (pageWeight == 1 ? 2 : 1))) * pageWeight) -
+        Utils.textOptionsWidth / 2;
     return Positioned(
       left: lelftmargin,
       top: _lineOffset,
@@ -268,6 +278,7 @@ class _PageEditorState extends State<PageEditor> {
                 radiusAll: 64,
                 elevation: 8,
                 width: Utils.textOptionsWidth,
+                color: Colors.white,
                 child: Column(
                   children: [
                     JustTheTooltip(
@@ -279,13 +290,50 @@ class _PageEditorState extends State<PageEditor> {
                         ),
                       ),
                       child: TapIcon(
+                        backgroundColor: Colors.white,
                         icon: const Icon(
                           Icons.add_link,
                         ),
                         onTap: () {
-                          _onAddChoice();
+                          setState(() {
+                            showingChoiceOption = !showingChoiceOption;
+                          });
+                          //_onAddChoice();
                         },
                       ),
+                    ),
+                    AnimatedSize(
+                      duration: const Duration(milliseconds: 200),
+                      child: !showingChoiceOption
+                          ? const SizedBox.shrink()
+                          : Column(
+                              children: [
+                                TapIcon(
+                                  backgroundColor: Colors.transparent,
+                                  icon: const Icon(
+                                    Icons.add_link,
+                                  ),
+                                  onTap: () {
+                                    setState(() {
+                                      showingChoiceOption = false;
+                                    });
+                                    //_onAddChoice();
+                                  },
+                                ),
+                                TapIcon(
+                                  backgroundColor: Colors.transparent,
+                                  icon: const Icon(
+                                    Icons.home,
+                                  ),
+                                  onTap: () {
+                                    setState(() {
+                                      showingChoiceOption = false;
+                                    });
+                                    //_onAddChoice();
+                                  },
+                                )
+                              ],
+                            ),
                     ),
                     JustTheTooltip(
                       waitDuration: const Duration(milliseconds: 1000),
@@ -296,6 +344,7 @@ class _PageEditorState extends State<PageEditor> {
                         ),
                       ),
                       child: TapIcon(
+                        backgroundColor: Colors.white,
                         icon: const Icon(
                           Icons.add_photo_alternate_outlined,
                         ),
@@ -313,6 +362,7 @@ class _PageEditorState extends State<PageEditor> {
                         ),
                       ),
                       child: TapIcon(
+                        backgroundColor: Colors.white,
                         icon: const Icon(
                           Icons.comment_outlined,
                         ),
@@ -334,6 +384,15 @@ class _PageEditorState extends State<PageEditor> {
     textEditorWeight = (widget.screenSize.width < Utils.maxWidthShowOnlyEditor) ? 1.0 : Utils.editorWeight;
     pageWeight = (widget.screenSize.width < Utils.maxWidthShowOnlyEditorPage) ? 1.0 : Utils.editorPageWeight;
     compensation = pageWeight == 1.0 ? Utils.collapseButtonSize - Utils.textOptionsWidth / 2 : -Utils.textOptionsWidth / 2;
+
+    missingLinks.clear();
+    int id = int.parse(widget.pageId);
+    for (var childId in widget.chapter.graph.nodes[id]!) {
+      if (!widget.chapter.links.nodes[id]!.contains(childId)) {
+        missingLinks.add(childId);
+      }
+    }
+
     return page == null
         ? loadingRotate()
         : Stack(
@@ -365,9 +424,7 @@ class _PageEditorState extends State<PageEditor> {
                                 scrollController: _scrollController,
                                 onImagePaste: (bytes) => Future.value(null),
                                 onLaunchUrl: null,
-                                embedBuilders: [
-                                  CursorEmbedBuilder()
-                                ],
+                                embedBuilders: [CursorEmbedBuilder()],
                               ),
                             ),
                           ),

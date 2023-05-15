@@ -51,7 +51,8 @@ class _ChapterEditorScreenState extends State<ChapterEditorScreen> {
   void initState() {
     textEditorWeight = Utils.editorWeight;
     loosePagesMenuHeight = Utils.loosePagesMenuDefaultHeight;
-    _chapterSubscription = ChapterManagementService.chapterStream(widget.storyId, widget.chapterId).listen((chapter) => setState(() => _chapter = chapter));
+    _chapterSubscription =
+        ChapterManagementService.chapterStream(widget.storyId, widget.chapterId).listen((chapter) => setState(() => _chapter = chapter));
     super.initState();
   }
 
@@ -134,74 +135,77 @@ class _ChapterEditorScreenState extends State<ChapterEditorScreen> {
           height: size.height,
         );
 
-  Widget _pageEditor(Size size) => Stack(
-        children: [
-          AnimatedPositioned(
-            duration: const Duration(milliseconds: Utils.textEditorAnimationDuration),
-            curve: Curves.decelerate,
-            right: selectedPageId == null ? -size.width * (size.width > Utils.maxWidthShowOnlyEditor ? textEditorWeight : 1.0) : 0,
-            child: SizedBox(
-              width: size.width * (size.width > Utils.maxWidthShowOnlyEditor ? textEditorWeight : 1.0),
-              height: size.height,
-              child: Container(
-                color: Utils.pageEditorBackgroundColor,
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  mainAxisSize: MainAxisSize.max,
-                  children: [
-                    Tile(
-                      padding: EdgeInsets.zero,
-                      elevation: 0.0,
-                      color: Utils.pageEditorBackgroundColor,
-                      child: const Icon(
-                        Icons.keyboard_arrow_right_rounded,
-                        size: Utils.collapseButtonSize,
+  Widget _pageEditor(Size size) => _chapter == null
+      ? loadingRotate()
+      : Stack(
+          children: [
+            AnimatedPositioned(
+              duration: const Duration(milliseconds: Utils.textEditorAnimationDuration),
+              curve: Curves.decelerate,
+              right: selectedPageId == null ? -size.width * (size.width > Utils.maxWidthShowOnlyEditor ? textEditorWeight : 1.0) : 0,
+              child: SizedBox(
+                width: size.width * (size.width > Utils.maxWidthShowOnlyEditor ? textEditorWeight : 1.0),
+                height: size.height,
+                child: Container(
+                  color: Utils.pageEditorBackgroundColor,
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    mainAxisSize: MainAxisSize.max,
+                    children: [
+                      Tile(
+                        padding: EdgeInsets.zero,
+                        elevation: 0.0,
+                        color: Utils.pageEditorBackgroundColor,
+                        child: const Icon(
+                          Icons.keyboard_arrow_right_rounded,
+                          size: Utils.collapseButtonSize,
+                        ),
+                        onTap: () {
+                          setState(() {
+                            selectedPageId = null;
+                          });
+                        },
                       ),
-                      onTap: () {
-                        setState(() {
-                          selectedPageId = null;
-                        });
-                      },
-                    ),
-                    selectedPageId != null
-                        ? Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.fromLTRB(8.0, 18.0, 16.0, 0.0),
-                                  child: Text(
-                                    'Page ${selectedPageId!}',
-                                    style: TextStyle(
-                                      color: Utils.graphSettings.nodeBorderColor,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 18.0,
+                      selectedPageId != null
+                          ? Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.fromLTRB(8.0, 18.0, 16.0, 0.0),
+                                    child: Text(
+                                      'Page ${selectedPageId!}',
+                                      style: TextStyle(
+                                        color: Utils.graphSettings.nodeBorderColor,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 18.0,
+                                      ),
                                     ),
                                   ),
-                                ),
-                                const Padding(
-                                  padding: EdgeInsets.fromLTRB(8.0, 8.0, 0.0, 8.0),
-                                  child: Divider(),
-                                ),
-                                Expanded(
-                                  child: PageEditor(
-                                    pageId: selectedPageId!.toString(),
-                                    focusNode: pageEditorFocusNode,
-                                    pushPageToRemote: _pushPageToRemote,
-                                    screenSize: size,
+                                  const Padding(
+                                    padding: EdgeInsets.fromLTRB(8.0, 8.0, 0.0, 8.0),
+                                    child: Divider(),
                                   ),
-                                ),
-                              ],
-                            ),
-                          )
-                        : const SizedBox.shrink(),
-                  ],
+                                  Expanded(
+                                    child: PageEditor(
+                                      pageId: selectedPageId!.toString(),
+                                      focusNode: pageEditorFocusNode,
+                                      pushPageToRemote: _pushPageToRemote,
+                                      screenSize: size,
+                                      chapter: _chapter!,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            )
+                          : const SizedBox.shrink(),
+                    ],
+                  ),
                 ),
               ),
             ),
-          ),
-        ],
-      );
+          ],
+        );
 
   @override
   Widget build(BuildContext context) {
