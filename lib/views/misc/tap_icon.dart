@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class TapIcon extends StatelessWidget {
   final Function()? onTap;
   final double splashRadius;
-  final Icon icon;
+  final Widget icon;
   final Color? borderColor;
   final Color? backgroundColor;
   final Color? hoverColor;

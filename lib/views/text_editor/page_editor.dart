@@ -61,6 +61,7 @@ class _PageEditorState extends State<PageEditor> {
   List<int> missingLinks = [];
   bool showingChoiceOption = false;
   bool showingTextOption = false;
+  bool showingImageOption = false;
 
   @override
   void initState() {
@@ -171,6 +172,8 @@ class _PageEditorState extends State<PageEditor> {
           const TextSelection(baseOffset: 0, extentOffset: 0),
           ChangeSource.REMOTE,
         );
+        // Move cursor to document end
+        _controller.moveCursorToEnd();
       }
       setState(() {});
     } else if (page.lastModifierUid == AuthenticationService.uid) {
@@ -244,9 +247,10 @@ class _PageEditorState extends State<PageEditor> {
     _pushPageToRemote(page);
   }
 
-  void _onAddChoice() {
+  void _onAddChoice([int? id]) {
     if (_selection == null) return;
     Delta currentDelta = page!.toDelta();
+    id ??= widget.chapter.addPage(page!.id);
     page!.createSnippet(_selection!.baseOffset, _selection!.extentOffset - 1, id: 0);
     _replaceDelta(currentDelta, page!.toDelta());
     _pushPageToRemote(page);
@@ -265,8 +269,7 @@ class _PageEditorState extends State<PageEditor> {
   }
 
   Widget _textOptions() {
-    var lelftmargin = (((widget.screenSize.width * textEditorWeight) - (Utils.collapseButtonSize * (pageWeight == 1 ? 2 : 1))) * pageWeight) -
-        Utils.textOptionsWidth / 2;
+    var lelftmargin = (((widget.screenSize.width * textEditorWeight) - (Utils.collapseButtonSize * (pageWeight == 1 ? 2 : 1))) * pageWeight) - Utils.textOptionsWidth / 2;
     return Positioned(
       left: lelftmargin,
       top: _lineOffset,
@@ -297,6 +300,7 @@ class _PageEditorState extends State<PageEditor> {
                         onTap: () {
                           setState(() {
                             showingChoiceOption = !showingChoiceOption;
+                            showingImageOption = false;
                           });
                           //_onAddChoice();
                         },
@@ -306,33 +310,54 @@ class _PageEditorState extends State<PageEditor> {
                       duration: const Duration(milliseconds: 200),
                       child: !showingChoiceOption
                           ? const SizedBox.shrink()
-                          : Column(
-                              children: [
-                                TapIcon(
-                                  backgroundColor: Colors.transparent,
-                                  icon: const Icon(
-                                    Icons.add_link,
-                                  ),
-                                  onTap: () {
-                                    setState(() {
-                                      showingChoiceOption = false;
-                                    });
-                                    //_onAddChoice();
-                                  },
-                                ),
-                                TapIcon(
-                                  backgroundColor: Colors.transparent,
-                                  icon: const Icon(
-                                    Icons.home,
-                                  ),
-                                  onTap: () {
-                                    setState(() {
-                                      showingChoiceOption = false;
-                                    });
-                                    //_onAddChoice();
-                                  },
-                                )
-                              ],
+                          : Tile(
+                              padding: EdgeInsets.zero,
+                              radiusAll: 64,
+                              elevation: 4,
+                              width: Utils.textOptionsWidth - 8,
+                              color: Colors.grey[100],
+                              child: Column(
+                                children: [
+                                  for (int id in missingLinks)
+                                    InkWell(
+                                      customBorder: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(128),
+                                      ),
+                                      child: Container(
+                                        width: Utils.textOptionsWidth - 8,
+                                        height: Utils.textOptionsWidth - 8,
+                                        decoration: BoxDecoration(
+                                          color: Colors.transparent,
+                                          borderRadius: BorderRadius.circular(128),
+                                        ),
+                                        child: Center(
+                                          child: Text(
+                                            id.toString(),
+                                            textAlign: TextAlign.center,
+                                          ),
+                                        ),
+                                      ),
+                                      onTap: () {
+                                        setState(() {
+                                          showingChoiceOption = false;
+                                        });
+                                        _onAddChoice(id);
+                                      },
+                                    ),
+                                  TapIcon(
+                                    backgroundColor: Colors.transparent,
+                                    icon: const Icon(
+                                      Icons.add,
+                                    ),
+                                    onTap: () {
+                                      setState(() {
+                                        showingChoiceOption = false;
+                                      });
+                                      _onAddChoice();
+                                    },
+                                  )
+                                ],
+                              ),
                             ),
                     ),
                     JustTheTooltip(
@@ -344,14 +369,56 @@ class _PageEditorState extends State<PageEditor> {
                         ),
                       ),
                       child: TapIcon(
-                        backgroundColor: Colors.white,
                         icon: const Icon(
                           Icons.add_photo_alternate_outlined,
                         ),
                         onTap: () {
-                          _onAddImage();
+                          setState(() {
+                            showingImageOption = !showingImageOption;
+                            showingChoiceOption = false;
+                          });
                         },
                       ),
+                    ),
+                    AnimatedSize(
+                      duration: const Duration(milliseconds: 200),
+                      child: !showingImageOption
+                          ? const SizedBox.shrink()
+                          : Tile(
+                              padding: EdgeInsets.zero,
+                              radiusAll: 64,
+                              elevation: 4,
+                              width: Utils.textOptionsWidth - 8,
+                              color: Colors.grey[100],
+                              child: Column(
+                                children: [
+                                  TapIcon(
+                                    backgroundColor: Colors.transparent,
+                                    icon: const Icon(
+                                      Icons.brush_rounded,
+                                    ),
+                                    onTap: () {
+                                      setState(() {
+                                        showingImageOption = false;
+                                      });
+                                      //_onAddChoice();
+                                    },
+                                  ),
+                                  TapIcon(
+                                    backgroundColor: Colors.transparent,
+                                    icon: const Icon(
+                                      Icons.upload_rounded,
+                                    ),
+                                    onTap: () {
+                                      setState(() {
+                                        showingImageOption = false;
+                                      });
+                                      //_onAddChoice();
+                                    },
+                                  ),
+                                ],
+                              ),
+                            ),
                     ),
                     JustTheTooltip(
                       waitDuration: const Duration(milliseconds: 1000),
@@ -362,11 +429,15 @@ class _PageEditorState extends State<PageEditor> {
                         ),
                       ),
                       child: TapIcon(
-                        backgroundColor: Colors.white,
                         icon: const Icon(
                           Icons.comment_outlined,
                         ),
-                        onTap: () {},
+                        onTap: () {
+                          setState(() {
+                            showingImageOption = false;
+                            showingChoiceOption = false;
+                          });
+                        },
                       ),
                     ),
                   ],
@@ -424,7 +495,9 @@ class _PageEditorState extends State<PageEditor> {
                                 scrollController: _scrollController,
                                 onImagePaste: (bytes) => Future.value(null),
                                 onLaunchUrl: null,
-                                embedBuilders: [CursorEmbedBuilder()],
+                                embedBuilders: [
+                                  CursorEmbedBuilder()
+                                ],
                               ),
                             ),
                           ),
