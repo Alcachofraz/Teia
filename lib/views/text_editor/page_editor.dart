@@ -5,6 +5,7 @@ import 'package:teia/models/chapter.dart';
 import 'package:teia/models/editing_page.dart';
 import 'package:flutter_quill/flutter_quill.dart' hide Text;
 import 'package:teia/models/snippets/snippet.dart';
+import 'package:teia/screens/image_editor_screen/image_editor_screen.dart';
 import 'package:teia/services/authentication_service.dart';
 import 'package:teia/services/chapter_management_service.dart';
 import 'package:teia/utils/loading.dart';
@@ -401,6 +402,10 @@ class _PageEditorState extends State<PageEditor> {
                                       setState(() {
                                         showingImageOption = false;
                                       });
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(builder: (context) => const ImageEditorScreen()),
+                                      );
                                       //_onAddChoice();
                                     },
                                   ),

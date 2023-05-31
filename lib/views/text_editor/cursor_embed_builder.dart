@@ -16,6 +16,7 @@ class CursorEmbedBuilder implements EmbedBuilder {
     Embed node,
     bool readOnly,
     bool inline,
+    TextStyle style,
   ) {
     RemoteCursor cursor = RemoteCursor.fromString(CursorBlockEmbed(node.value.data).data);
     return Material(
