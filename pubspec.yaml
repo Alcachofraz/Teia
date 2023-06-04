@@ -42,7 +42,6 @@ dependencies:
   firebase_auth: ^4.2.6
   cloud_firestore: ^4.4.3
   cloud_functions: ^4.0.11
-  flutterfire_ui: ^0.4.3+20
 
   get: ^4.6.5
 
@@ -58,7 +57,9 @@ dependencies:
   universal_html: ^2.2.1
   just_the_tooltip: ^0.0.12
   dropdown_button2: ^2.1.2
-  flutter_painter: ^1.0.1
+  flutter_painter:
+    git:
+      url: https://github.com/Harishwarrior/flutter_painter.git
   image: ^4.0.8
   stability_sdk: ^0.1.2
   cached_network_image: ^3.2.3
