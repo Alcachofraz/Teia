@@ -6,6 +6,7 @@ import 'package:flutter_painter/flutter_painter.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
 import 'dart:ui' as ui;
+import 'dart:convert';
 
 import 'package:teia/models/stable_diffusion/generation.dart';
 import 'package:teia/services/stable_diffusion/al_service.dart';
@@ -213,11 +214,47 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
                             setState(() {
                               generateBusy = true;
                             });
+                            Uri uri = Uri.https('api.stability.ai', 'v1/generation/stable-diffusion-512-v2-1/text-to-image');
+
+                            var body = json.encode(
+                              {
+                                "text_prompts": [
+                                  {"text": "A lighthouse on a cliff"}
+                                ],
+                                "cfg_scale": 7,
+                                "clip_guidance_preset": "FAST_BLUE",
+                                "height": 512,
+                                "width": 512,
+                                "samples": 1,
+                                "steps": 30,
+                              },
+                            );
+                            print(body);
+                            /*http.Response res = await http.post(
+                              uri,
+                              body: body,
+                              headers: {
+                                "Authorization": "Bearer sk-DY0hd8PcPKrQCRtiGL6bzRObUbOmBjgGHuQJudHTGHdjcCZa",
+                                "Accept": "application/json",
+                                "Content-Type": "application/json",
+                              },
+                            );*/
+
+                            /*http.Request request = http.Request('POST', uri);
+                            request.body = body;
+                            request.headers['content-type'] = 'application/json';
+                            request.headers['accept'] = 'application/json';
+                            request.headers['Authorization'] = 'Bearer sk-DY0hd8PcPKrQCRtiGL6bzRObUbOmBjgGHuQJudHTGHdjcCZa';
+                            var res = (await request.send()).;
+                            print(res.body);
+                            setState(() {
+                              generateBusy = false;
+                            });*/
                             /*Uint8List? aux = await generate();
                             if (aux == null && mounted) {
                               snackBar(context, 'Image generation is not working at the moment.');
                             }*/
-                            StableDiffusionService.txt2img2(
+                            /*StableDiffusionService.txt2img2(
                               (image) => setState(
                                 () {
                                   painterController.clearDrawables();
@@ -226,7 +263,7 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
                                   base64 = image;
                                 },
                               ),
-                            );
+                            );*/
                             /*setState(() {
                               painterController.clearDrawables();
                               image = aux;
