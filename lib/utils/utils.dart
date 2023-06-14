@@ -50,7 +50,7 @@ class Utils {
   ];
 
   static const double minInpaintBrushThickness = 5.0;
-  static const double maxInpaintBrushThickness = 40.0;
+  static const double maxInpaintBrushThickness = 80.0;
 
   static late final Color pageEditorBackgroundColor;
   static late final Color pageEditorSheetColor;

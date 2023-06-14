@@ -14,7 +14,7 @@ class AccessLayerService {
         [
           Prompt(
             1,
-            'a lighthouse on a cliff, by greg rutkowski',
+            'a xenomorph playing an acoustic piano, dark ambience, smooth lighting, photorealistic',
           ),
         ],
       ),

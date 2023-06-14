@@ -14,10 +14,7 @@ import 'package:teia/utils/loading.dart';
 import 'package:teia/utils/utils.dart';
 import 'package:teia/views/misc/screen_wrapper.dart';
 import 'package:teia/views/misc/tap_icon.dart';
-import 'package:cached_memory_image/cached_memory_image.dart';
 import 'package:teia/views/misc/tile.dart';
-
-import 'package:dio/dio.dart';
 
 class ImageEditorScreen extends StatefulWidget {
   const ImageEditorScreen({Key? key}) : super(key: key);
@@ -39,7 +36,7 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
   String? base64;
 
   Paint shapePaint = Paint()
-    ..strokeWidth = 5
+    ..strokeWidth = 20
     ..color = Colors.black
     ..style = PaintingStyle.stroke
     ..strokeCap = StrokeCap.round;
@@ -51,7 +48,7 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
       settings: PainterSettings(
         freeStyle: const FreeStyleSettings(
           color: Colors.black,
-          strokeWidth: 5,
+          strokeWidth: 20,
           mode: FreeStyleMode.draw,
         ),
         shape: ShapeSettings(
@@ -107,199 +104,152 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
             return loadingRotate();
           } else {
             generation = snapshot.data;
-            return SizedBox(
-              width: screenSize.height * Utils.imageEditorHeight,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SizedBox(
-                    height: screenSize.height * Utils.imageEditorHeight,
-                    child: Stack(
-                      children: [
-                        base64 != null
-                            ? //Image.memory(image!, fit: BoxFit.fill)
-                            CachedMemoryImage(
-                                base64: base64,
-                                uniqueKey: base64.toString(),
-                              )
-                            : SizedBox(
-                                width: MediaQuery.of(context).size.width,
-                                height: MediaQuery.of(context).size.width,
-                                child: const Center(
-                                  child: Icon(
-                                    Icons.hide_image_outlined,
-                                    color: Colors.grey,
-                                    size: 64.0,
+            return StatefulBuilder(builder: (context, setState) {
+              return SizedBox(
+                width: screenSize.height * Utils.imageEditorHeight,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(
+                      width: screenSize.height * Utils.imageEditorHeight,
+                      height: screenSize.height * Utils.imageEditorHeight,
+                      child: Stack(
+                        children: [
+                          image != null
+                              ? Container(
+                                  decoration: BoxDecoration(
+                                    image: DecorationImage(
+                                      fit: BoxFit.fill,
+                                      image: MemoryImage(image!),
+                                    ),
+                                  ),
+                                )
+                              : const SizedBox.expand(
+                                  child: Center(
+                                    child: Icon(
+                                      Icons.hide_image_outlined,
+                                      color: Colors.grey,
+                                      size: 64.0,
+                                    ),
                                   ),
                                 ),
-                              ),
-                        FlutterPainter(
-                          controller: painterController,
-                        ),
-                      ],
-                    ),
-                  ),
-                  Tile(
-                    padding: EdgeInsets.zero,
-                    child: IntrinsicHeight(
-                      child: Row(
-                        children: [
-                          const VerticalDivider(),
-                          TapIcon(
-                            icon: const Icon(Icons.undo_rounded, color: Colors.black),
-                            onTap: () {
-                              if (painterController.canUndo) {
-                                painterController.undo();
-                              }
-                            },
-                          ),
-                          const VerticalDivider(),
-                          TapIcon(
-                            icon: const Icon(Icons.redo_rounded, color: Colors.black),
-                            onTap: () {
-                              if (painterController.canRedo) {
-                                painterController.redo();
-                              }
-                            },
-                          ),
-                          const VerticalDivider(),
-                          const TapIcon(
-                            icon: Icon(MdiIcons.eraser, color: Colors.black),
-                            onTap: null,
-                          ),
-                          Expanded(
-                            child: Slider(
-                              min: 5.0,
-                              max: 40.0,
-                              value: eraserSize,
-                              onChanged: (value) {
-                                setState(() {
-                                  eraserSize = value;
-                                  painterController.freeStyleStrokeWidth = eraserSize;
-                                });
-                              },
+                          Positioned.fill(
+                            child: FlutterPainter(
+                              controller: painterController,
                             ),
                           ),
-                          const VerticalDivider(),
-                          TapIcon(
-                            icon: const Icon(MdiIcons.image),
-                            onTap: () {
-                              setState(() {
-                                painterController.clearDrawables();
-                              });
-                            },
-                          ),
-                          const VerticalDivider(),
                         ],
                       ),
                     ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 16.0),
-                    child: TextFormField(
-                      initialValue: generation!.prompts[0].text,
-                      decoration: const InputDecoration(
-                        hintText: 'Prompt',
-                      ),
-                      onChanged: (text) {
-                        generation!.prompts[0].text = text;
-                      },
-                    ),
-                  ),
-                  Tile(
-                    padding: EdgeInsets.zero,
-                    color: Colors.black,
-                    onTap: generateBusy
-                        ? null
-                        : () async {
-                            setState(() {
-                              generateBusy = true;
-                            });
-                            Uri uri = Uri.https('api.stability.ai', 'v1/generation/stable-diffusion-512-v2-1/text-to-image');
-
-                            var body = {
-                              "text_prompts": [
-                                {"text": "A lighthouse on a cliff"}
-                              ],
-                              "cfg_scale": 7,
-                              "clip_guidance_preset": "FAST_BLUE",
-                              "height": 512,
-                              "width": 512,
-                              "samples": 1,
-                              "steps": 30,
-                            };
-                            var headers = {
-                              "Authorization": "Bearer sk-DY0hd8PcPKrQCRtiGL6bzRObUbOmBjgGHuQJudHTGHdjcCZa",
-                              "Accept": "application/json",
-                              "Content-Type": "application/json",
-                            };
-                            final dio = Dio();
-                            try {
-                              var response = await dio.post(
-                                'https://api.stability.ai/v1/generation/stable-diffusion-v1-5/text-to-image',
-                                data: body,
-                                options: Options(
-                                  headers: headers,
-                                ),
-                              );
-                              print(response.data);
-                            } on DioException catch (e) {
-                              print(e);
-                            }
-
-                            /*http.Request request = http.Request('POST', uri);
-                            request.body = body;
-                            request.headers['content-type'] = 'application/json';
-                            request.headers['accept'] = 'application/json';
-                            request.headers['Authorization'] = 'Bearer sk-DY0hd8PcPKrQCRtiGL6bzRObUbOmBjgGHuQJudHTGHdjcCZa';
-                            var res = (await request.send()).;
-                            print(res.body);
-                            setState(() {
-                              generateBusy = false;
-                            });*/
-                            /*Uint8List? aux = await generate();
-                            if (aux == null && mounted) {
-                              snackBar(context, 'Image generation is not working at the moment.');
-                            }*/
-                            /*StableDiffusionService.txt2img2(
-                              (image) => setState(
-                                () {
-                                  painterController.clearDrawables();
-                                  //image = aux;
-                                  generateBusy = false;
-                                  base64 = image;
+                    Tile(
+                      padding: EdgeInsets.zero,
+                      child: IntrinsicHeight(
+                        child: Row(
+                          children: [
+                            const VerticalDivider(),
+                            TapIcon(
+                              icon: const Icon(Icons.undo_rounded, color: Colors.black),
+                              onTap: () {
+                                if (painterController.canUndo) {
+                                  painterController.undo();
+                                }
+                              },
+                            ),
+                            const VerticalDivider(),
+                            TapIcon(
+                              icon: const Icon(Icons.redo_rounded, color: Colors.black),
+                              onTap: () {
+                                if (painterController.canRedo) {
+                                  painterController.redo();
+                                }
+                              },
+                            ),
+                            const VerticalDivider(),
+                            const TapIcon(
+                              icon: Icon(MdiIcons.eraser, color: Colors.black),
+                              onTap: null,
+                            ),
+                            Expanded(
+                              child: Slider(
+                                min: Utils.minInpaintBrushThickness,
+                                max: Utils.maxInpaintBrushThickness,
+                                value: eraserSize,
+                                onChanged: (value) {
+                                  setState(() {
+                                    eraserSize = value;
+                                    painterController.freeStyleStrokeWidth = eraserSize;
+                                  });
                                 },
                               ),
-                            );*/
-                            /*setState(() {
-                              painterController.clearDrawables();
-                              image = aux;
-                              generateBusy = false;
-                            });*/
-                          },
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Expanded(
-                          child: Padding(
-                            padding: const EdgeInsets.all(16.0),
-                            child: generateBusy
-                                ? loadingDots(color: Colors.white, size: 16.0)
-                                : const Text(
-                                    "Generate",
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                          ),
+                            ),
+                            const VerticalDivider(),
+                            TapIcon(
+                              icon: const Icon(MdiIcons.image),
+                              onTap: () {
+                                setState(() {
+                                  painterController.clearDrawables();
+                                });
+                              },
+                            ),
+                            const VerticalDivider(),
+                          ],
                         ),
-                      ],
+                      ),
                     ),
-                  ),
-                ],
-              ),
-            );
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 16.0),
+                      child: TextFormField(
+                        initialValue: generation!.prompts[0].text,
+                        decoration: const InputDecoration(
+                          hintText: 'Prompt',
+                        ),
+                        onChanged: (text) {
+                          generation!.prompts[0].text = text;
+                        },
+                      ),
+                    ),
+                    Tile(
+                      padding: EdgeInsets.zero,
+                      color: Colors.black,
+                      onTap: generateBusy
+                          ? null
+                          : () async {
+                              setState(() {
+                                generateBusy = true;
+                              });
+
+                              var imaggeBytes = await generate();
+
+                              setState(() {
+                                image = imaggeBytes;
+                                painterController.clearDrawables();
+                                generateBusy = false;
+                              });
+                            },
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Expanded(
+                            child: Padding(
+                              padding: const EdgeInsets.all(16.0),
+                              child: generateBusy
+                                  ? loadingDots(color: Colors.white, size: 16.0)
+                                  : const Text(
+                                      "Generate",
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            });
           }
         },
       ),
