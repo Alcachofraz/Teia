@@ -44,7 +44,7 @@ class EditingPage {
         LetterId to = LetterId.fromMap(snippetJson['to']);
         switch (snippetJson['type']) {
           case 1:
-            return ChoiceSnippet(from, to, snippetJson['id']);
+            return ChoiceSnippet(from, to, snippetJson['choice']);
           case 2:
             return ImageSnippet(from, to, snippetJson['url']);
           default:
@@ -91,9 +91,7 @@ class EditingPage {
 
     /// 1)
     if (s2.from.compareTo(s1.to) > 0 || s2.to.compareTo(s1.from) < 0) {
-      return [
-        s1.deepCopy()
-      ];
+      return [s1.deepCopy()];
     }
 
     /// 2)
@@ -106,16 +104,12 @@ class EditingPage {
 
     /// 3)
     else if (s2.from.compareTo(s1.from) > 0 && s2.to.compareTo(s1.to) >= 0) {
-      return [
-        s1.deepCopy(to: letters.lastWhere((letter) => letter.id.compareTo(s2.from) < 0).id)
-      ];
+      return [s1.deepCopy(to: letters.lastWhere((letter) => letter.id.compareTo(s2.from) < 0).id)];
     }
 
     /// 4)
     else if (s2.from.compareTo(s1.from) <= 0 && s2.to.compareTo(s1.to) < 0) {
-      return [
-        s1.deepCopy(from: letters.firstWhere((letter) => letter.id.compareTo(s2.to) > 0).id)
-      ];
+      return [s1.deepCopy(from: letters.firstWhere((letter) => letter.id.compareTo(s2.to) > 0).id)];
     } else {
       return [];
     }
@@ -165,9 +159,7 @@ class EditingPage {
       }
     } else {
       // All null
-      return LetterId([
-        boundary
-      ]); // Create first id
+      return LetterId([boundary]); // Create first id
     }
   }
 
@@ -268,11 +260,7 @@ class EditingPage {
         return delta
           ..insert(
             letter.letter,
-            insideSnippet
-                ? {
-                    'color': Utils.snippetColors[currentColor]
-                  }
-                : null,
+            insideSnippet ? {'color': Utils.snippetColors[currentColor]} : null,
           );
       },
     );

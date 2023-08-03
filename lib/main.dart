@@ -30,12 +30,10 @@ class Teia extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: swatch(Colors.red[300]!),
       ),
-      home: const ImageEditorScreen(),
-
-      /*const ChapterEditorScreen(
+      home: const ChapterEditorScreen(
         storyId: '1',
         chapterId: '1',
-      ),*/
+      ),
     );
   }
 }

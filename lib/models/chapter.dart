@@ -24,12 +24,8 @@ class Chapter {
       id,
       storyId,
       title,
-      ChapterGraph({
-        1: []
-      }),
-      ChapterGraph({
-        1: []
-      }),
+      ChapterGraph({1: []}),
+      ChapterGraph({1: []}),
     );
   }
 
@@ -76,11 +72,8 @@ class Chapter {
   }
 
   /// Convert this chapter to a Map<String, dynamic> object.
-  Map<String, dynamic> toMap() => {
-        'id': id,
-        'storyId': storyId,
-        'title': title,
-        'graph': graph.nodes,
-        'links': links.nodes
-      };
+  Map<String, dynamic> toMap() => {'id': id, 'storyId': storyId, 'title': title, 'graph': graph.nodes, 'links': links.nodes};
+
+  @override
+  String toString() => toMap().toString();
 }
