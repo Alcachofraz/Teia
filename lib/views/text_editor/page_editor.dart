@@ -23,7 +23,8 @@ import 'package:just_the_tooltip/just_the_tooltip.dart';
 class PageEditor extends StatefulWidget {
   final String pageId;
   final FocusNode? focusNode;
-  final Function(EditingPage page)? pushPageToRemote;
+  final Future<void> Function(EditingPage page)? pushPageToRemote;
+  final Future<void> Function(Chapter chapter)? pushChapterToRemote;
   final Size screenSize;
   final List<int> missingLinks;
   final Chapter chapter;
@@ -33,6 +34,7 @@ class PageEditor extends StatefulWidget {
     required this.pageId,
     this.focusNode,
     this.pushPageToRemote,
+    this.pushChapterToRemote,
     required this.screenSize,
     this.missingLinks = const [],
     required this.chapter,
@@ -91,9 +93,14 @@ class _PageEditorState extends State<PageEditor> {
     super.dispose();
   }
 
-  void _pushPageToRemote(EditingPage? page) {
+  Future<void> _pushChapterToRemote(Chapter chapter) async {
+    //Logs.d('Sending:\n${chapter.toString()}');
+    if (widget.pushChapterToRemote != null) await widget.pushChapterToRemote!(widget.chapter);
+  }
+
+  Future<void> _pushPageToRemote(EditingPage? page) async {
     //Logs.d('Sending:\n${page.toString()}');
-    if (widget.pushPageToRemote != null && page != null) widget.pushPageToRemote!(page);
+    if (widget.pushPageToRemote != null && page != null) await widget.pushPageToRemote!(page);
   }
 
   void _replaceDelta(Delta currentDelta, Delta newDelta) {
@@ -248,13 +255,15 @@ class _PageEditorState extends State<PageEditor> {
     _pushPageToRemote(page);
   }
 
-  void _onAddChoice([int? id]) {
+  void _onAddChoice([int? id]) async {
     if (_selection == null) return;
     Delta currentDelta = page!.toDelta();
     id ??= widget.chapter.addPage(page!.id);
     page!.createSnippet(_selection!.baseOffset, _selection!.extentOffset - 1, id: 0);
     _replaceDelta(currentDelta, page!.toDelta());
-    _pushPageToRemote(page);
+    widget.chapter.addLink(page!.id, childId: id);
+    await _pushChapterToRemote(widget.chapter);
+    await _pushPageToRemote(page);
   }
 
   Widget _comments() {
@@ -270,7 +279,8 @@ class _PageEditorState extends State<PageEditor> {
   }
 
   Widget _textOptions() {
-    var lelftmargin = (((widget.screenSize.width * textEditorWeight) - (Utils.collapseButtonSize * (pageWeight == 1 ? 2 : 1))) * pageWeight) - Utils.textOptionsWidth / 2;
+    var lelftmargin = (((widget.screenSize.width * textEditorWeight) - (Utils.collapseButtonSize * (pageWeight == 1 ? 2 : 1))) * pageWeight) -
+        Utils.textOptionsWidth / 2;
     return Positioned(
       left: lelftmargin,
       top: _lineOffset,
@@ -316,10 +326,10 @@ class _PageEditorState extends State<PageEditor> {
                               radiusAll: 64,
                               elevation: 4,
                               width: Utils.textOptionsWidth - 8,
-                              color: Colors.grey[100],
+                              color: Colors.grey[50],
                               child: Column(
                                 children: [
-                                  for (int id in missingLinks)
+                                  for (int id in widget.chapter.graph.nodes[int.parse(widget.pageId)]!)
                                     InkWell(
                                       customBorder: RoundedRectangleBorder(
                                         borderRadius: BorderRadius.circular(128),
@@ -335,6 +345,9 @@ class _PageEditorState extends State<PageEditor> {
                                           child: Text(
                                             id.toString(),
                                             textAlign: TextAlign.center,
+                                            style: TextStyle(
+                                              color: missingLinks.contains(id) ? Colors.red : Colors.green,
+                                            ),
                                           ),
                                         ),
                                       ),
@@ -462,10 +475,10 @@ class _PageEditorState extends State<PageEditor> {
     compensation = pageWeight == 1.0 ? Utils.collapseButtonSize - Utils.textOptionsWidth / 2 : -Utils.textOptionsWidth / 2;
 
     missingLinks.clear();
-    int id = int.parse(widget.pageId);
-    for (var childId in widget.chapter.graph.nodes[id]!) {
-      if (!widget.chapter.links.nodes[id]!.contains(childId)) {
-        missingLinks.add(childId);
+    int pageId = int.parse(widget.pageId);
+    for (int id in widget.chapter.graph.nodes[pageId]!) {
+      if (!widget.chapter.links.nodes[pageId]!.contains(id)) {
+        missingLinks.add(id);
       }
     }
 
@@ -500,9 +513,7 @@ class _PageEditorState extends State<PageEditor> {
                                 scrollController: _scrollController,
                                 onImagePaste: (bytes) => Future.value(null),
                                 onLaunchUrl: null,
-                                embedBuilders: [
-                                  CursorEmbedBuilder()
-                                ],
+                                embedBuilders: [CursorEmbedBuilder()],
                               ),
                             ),
                           ),

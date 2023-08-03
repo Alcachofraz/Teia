@@ -137,7 +137,7 @@ class StableDiffusionService {
   }
 
   static Future<Response<dynamic>?> txt2img(Map<String, dynamic> body) async {
-    log('TXT2IMG');
+    log('TXT2IMG -> $engineId');
     var headers = {
       "Authorization": "Bearer $apiKey",
       "Accept": "application/json",
@@ -158,7 +158,7 @@ class StableDiffusionService {
   }
 
   static Future<Response<dynamic>?> inpaint(Map<String, dynamic> body, Uint8List initImage, Uint8List maskImage) async {
-    log('INPAINT');
+    log('INPAINT -> $maskingEngineId');
     var headers = {
       "Authorization": "Bearer $apiKey",
       "Accept": "application/json",
@@ -187,7 +187,8 @@ class StableDiffusionService {
     }
   }
 
-  static Future<Uint8List?> generate(double cfgScale, String clipGuidancePreset, int width, int height, int steps, List<Prompt> prompts, int samples, {Uint8List? initImage, Uint8List? maskImage}) async {
+  static Future<Uint8List?> generate(double cfgScale, String clipGuidancePreset, int width, int height, int steps, List<Prompt> prompts, int samples,
+      {Uint8List? initImage, Uint8List? maskImage}) async {
     List<Map<String, dynamic>> textPrompts = [];
     for (Prompt prompt in prompts) {
       textPrompts.add({

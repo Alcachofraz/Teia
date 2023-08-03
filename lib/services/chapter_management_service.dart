@@ -3,13 +3,20 @@ import 'package:teia/models/chapter_graph.dart';
 import 'package:teia/models/editing_page.dart';
 import 'package:teia/models/note/note.dart';
 import 'package:teia/services/firebase/firestore_utils.dart';
+import 'package:teia/utils/logs.dart';
 
 class ChapterManagementService {
   static Stream<Chapter> chapterStream(
     String storyId,
     String chapterId,
   ) =>
-      FirebaseUtils.firestore.collection('stories').doc(storyId).collection('chapters').doc(chapterId).snapshots().asyncMap((doc) => Chapter.fromMap(doc.data()));
+      FirebaseUtils.firestore
+          .collection('stories')
+          .doc(storyId)
+          .collection('chapters')
+          .doc(chapterId)
+          .snapshots()
+          .asyncMap((doc) => Chapter.fromMap(doc.data()));
 
   static Stream<EditingPage> pageStream(
     String storyId,
@@ -28,15 +35,30 @@ class ChapterManagementService {
 
   static Future<void> chapterSet(Chapter chapter) async {
     //Logs.d('Sending $page');
-    FirebaseUtils.firestore.collection('stories').doc(chapter.storyId).collection('chapters').doc(chapter.id.toString()).set(chapter.toMap());
+    try {
+      FirebaseUtils.firestore.collection('stories').doc(chapter.storyId).collection('chapters').doc(chapter.id.toString()).set(chapter.toMap());
+    } catch (e) {
+      Logs.d('Sending $chapter\n$e');
+    }
   }
 
   static Future<void> pageSet(EditingPage page, String uid) async {
-    //Logs.d('Sending $page');
-    FirebaseUtils.firestore.collection('stories').doc(page.storyId).collection('chapters').doc(page.chapterId.toString()).collection('pages').doc(page.id.toString()).set({
-      ...page.toMap(),
-      ...{'lastModifierUid': uid},
-    });
+    //Logs.d('Sending $page - ${page.id.toString()}');
+    try {
+      FirebaseUtils.firestore
+          .collection('stories')
+          .doc(page.storyId)
+          .collection('chapters')
+          .doc(page.chapterId.toString())
+          .collection('pages')
+          .doc(page.id.toString())
+          .set({
+        ...page.toMap(),
+        ...{'lastModifierUid': uid},
+      });
+    } catch (e) {
+      Logs.d('Sending $page\n$e');
+    }
   }
 
   static Future<void> pageCreate(EditingPage page, ChapterGraph newGraph) async {
@@ -46,7 +68,13 @@ class ChapterManagementService {
         {'graph': newGraph.toMap()},
       );
       transaction.set(
-        FirebaseUtils.firestore.collection('stories').doc(page.storyId).collection('chapters').doc(page.chapterId.toString()).collection('pages').doc(page.id.toString()),
+        FirebaseUtils.firestore
+            .collection('stories')
+            .doc(page.storyId)
+            .collection('chapters')
+            .doc(page.chapterId.toString())
+            .collection('pages')
+            .doc(page.id.toString()),
         {
           ...page.toMap(),
           ...{'lastModifierUid': null},

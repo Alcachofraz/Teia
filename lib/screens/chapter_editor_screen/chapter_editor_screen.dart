@@ -62,8 +62,12 @@ class _ChapterEditorScreenState extends State<ChapterEditorScreen> {
     super.dispose();
   }
 
-  void _pushPageToRemote(EditingPage page) {
-    ChapterManagementService.pageSet(page, AuthenticationService.uid);
+  Future<void> _pushChapterToRemote(Chapter chapter) async {
+    await ChapterManagementService.chapterSet(chapter);
+  }
+
+  Future<void> _pushPageToRemote(EditingPage page) async {
+    await ChapterManagementService.pageSet(page, AuthenticationService.uid);
   }
 
   void _clickPage(pageId) {
@@ -191,6 +195,7 @@ class _ChapterEditorScreenState extends State<ChapterEditorScreen> {
                                       pageId: selectedPageId!.toString(),
                                       focusNode: pageEditorFocusNode,
                                       pushPageToRemote: _pushPageToRemote,
+                                      pushChapterToRemote: _pushChapterToRemote,
                                       screenSize: size,
                                       chapter: _chapter!,
                                     ),
