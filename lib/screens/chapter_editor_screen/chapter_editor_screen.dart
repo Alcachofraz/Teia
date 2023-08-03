@@ -8,7 +8,7 @@ import 'package:teia/screens/chapter_editor_screen/chapter_graph_view.dart';
 import 'package:teia/services/authentication_service.dart';
 import 'package:teia/services/chapter_management_service.dart';
 import 'package:teia/utils/loading.dart';
-import 'package:teia/views/text_editor/page_editor.dart';
+import 'package:teia/screens/chapter_editor_screen/widgets/page_editor.dart';
 import 'package:teia/utils/utils.dart';
 import 'package:teia/views/misc/scrollable_static_scaffold.dart';
 import 'package:teia/views/misc/tile.dart';
@@ -51,8 +51,7 @@ class _ChapterEditorScreenState extends State<ChapterEditorScreen> {
   void initState() {
     textEditorWeight = Utils.editorWeight;
     loosePagesMenuHeight = Utils.loosePagesMenuDefaultHeight;
-    _chapterSubscription =
-        ChapterManagementService.chapterStream(widget.storyId, widget.chapterId).listen((chapter) => setState(() => _chapter = chapter));
+    _chapterSubscription = ChapterManagementService.chapterStream(widget.storyId, widget.chapterId).listen((chapter) => setState(() => _chapter = chapter));
     super.initState();
   }
 
@@ -198,6 +197,7 @@ class _ChapterEditorScreenState extends State<ChapterEditorScreen> {
                                       pushChapterToRemote: _pushChapterToRemote,
                                       screenSize: size,
                                       chapter: _chapter!,
+                                      onPageTap: (pageId) => _clickPage(pageId),
                                     ),
                                   ),
                                 ],

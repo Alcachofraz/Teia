@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:teia/utils/swatch.dart';
 import 'dart:html';
 
@@ -57,7 +58,7 @@ class Utils {
 
   static const double imageEditorHeight = 0.6;
 
-  static const textEditorStyle = TextStyle(fontFamily: 'Arial');
+  static final textEditorStyle = GoogleFonts.roboto(textStyle: const TextStyle());
 
   static void init() {
     graphSettings = ChapterGraphSettings(

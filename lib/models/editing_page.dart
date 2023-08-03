@@ -91,7 +91,9 @@ class EditingPage {
 
     /// 1)
     if (s2.from.compareTo(s1.to) > 0 || s2.to.compareTo(s1.from) < 0) {
-      return [s1.deepCopy()];
+      return [
+        s1.deepCopy()
+      ];
     }
 
     /// 2)
@@ -104,21 +106,25 @@ class EditingPage {
 
     /// 3)
     else if (s2.from.compareTo(s1.from) > 0 && s2.to.compareTo(s1.to) >= 0) {
-      return [s1.deepCopy(to: letters.lastWhere((letter) => letter.id.compareTo(s2.from) < 0).id)];
+      return [
+        s1.deepCopy(to: letters.lastWhere((letter) => letter.id.compareTo(s2.from) < 0).id)
+      ];
     }
 
     /// 4)
     else if (s2.from.compareTo(s1.from) <= 0 && s2.to.compareTo(s1.to) < 0) {
-      return [s1.deepCopy(from: letters.firstWhere((letter) => letter.id.compareTo(s2.to) > 0).id)];
+      return [
+        s1.deepCopy(from: letters.firstWhere((letter) => letter.id.compareTo(s2.to) > 0).id)
+      ];
     } else {
       return [];
     }
   }
 
-  void createSnippet(int from, int to, {String? url, int? id}) {
+  void createSnippet(int from, int to, {String? url, int? choice}) {
     Snippet toAdd;
-    if (id != null) {
-      toAdd = ChoiceSnippet(letters[from].id, letters[to].id, id);
+    if (choice != null) {
+      toAdd = ChoiceSnippet(letters[from].id, letters[to].id, choice);
     } else if (url != null) {
       toAdd = ImageSnippet(letters[from].id, letters[to].id, url);
     } else {
@@ -159,7 +165,9 @@ class EditingPage {
       }
     } else {
       // All null
-      return LetterId([boundary]); // Create first id
+      return LetterId([
+        boundary
+      ]); // Create first id
     }
   }
 
@@ -260,7 +268,11 @@ class EditingPage {
         return delta
           ..insert(
             letter.letter,
-            insideSnippet ? {'color': Utils.snippetColors[currentColor]} : null,
+            insideSnippet
+                ? {
+                    'color': Utils.snippetColors[currentColor]
+                  }
+                : null,
           );
       },
     );

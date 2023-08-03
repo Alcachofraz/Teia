@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart';
-import 'package:teia/views/text_editor/cursor_block_embed.dart';
-import 'package:teia/views/text_editor/remote_cursor.dart';
+import 'package:teia/screens/chapter_editor_screen/widgets/cursor/cursor_block_embed.dart';
+import 'package:teia/screens/chapter_editor_screen/widgets/remote_cursor.dart';
 
 class CursorEmbedBuilder implements EmbedBuilder {
   CursorEmbedBuilder();
@@ -41,4 +41,9 @@ class CursorEmbedBuilder implements EmbedBuilder {
 
   @override
   bool get expanded => true;
+
+  @override
+  String toPlainText(Embed node) {
+    return key;
+  }
 }

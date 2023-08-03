@@ -4,8 +4,11 @@ import 'package:flutter/material.dart' hide Page;
 import 'package:teia/models/chapter.dart';
 import 'package:teia/models/editing_page.dart';
 import 'package:flutter_quill/flutter_quill.dart' hide Text;
+import 'package:teia/models/snippets/choice_snippet.dart';
+import 'package:teia/models/snippets/image_snippet.dart';
 import 'package:teia/models/snippets/snippet.dart';
-import 'package:teia/screens/image_editor_screen/image_editor_screen.dart';
+import 'package:teia/screens/chapter_editor_screen/widgets/snippets/snippet_choice_card.dart';
+import 'package:teia/screens/chapter_editor_screen/widgets/snippets/snippet_image_card.dart';
 import 'package:teia/services/authentication_service.dart';
 import 'package:teia/services/chapter_management_service.dart';
 import 'package:teia/utils/loading.dart';
@@ -13,10 +16,9 @@ import 'package:teia/utils/logs.dart';
 import 'package:teia/utils/utils.dart';
 import 'package:teia/views/misc/tap_icon.dart';
 import 'package:teia/views/misc/tile.dart';
-import 'package:teia/views/text_editor/cursor_block_embed.dart';
-import 'package:teia/views/text_editor/cursor_embed_builder.dart';
-import 'package:teia/views/text_editor/remote_cursor.dart';
-import 'package:teia/views/text_editor/snippet_info_card.dart';
+import 'package:teia/screens/chapter_editor_screen/widgets/cursor/cursor_block_embed.dart';
+import 'package:teia/screens/chapter_editor_screen/widgets/cursor/cursor_embed_builder.dart';
+import 'package:teia/screens/chapter_editor_screen/widgets/remote_cursor.dart';
 import 'package:universal_html/html.dart';
 import 'package:just_the_tooltip/just_the_tooltip.dart';
 
@@ -28,6 +30,7 @@ class PageEditor extends StatefulWidget {
   final Size screenSize;
   final List<int> missingLinks;
   final Chapter chapter;
+  final Function(int pageId) onPageTap;
 
   const PageEditor({
     super.key,
@@ -37,6 +40,7 @@ class PageEditor extends StatefulWidget {
     this.pushChapterToRemote,
     required this.screenSize,
     this.missingLinks = const [],
+    required this.onPageTap,
     required this.chapter,
   });
 
@@ -244,7 +248,7 @@ class _PageEditorState extends State<PageEditor> {
         _atSnippet = page!.findSnippetByIndex(selection.baseOffset);
       });
     }
-    _controller.formatSelection(const ColorAttribute('#000000'));
+    //_controller.formatSelection(const ColorAttribute('#000000'));
   }
 
   void _onAddImage() {
@@ -259,28 +263,46 @@ class _PageEditorState extends State<PageEditor> {
     if (_selection == null) return;
     Delta currentDelta = page!.toDelta();
     id ??= widget.chapter.addPage(page!.id);
-    page!.createSnippet(_selection!.baseOffset, _selection!.extentOffset - 1, id: 0);
+    page!.createSnippet(_selection!.baseOffset, _selection!.extentOffset - 1, choice: id);
     _replaceDelta(currentDelta, page!.toDelta());
     widget.chapter.addLink(page!.id, childId: id);
     await _pushChapterToRemote(widget.chapter);
     await _pushPageToRemote(page);
   }
 
+  Widget _snippetCard(Snippet snippet, String text) {
+    if (snippet is ImageSnippet) return SnippetImageCard(snippet: snippet, text: text);
+    if (snippet is ChoiceSnippet) return SnippetChoiceCard(snippet: snippet, text: text, onPageTap: widget.onPageTap);
+    return const SizedBox.shrink();
+  }
+
   Widget _comments() {
+    String text = '';
+    if (_atSnippet != null) {
+      // Get text of Snippet
+      for (var letter in page!.letters) {
+        if (letter.id.compareTo(_atSnippet!.from) >= 0) {
+          text += letter.letter;
+        }
+        if (letter.id.compareTo(_atSnippet!.to) >= 0) {
+          break;
+        }
+      }
+    }
     return Column(
       children: [
         if (_atSnippet != null)
           Padding(
             padding: const EdgeInsets.fromLTRB(16.0, 0.0, 16.0, 16.0),
-            child: SnippetInfoCard(snippet: _atSnippet!, page: page!),
+            child: _snippetCard(_atSnippet!, text),
           ),
+        // for() comments
       ],
     );
   }
 
   Widget _textOptions() {
-    var lelftmargin = (((widget.screenSize.width * textEditorWeight) - (Utils.collapseButtonSize * (pageWeight == 1 ? 2 : 1))) * pageWeight) -
-        Utils.textOptionsWidth / 2;
+    var lelftmargin = (((widget.screenSize.width * textEditorWeight) - (Utils.collapseButtonSize * (pageWeight == 1 ? 2 : 1))) * pageWeight) - Utils.textOptionsWidth / 2;
     return Positioned(
       left: lelftmargin,
       top: _lineOffset,
@@ -415,11 +437,11 @@ class _PageEditorState extends State<PageEditor> {
                                       setState(() {
                                         showingImageOption = false;
                                       });
-                                      Navigator.push(
+                                      /* Navigator.push(
                                         context,
                                         MaterialPageRoute(builder: (context) => const ImageEditorScreen()),
-                                      );
-                                      //_onAddChoice();
+                                      );*/
+                                      _onAddImage();
                                     },
                                   ),
                                   TapIcon(
@@ -431,7 +453,7 @@ class _PageEditorState extends State<PageEditor> {
                                       setState(() {
                                         showingImageOption = false;
                                       });
-                                      //_onAddChoice();
+                                      // Load image from device
                                     },
                                   ),
                                 ],
@@ -501,7 +523,6 @@ class _PageEditorState extends State<PageEditor> {
                               padding: const EdgeInsets.fromLTRB(24.0, 24.0, 24.0, 24.0),
                               child: QuillEditor(
                                 controller: _controller,
-                                customStyleBuilder: (attribute) => Utils.textEditorStyle,
                                 readOnly: false,
                                 expands: true,
                                 paintCursorAboveText: true,
@@ -513,7 +534,9 @@ class _PageEditorState extends State<PageEditor> {
                                 scrollController: _scrollController,
                                 onImagePaste: (bytes) => Future.value(null),
                                 onLaunchUrl: null,
-                                embedBuilders: [CursorEmbedBuilder()],
+                                embedBuilders: [
+                                  CursorEmbedBuilder()
+                                ],
                               ),
                             ),
                           ),

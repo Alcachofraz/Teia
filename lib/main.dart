@@ -7,6 +7,7 @@ import 'package:teia/utils/swatch.dart';
 import 'package:teia/utils/utils.dart';
 
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -23,11 +24,13 @@ class Teia extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Teia',
       theme: ThemeData(
         primarySwatch: swatch(Colors.red[300]!),
+        textTheme: GoogleFonts.sourceSansProTextTheme(textTheme),
       ),
       home: const ChapterEditorScreen(
         storyId: '1',
