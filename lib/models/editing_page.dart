@@ -44,7 +44,7 @@ class EditingPage {
         LetterId to = LetterId.fromMap(snippetJson['to']);
         switch (snippetJson['type']) {
           case 1:
-            return ChoiceSnippet(from, to, snippetJson['id']);
+            return ChoiceSnippet(from, to, snippetJson['choice']);
           case 2:
             return ImageSnippet(from, to, snippetJson['url']);
           default:

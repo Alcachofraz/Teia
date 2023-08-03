@@ -6,7 +6,8 @@ class Generation {
   final int width;
   final int height;
   final int steps;
+  final int samples;
   final List<Prompt> prompts;
 
-  Generation(this.cfgScale, this.clipGuidancePreset, this.width, this.height, this.steps, this.prompts);
+  Generation(this.cfgScale, this.clipGuidancePreset, this.width, this.height, this.steps, this.samples, this.prompts);
 }

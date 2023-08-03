@@ -11,10 +11,11 @@ class AccessLayerService {
         512,
         512,
         30,
+        1,
         [
           Prompt(
             1,
-            'a xenomorph playing an acoustic piano, dark ambience, smooth lighting, photorealistic',
+            'a xenomorph playing a grand piano inside a library',
           ),
         ],
       ),

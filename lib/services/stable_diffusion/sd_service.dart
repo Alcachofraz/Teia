@@ -10,6 +10,16 @@ class StableDiffusionService {
   static const String engineId = 'stable-diffusion-xl-beta-v2-2-2';
   static const String maskingEngineId = 'stable-inpainting-512-v2-0';
 
+  static const String promptStyler = '''8k, detailed, sharp, vivid, soft glow, artstation, 
+  (Midjourney style) hyperrealism, highly detailed, insanely detailed, intricate, cinematic 
+  lighting, depth of field, god ray, glow, glare, cinematic, dynamic lighting, behance, 
+  sharp focus, concept art, spike painting, illustration, concept art, key visual''';
+
+  static const String negativePromptStyler = '''bad, ugly, overexposed, low contrast, 
+  cut off, tiling, watermark, blurry, deformed, weird colors, mutated color, muted color, 
+  photo realistic, fused, less detail, lowres, out of frame, worst quality, low quality, 
+  normal quality, displaced object''';
+
   /*
   [
     {
@@ -181,10 +191,14 @@ class StableDiffusionService {
     List<Map<String, dynamic>> textPrompts = [];
     for (Prompt prompt in prompts) {
       textPrompts.add({
-        'text': prompt.text,
+        'text': '${prompt.text}, $promptStyler',
         'weight': prompt.weight,
       });
     }
+    textPrompts.add({
+      'text': negativePromptStyler,
+      'weight': -1,
+    });
     try {
       Response<dynamic>? response;
       if (initImage != null && maskImage != null) {
