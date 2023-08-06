@@ -14,4 +14,13 @@ class User {
       'photoUrl': photoUrl,
     };
   }
+
+  factory User.fromMap(Map<String, dynamic> map) {
+    return User(
+      map['uid'],
+      map['name'],
+      map['email'],
+      map['photoUrl'],
+    );
+  }
 }

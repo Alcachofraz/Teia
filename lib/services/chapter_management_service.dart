@@ -36,13 +36,18 @@ class ChapterManagementService {
   static Future<void> chapterSet(Chapter chapter) async {
     //Logs.d('Sending $page');
     try {
-      FirebaseUtils.firestore.collection('stories').doc(chapter.storyId).collection('chapters').doc(chapter.id.toString()).set(chapter.toMap());
+      FirebaseUtils.firestore
+          .collection('stories')
+          .doc(chapter.storyId)
+          .collection('chapters')
+          .doc(chapter.id.toString())
+          .set(chapter.toMap());
     } catch (e) {
       Logs.d('Sending $chapter\n$e');
     }
   }
 
-  static Future<void> pageSet(EditingPage page, String uid) async {
+  static Future<void> pageSet(EditingPage page, String? uid) async {
     //Logs.d('Sending $page - ${page.id.toString()}');
     try {
       FirebaseUtils.firestore
@@ -61,10 +66,15 @@ class ChapterManagementService {
     }
   }
 
-  static Future<void> pageCreate(EditingPage page, ChapterGraph newGraph) async {
+  static Future<void> pageCreate(
+      EditingPage page, ChapterGraph newGraph) async {
     FirebaseUtils.firestore.runTransaction((transaction) async {
       transaction.update(
-        FirebaseUtils.firestore.collection('stories').doc(page.storyId).collection('chapters').doc(page.chapterId.toString()),
+        FirebaseUtils.firestore
+            .collection('stories')
+            .doc(page.storyId)
+            .collection('chapters')
+            .doc(page.chapterId.toString()),
         {'graph': newGraph.toMap()},
       );
       transaction.set(
@@ -97,5 +107,6 @@ class ChapterManagementService {
           .doc(pageId)
           .collection('notes')
           .snapshots()
-          .asyncMap((snapshot) => snapshot.docs.map((map) => Note.fromMap(map.data())).toList());
+          .asyncMap((snapshot) =>
+              snapshot.docs.map((map) => Note.fromMap(map.data())).toList());
 }
