@@ -1,12 +1,12 @@
-import 'package:teia/models/chapter.dart';
 import 'package:teia/models/chapter_graph.dart';
-import 'package:teia/models/editing_page.dart';
+import 'package:teia/models/editing/editing_chapter.dart';
+import 'package:teia/models/editing/editing_page.dart';
 import 'package:teia/models/note/note.dart';
 import 'package:teia/services/firebase/firestore_utils.dart';
 import 'package:teia/utils/logs.dart';
 
 class ChapterManagementService {
-  static Stream<Chapter> chapterStream(
+  static Stream<EditingChapter> chapterStream(
     String storyId,
     String chapterId,
   ) =>
@@ -16,7 +16,7 @@ class ChapterManagementService {
           .collection('chapters')
           .doc(chapterId)
           .snapshots()
-          .asyncMap((doc) => Chapter.fromMap(doc.data()));
+          .asyncMap((doc) => EditingChapter.fromMap(doc.data()));
 
   static Stream<EditingPage> pageStream(
     String storyId,
@@ -33,7 +33,7 @@ class ChapterManagementService {
           .snapshots()
           .asyncMap((doc) => EditingPage.fromMap(doc.data()));
 
-  static Future<void> chapterSet(Chapter chapter) async {
+  static Future<void> chapterSet(EditingChapter chapter) async {
     //Logs.d('Sending $page');
     try {
       FirebaseUtils.firestore

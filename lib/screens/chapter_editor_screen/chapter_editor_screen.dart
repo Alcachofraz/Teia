@@ -1,19 +1,19 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart' hide Page;
-import 'package:teia/models/chapter.dart';
-import 'package:teia/models/editing_page.dart';
+import 'package:multi_split_view/multi_split_view.dart';
+import 'package:sorted_list/sorted_list.dart';
+import 'package:teia/models/editing/editing_chapter.dart';
+import 'package:teia/models/editing/editing_page.dart';
 import 'package:teia/models/letter.dart';
 import 'package:teia/screens/chapter_editor_screen/chapter_graph_view.dart';
+import 'package:teia/screens/chapter_editor_screen/widgets/page_editor.dart';
 import 'package:teia/services/authentication_service.dart';
 import 'package:teia/services/chapter_management_service.dart';
 import 'package:teia/utils/loading.dart';
-import 'package:teia/screens/chapter_editor_screen/widgets/page_editor.dart';
 import 'package:teia/utils/utils.dart';
 import 'package:teia/views/misc/scrollable_static_scaffold.dart';
 import 'package:teia/views/misc/tile.dart';
-import 'package:multi_split_view/multi_split_view.dart';
-import 'package:sorted_list/sorted_list.dart';
 
 class ChapterEditorScreen extends StatefulWidget {
   final bool picking;
@@ -32,7 +32,7 @@ class ChapterEditorScreen extends StatefulWidget {
 }
 
 class _ChapterEditorScreenState extends State<ChapterEditorScreen> {
-  Chapter? _chapter;
+  EditingChapter? _chapter;
   late double textEditorWeight;
   late double loosePagesMenuHeight;
   late StreamSubscription _chapterSubscription;
@@ -40,10 +40,15 @@ class _ChapterEditorScreenState extends State<ChapterEditorScreen> {
   bool showingLoosePages = false;
   final FocusNode pageEditorFocusNode = FocusNode();
 
-  final MultiSplitViewController _loosePagesMultiSplitViewController = MultiSplitViewController(
+  final MultiSplitViewController _loosePagesMultiSplitViewController =
+      MultiSplitViewController(
     areas: [
-      Area(minimalWeight: 1 - Utils.loosePagesMenuMaximumHeight, weight: 1 - Utils.loosePagesMenuDefaultHeight),
-      Area(minimalWeight: Utils.loosePagesMenuMinimumHeight, weight: Utils.loosePagesMenuDefaultHeight),
+      Area(
+          minimalWeight: 1 - Utils.loosePagesMenuMaximumHeight,
+          weight: 1 - Utils.loosePagesMenuDefaultHeight),
+      Area(
+          minimalWeight: Utils.loosePagesMenuMinimumHeight,
+          weight: Utils.loosePagesMenuDefaultHeight),
     ],
   );
 
@@ -51,7 +56,9 @@ class _ChapterEditorScreenState extends State<ChapterEditorScreen> {
   void initState() {
     textEditorWeight = Utils.editorWeight;
     loosePagesMenuHeight = Utils.loosePagesMenuDefaultHeight;
-    _chapterSubscription = ChapterManagementService.chapterStream(widget.storyId, widget.chapterId).listen((chapter) => setState(() => _chapter = chapter));
+    _chapterSubscription =
+        ChapterManagementService.chapterStream(widget.storyId, widget.chapterId)
+            .listen((chapter) => setState(() => _chapter = chapter));
     super.initState();
   }
 
@@ -61,7 +68,7 @@ class _ChapterEditorScreenState extends State<ChapterEditorScreen> {
     super.dispose();
   }
 
-  Future<void> _pushChapterToRemote(Chapter chapter) async {
+  Future<void> _pushChapterToRemote(EditingChapter chapter) async {
     await ChapterManagementService.chapterSet(chapter);
   }
 
@@ -114,19 +121,21 @@ class _ChapterEditorScreenState extends State<ChapterEditorScreen> {
     );
   }
 
-  Widget _dividerBuilder(bool vertical, axis, index, resizable, dragging, highlighted, themeData) => resizable
-      ? Container(
-          color: dragging ? Colors.grey[300] : Colors.grey[100],
-          child: RotatedBox(
-            quarterTurns: vertical ? 0 : 1,
-            child: Icon(
-              Icons.drag_indicator,
-              size: Utils.dividerThickness,
-              color: highlighted ? Colors.grey[600] : Colors.grey[400],
-            ),
-          ),
-        )
-      : const SizedBox.shrink();
+  Widget _dividerBuilder(bool vertical, axis, index, resizable, dragging,
+          highlighted, themeData) =>
+      resizable
+          ? Container(
+              color: dragging ? Colors.grey[300] : Colors.grey[100],
+              child: RotatedBox(
+                quarterTurns: vertical ? 0 : 1,
+                child: Icon(
+                  Icons.drag_indicator,
+                  size: Utils.dividerThickness,
+                  color: highlighted ? Colors.grey[600] : Colors.grey[400],
+                ),
+              ),
+            )
+          : const SizedBox.shrink();
 
   Widget _chapterGraph(Size size) => _chapter == null
       ? loadingRotate()
@@ -143,11 +152,20 @@ class _ChapterEditorScreenState extends State<ChapterEditorScreen> {
       : Stack(
           children: [
             AnimatedPositioned(
-              duration: const Duration(milliseconds: Utils.textEditorAnimationDuration),
+              duration: const Duration(
+                  milliseconds: Utils.textEditorAnimationDuration),
               curve: Curves.decelerate,
-              right: selectedPageId == null ? -size.width * (size.width > Utils.maxWidthShowOnlyEditor ? textEditorWeight : 1.0) : 0,
+              right: selectedPageId == null
+                  ? -size.width *
+                      (size.width > Utils.maxWidthShowOnlyEditor
+                          ? textEditorWeight
+                          : 1.0)
+                  : 0,
               child: SizedBox(
-                width: size.width * (size.width > Utils.maxWidthShowOnlyEditor ? textEditorWeight : 1.0),
+                width: size.width *
+                    (size.width > Utils.maxWidthShowOnlyEditor
+                        ? textEditorWeight
+                        : 1.0),
                 height: size.height,
                 child: Container(
                   color: Utils.pageEditorBackgroundColor,
@@ -175,18 +193,21 @@ class _ChapterEditorScreenState extends State<ChapterEditorScreen> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Padding(
-                                    padding: const EdgeInsets.fromLTRB(8.0, 18.0, 16.0, 0.0),
+                                    padding: const EdgeInsets.fromLTRB(
+                                        8.0, 18.0, 16.0, 0.0),
                                     child: Text(
                                       'Page ${selectedPageId!}',
                                       style: TextStyle(
-                                        color: Utils.graphSettings.nodeBorderColor,
+                                        color:
+                                            Utils.graphSettings.nodeBorderColor,
                                         fontWeight: FontWeight.bold,
                                         fontSize: 18.0,
                                       ),
                                     ),
                                   ),
                                   const Padding(
-                                    padding: EdgeInsets.fromLTRB(8.0, 8.0, 0.0, 8.0),
+                                    padding:
+                                        EdgeInsets.fromLTRB(8.0, 8.0, 0.0, 8.0),
                                     child: Divider(),
                                   ),
                                   Expanded(

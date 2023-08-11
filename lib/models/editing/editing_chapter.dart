@@ -1,6 +1,6 @@
 import 'package:teia/models/chapter_graph.dart';
 
-class Chapter {
+class EditingChapter {
   int id;
   String storyId;
   String title;
@@ -11,7 +11,7 @@ class Chapter {
   /// Indicates which pages are connected logically (by links).
   ChapterGraph links;
 
-  Chapter(
+  EditingChapter(
     this.id,
     this.storyId,
     this.title,
@@ -19,8 +19,9 @@ class Chapter {
     this.links,
   );
 
-  factory Chapter.create(int id, String storyId, String title, String uid) {
-    return Chapter(
+  factory EditingChapter.create(
+      int id, String storyId, String title, String uid) {
+    return EditingChapter(
       id,
       storyId,
       title,
@@ -31,14 +32,24 @@ class Chapter {
 
   /// Map Page constructor. Instantiate a page from a
   /// Map<String, dynamic> object.
-  factory Chapter.fromMap(Map<String, dynamic>? map) {
-    if (map == null) return Chapter(-1, '', '', ChapterGraph.empty(), ChapterGraph.empty());
-    return Chapter(
+  factory EditingChapter.fromMap(Map<String, dynamic>? map) {
+    if (map == null) {
+      return EditingChapter(
+        -1,
+        '',
+        '',
+        ChapterGraph.empty(),
+        ChapterGraph.empty(),
+      );
+    }
+    return EditingChapter(
       map['id'] as int,
       map['storyId'] as String,
       map['title'] as String,
-      ChapterGraph.fromMap(Map<String, dynamic>.from(map['graph']).map((key, value) => MapEntry(int.parse(key), List<int>.from(value)))),
-      ChapterGraph.fromMap(Map<String, dynamic>.from(map['links']).map((key, value) => MapEntry(int.parse(key), List<int>.from(value)))),
+      ChapterGraph.fromMap(Map<String, dynamic>.from(map['graph']).map(
+          (key, value) => MapEntry(int.parse(key), List<int>.from(value)))),
+      ChapterGraph.fromMap(Map<String, dynamic>.from(map['links']).map(
+          (key, value) => MapEntry(int.parse(key), List<int>.from(value)))),
     );
   }
 
@@ -72,7 +83,13 @@ class Chapter {
   }
 
   /// Convert this chapter to a Map<String, dynamic> object.
-  Map<String, dynamic> toMap() => {'id': id, 'storyId': storyId, 'title': title, 'graph': graph.nodes, 'links': links.nodes};
+  Map<String, dynamic> toMap() => {
+        'id': id,
+        'storyId': storyId,
+        'title': title,
+        'graph': graph.nodes,
+        'links': links.nodes
+      };
 
   @override
   String toString() => toMap().toString();

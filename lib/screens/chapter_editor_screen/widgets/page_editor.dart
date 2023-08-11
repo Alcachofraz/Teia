@@ -1,12 +1,16 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart' hide Page;
-import 'package:teia/models/chapter.dart';
-import 'package:teia/models/editing_page.dart';
 import 'package:flutter_quill/flutter_quill.dart' hide Text;
+import 'package:just_the_tooltip/just_the_tooltip.dart';
+import 'package:teia/models/editing/editing_chapter.dart';
+import 'package:teia/models/editing/editing_page.dart';
 import 'package:teia/models/snippets/choice_snippet.dart';
 import 'package:teia/models/snippets/image_snippet.dart';
 import 'package:teia/models/snippets/snippet.dart';
+import 'package:teia/screens/chapter_editor_screen/widgets/cursor/cursor_block_embed.dart';
+import 'package:teia/screens/chapter_editor_screen/widgets/cursor/cursor_embed_builder.dart';
+import 'package:teia/screens/chapter_editor_screen/widgets/remote_cursor.dart';
 import 'package:teia/screens/chapter_editor_screen/widgets/snippets/snippet_choice_card.dart';
 import 'package:teia/screens/chapter_editor_screen/widgets/snippets/snippet_image_card.dart';
 import 'package:teia/services/authentication_service.dart';
@@ -16,20 +20,16 @@ import 'package:teia/utils/logs.dart';
 import 'package:teia/utils/utils.dart';
 import 'package:teia/views/misc/tap_icon.dart';
 import 'package:teia/views/misc/tile.dart';
-import 'package:teia/screens/chapter_editor_screen/widgets/cursor/cursor_block_embed.dart';
-import 'package:teia/screens/chapter_editor_screen/widgets/cursor/cursor_embed_builder.dart';
-import 'package:teia/screens/chapter_editor_screen/widgets/remote_cursor.dart';
 import 'package:universal_html/html.dart';
-import 'package:just_the_tooltip/just_the_tooltip.dart';
 
 class PageEditor extends StatefulWidget {
   final String pageId;
   final FocusNode? focusNode;
   final Future<void> Function(EditingPage page)? pushPageToRemote;
-  final Future<void> Function(Chapter chapter)? pushChapterToRemote;
+  final Future<void> Function(EditingChapter chapter)? pushChapterToRemote;
   final Size screenSize;
   final List<int> missingLinks;
-  final Chapter chapter;
+  final EditingChapter chapter;
   final Function(int pageId) onPageTap;
 
   const PageEditor({
@@ -77,11 +77,14 @@ class _PageEditorState extends State<PageEditor> {
     // Initialize controller
     _controller = QuillController.basic();
     // Listen to delta changes with _onLocalChange
-    _documentChangesSubscription = _controller.document.changes.listen(_onLocalChange);
+    _documentChangesSubscription =
+        _controller.document.changes.listen(_onLocalChange);
     // Listen to selection changes with _onSelectionChanged
     _controller.onSelectionChanged = _onSelectionChanged;
     // Listen to cloud document changes with _onRemoteChange
-    _pageSubscription = ChapterManagementService.pageStream('1', '1', widget.pageId).listen(_onRemoteChange);
+    _pageSubscription =
+        ChapterManagementService.pageStream('1', '1', widget.pageId)
+            .listen(_onRemoteChange);
 
     // Prevent default event handler
     document.onContextMenu.listen((event) => event.preventDefault());
@@ -97,14 +100,18 @@ class _PageEditorState extends State<PageEditor> {
     super.dispose();
   }
 
-  Future<void> _pushChapterToRemote(Chapter chapter) async {
+  Future<void> _pushChapterToRemote(EditingChapter chapter) async {
     //Logs.d('Sending:\n${chapter.toString()}');
-    if (widget.pushChapterToRemote != null) await widget.pushChapterToRemote!(widget.chapter);
+    if (widget.pushChapterToRemote != null) {
+      await widget.pushChapterToRemote!(widget.chapter);
+    }
   }
 
   Future<void> _pushPageToRemote(EditingPage? page) async {
     //Logs.d('Sending:\n${page.toString()}');
-    if (widget.pushPageToRemote != null && page != null) await widget.pushPageToRemote!(page);
+    if (widget.pushPageToRemote != null && page != null) {
+      await widget.pushPageToRemote!(page);
+    }
   }
 
   void _replaceDelta(Delta currentDelta, Delta newDelta) {
@@ -254,7 +261,8 @@ class _PageEditorState extends State<PageEditor> {
   void _onAddImage() {
     if (_selection == null) return;
     Delta currentDelta = page!.toDelta();
-    page!.createSnippet(_selection!.baseOffset, _selection!.extentOffset - 1, url: 'https://picsum.photos/200');
+    page!.createSnippet(_selection!.baseOffset, _selection!.extentOffset - 1,
+        url: 'https://picsum.photos/200');
     _replaceDelta(currentDelta, page!.toDelta());
     _pushPageToRemote(page);
   }
@@ -263,7 +271,8 @@ class _PageEditorState extends State<PageEditor> {
     if (_selection == null) return;
     Delta currentDelta = page!.toDelta();
     id ??= widget.chapter.addPage(page!.id);
-    page!.createSnippet(_selection!.baseOffset, _selection!.extentOffset - 1, choice: id);
+    page!.createSnippet(_selection!.baseOffset, _selection!.extentOffset - 1,
+        choice: id);
     _replaceDelta(currentDelta, page!.toDelta());
     widget.chapter.addLink(page!.id, childId: id);
     await _pushChapterToRemote(widget.chapter);
@@ -271,8 +280,13 @@ class _PageEditorState extends State<PageEditor> {
   }
 
   Widget _snippetCard(Snippet snippet, String text) {
-    if (snippet is ImageSnippet) return SnippetImageCard(snippet: snippet, text: text);
-    if (snippet is ChoiceSnippet) return SnippetChoiceCard(snippet: snippet, text: text, onPageTap: widget.onPageTap);
+    if (snippet is ImageSnippet) {
+      return SnippetImageCard(snippet: snippet, text: text);
+    }
+    if (snippet is ChoiceSnippet) {
+      return SnippetChoiceCard(
+          snippet: snippet, text: text, onPageTap: widget.onPageTap);
+    }
     return const SizedBox.shrink();
   }
 
@@ -302,7 +316,10 @@ class _PageEditorState extends State<PageEditor> {
   }
 
   Widget _textOptions() {
-    var lelftmargin = (((widget.screenSize.width * textEditorWeight) - (Utils.collapseButtonSize * (pageWeight == 1 ? 2 : 1))) * pageWeight) - Utils.textOptionsWidth / 2;
+    var lelftmargin = (((widget.screenSize.width * textEditorWeight) -
+                (Utils.collapseButtonSize * (pageWeight == 1 ? 2 : 1))) *
+            pageWeight) -
+        Utils.textOptionsWidth / 2;
     return Positioned(
       left: lelftmargin,
       top: _lineOffset,
@@ -351,24 +368,29 @@ class _PageEditorState extends State<PageEditor> {
                               color: Colors.grey[50],
                               child: Column(
                                 children: [
-                                  for (int id in widget.chapter.graph.nodes[int.parse(widget.pageId)]!)
+                                  for (int id in widget.chapter.graph
+                                      .nodes[int.parse(widget.pageId)]!)
                                     InkWell(
                                       customBorder: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(128),
+                                        borderRadius:
+                                            BorderRadius.circular(128),
                                       ),
                                       child: Container(
                                         width: Utils.textOptionsWidth - 8,
                                         height: Utils.textOptionsWidth - 8,
                                         decoration: BoxDecoration(
                                           color: Colors.transparent,
-                                          borderRadius: BorderRadius.circular(128),
+                                          borderRadius:
+                                              BorderRadius.circular(128),
                                         ),
                                         child: Center(
                                           child: Text(
                                             id.toString(),
                                             textAlign: TextAlign.center,
                                             style: TextStyle(
-                                              color: missingLinks.contains(id) ? Colors.red : Colors.green,
+                                              color: missingLinks.contains(id)
+                                                  ? Colors.red
+                                                  : Colors.green,
                                             ),
                                           ),
                                         ),
@@ -492,9 +514,15 @@ class _PageEditorState extends State<PageEditor> {
 
   @override
   Widget build(BuildContext context) {
-    textEditorWeight = (widget.screenSize.width < Utils.maxWidthShowOnlyEditor) ? 1.0 : Utils.editorWeight;
-    pageWeight = (widget.screenSize.width < Utils.maxWidthShowOnlyEditorPage) ? 1.0 : Utils.editorPageWeight;
-    compensation = pageWeight == 1.0 ? Utils.collapseButtonSize - Utils.textOptionsWidth / 2 : -Utils.textOptionsWidth / 2;
+    textEditorWeight = (widget.screenSize.width < Utils.maxWidthShowOnlyEditor)
+        ? 1.0
+        : Utils.editorWeight;
+    pageWeight = (widget.screenSize.width < Utils.maxWidthShowOnlyEditorPage)
+        ? 1.0
+        : Utils.editorPageWeight;
+    compensation = pageWeight == 1.0
+        ? Utils.collapseButtonSize - Utils.textOptionsWidth / 2
+        : -Utils.textOptionsWidth / 2;
 
     missingLinks.clear();
     int pageId = int.parse(widget.pageId);
@@ -520,7 +548,8 @@ class _PageEditorState extends State<PageEditor> {
                         children: [
                           Expanded(
                             child: Padding(
-                              padding: const EdgeInsets.fromLTRB(24.0, 24.0, 24.0, 24.0),
+                              padding: const EdgeInsets.fromLTRB(
+                                  24.0, 24.0, 24.0, 24.0),
                               child: QuillEditor(
                                 controller: _controller,
                                 readOnly: false,
@@ -530,13 +559,12 @@ class _PageEditorState extends State<PageEditor> {
                                 scrollable: true,
                                 autoFocus: true,
                                 focusNode: focus,
-                                padding: const EdgeInsets.fromLTRB(24.0, 20.0, 24.0, 24.0),
+                                padding: const EdgeInsets.fromLTRB(
+                                    24.0, 20.0, 24.0, 24.0),
                                 scrollController: _scrollController,
                                 onImagePaste: (bytes) => Future.value(null),
                                 onLaunchUrl: null,
-                                embedBuilders: [
-                                  CursorEmbedBuilder()
-                                ],
+                                embedBuilders: [CursorEmbedBuilder()],
                               ),
                             ),
                           ),

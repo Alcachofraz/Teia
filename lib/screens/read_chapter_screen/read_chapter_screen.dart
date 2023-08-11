@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:teia/models/chapter.dart';
+import 'package:teia/models/editing/editing_chapter.dart';
 import 'package:teia/views/misc/screen_wrapper.dart';
 
 class ReadChapterScreen extends StatefulWidget {
-  final Chapter chapter;
+  final EditingChapter chapter;
   const ReadChapterScreen({
     Key? key,
     required this.chapter,
@@ -24,18 +24,15 @@ class _ReadChapterScreenState extends State<ReadChapterScreen> {
   /// Callback to when a choice is clicked.
   void onChoice(int newPageId) {}
 
-  /// Callback to when a choice is clicked.
+  /// Callback to when an image is clicked.
   void onImage(String url) {}
-
-  /// Callback to when a choice is clicked.
-  void onSecret(String secret) {}
 
   @override
   Widget build(BuildContext context) {
     return ScreenWrapper(
       body: Column(
         children: [
-          PageView(),
+          PageView(EditingPage),
           if (widget.chapter.isFinalPage(pageId))
             TextButton(
               onPressed: () {

@@ -1,12 +1,12 @@
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:graphview/GraphView.dart';
-import 'package:teia/models/chapter.dart';
+import 'package:teia/models/editing/editing_chapter.dart';
 import 'package:teia/utils/utils.dart';
 import 'package:teia/views/graph_page_node.dart';
-import 'package:collection/collection.dart';
 
 class ChapterGraphView extends StatefulWidget {
-  final Chapter chapter;
+  final EditingChapter chapter;
   final double? width;
   final double? height;
   final Function(int)? createPage;
@@ -30,7 +30,7 @@ class _ChapterGraphViewState extends State<ChapterGraphView> {
   Function eq = const ListEquality().equals;
 
   /// Returns a list with [Graph, BuchheimWalkerAlgorithm];
-  List<dynamic> buildGraph(Chapter chapter) {
+  List<dynamic> buildGraph(EditingChapter chapter) {
     Graph graph = Graph();
     graph.addNode(Node.Id(1));
 
@@ -42,7 +42,8 @@ class _ChapterGraphViewState extends State<ChapterGraphView> {
     });
 
     for (var element in chapter.graph.nodes.entries) {
-      if (chapter.links.nodes.containsKey(element.key) && !eq(chapter.links.nodes[element.key], element.value)) {
+      if (chapter.links.nodes.containsKey(element.key) &&
+          !eq(chapter.links.nodes[element.key], element.value)) {
         missingLinks.add(element.key);
       }
     }
@@ -55,10 +56,7 @@ class _ChapterGraphViewState extends State<ChapterGraphView> {
 
     SugiyamaAlgorithm builder = SugiyamaAlgorithm(sug);
 
-    return [
-      graph,
-      builder
-    ];
+    return [graph, builder];
   }
 
   @override
