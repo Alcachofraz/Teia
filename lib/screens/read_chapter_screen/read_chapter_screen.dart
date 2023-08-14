@@ -32,7 +32,7 @@ class _ReadChapterScreenState extends State<ReadChapterScreen> {
     return ScreenWrapper(
       body: Column(
         children: [
-          PageView(EditingPage),
+          // page view
           if (widget.chapter.isFinalPage(pageId))
             TextButton(
               onPressed: () {
