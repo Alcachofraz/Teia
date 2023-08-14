@@ -1,12 +1,12 @@
+import 'package:teia/models/chapter.dart';
 import 'package:teia/models/chapter_graph.dart';
-import 'package:teia/models/editing/editing_chapter.dart';
-import 'package:teia/models/editing/editing_page.dart';
 import 'package:teia/models/note/note.dart';
+import 'package:teia/models/page.dart';
 import 'package:teia/services/firebase/firestore_utils.dart';
 import 'package:teia/utils/logs.dart';
 
 class ChapterManagementService {
-  static Stream<EditingChapter> chapterStream(
+  static Stream<Chapter> chapterStream(
     String storyId,
     String chapterId,
   ) =>
@@ -16,9 +16,9 @@ class ChapterManagementService {
           .collection('chapters')
           .doc(chapterId)
           .snapshots()
-          .asyncMap((doc) => EditingChapter.fromMap(doc.data()));
+          .asyncMap((doc) => Chapter.fromMap(doc.data()));
 
-  static Stream<EditingPage> pageStream(
+  static Stream<tPage> pageStream(
     String storyId,
     String chapterId,
     String pageId,
@@ -31,9 +31,9 @@ class ChapterManagementService {
           .collection('pages')
           .doc(pageId)
           .snapshots()
-          .asyncMap((doc) => EditingPage.fromMap(doc.data()));
+          .asyncMap((doc) => tPage.fromMap(doc.data()));
 
-  static Future<void> chapterSet(EditingChapter chapter) async {
+  static Future<void> chapterSet(Chapter chapter) async {
     //Logs.d('Sending $page');
     try {
       FirebaseUtils.firestore
@@ -47,7 +47,7 @@ class ChapterManagementService {
     }
   }
 
-  static Future<void> pageSet(EditingPage page, String? uid) async {
+  static Future<void> pageSet(tPage page, String? uid) async {
     //Logs.d('Sending $page - ${page.id.toString()}');
     try {
       FirebaseUtils.firestore
@@ -66,8 +66,28 @@ class ChapterManagementService {
     }
   }
 
-  static Future<void> pageCreate(
-      EditingPage page, ChapterGraph newGraph) async {
+  static Future<tPage?> pageGet(
+    String storyId,
+    String chapterId,
+    String pageId,
+  ) async {
+    try {
+      return tPage.fromMap((await FirebaseUtils.firestore
+              .collection('stories')
+              .doc(storyId)
+              .collection('chapters')
+              .doc(chapterId)
+              .collection('pages')
+              .doc(pageId)
+              .get())
+          .data());
+    } catch (e) {
+      print(e);
+      return null;
+    }
+  }
+
+  static Future<void> pageCreate(tPage page, ChapterGraph newGraph) async {
     FirebaseUtils.firestore.runTransaction((transaction) async {
       transaction.update(
         FirebaseUtils.firestore

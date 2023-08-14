@@ -9,7 +9,7 @@ class GraphScreen extends StatefulWidget {
   Algorithm algorithm;
   final Paint? paint;
 
-  GraphScreen(this.graph, this.algorithm, this.paint);
+  GraphScreen(this.graph, this.algorithm, this.paint, {super.key});
 
   @override
   _GraphScreenState createState() => _GraphScreenState();
@@ -23,10 +23,10 @@ class _GraphScreenState extends State<GraphScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Graph Screen'),
+        title: const Text('Graph Screen'),
         actions: [
           IconButton(
-            icon: Icon(Icons.add),
+            icon: const Icon(Icons.add),
             onPressed: () async {
               setState(() {
                 final node12 = Node.Id(r.nextInt(100).toString());
@@ -38,7 +38,7 @@ class _GraphScreenState extends State<GraphScreen> {
             },
           ),
           IconButton(
-            icon: Icon(Icons.animation),
+            icon: const Icon(Icons.animation),
             onPressed: () async {
               setState(() {
                 animated = !animated;
@@ -49,7 +49,7 @@ class _GraphScreenState extends State<GraphScreen> {
       ),
       body: InteractiveViewer(
           constrained: false,
-          boundaryMargin: EdgeInsets.all(100),
+          boundaryMargin: const EdgeInsets.all(100),
           minScale: 0.0001,
           maxScale: 10.6,
           child: GraphView(
@@ -67,10 +67,10 @@ class _GraphScreenState extends State<GraphScreen> {
 
   Widget rectangWidget(String? i) {
     return Container(
-        padding: EdgeInsets.all(16),
+        padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(4),
-          boxShadow: [
+          boxShadow: const [
             BoxShadow(color: Colors.blue, spreadRadius: 1),
           ],
         ),

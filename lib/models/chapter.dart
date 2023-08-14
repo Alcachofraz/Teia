@@ -1,6 +1,6 @@
 import 'package:teia/models/chapter_graph.dart';
 
-class EditingChapter {
+class Chapter {
   int id;
   String storyId;
   String title;
@@ -11,7 +11,7 @@ class EditingChapter {
   /// Indicates which pages are connected logically (by links).
   ChapterGraph links;
 
-  EditingChapter(
+  Chapter(
     this.id,
     this.storyId,
     this.title,
@@ -19,9 +19,8 @@ class EditingChapter {
     this.links,
   );
 
-  factory EditingChapter.create(
-      int id, String storyId, String title, String uid) {
-    return EditingChapter(
+  factory Chapter.create(int id, String storyId, String title, String uid) {
+    return Chapter(
       id,
       storyId,
       title,
@@ -30,11 +29,21 @@ class EditingChapter {
     );
   }
 
+  factory Chapter.empty() {
+    return Chapter(
+      -1,
+      'Story ID',
+      'Title',
+      ChapterGraph({1: []}),
+      ChapterGraph({1: []}),
+    );
+  }
+
   /// Map Page constructor. Instantiate a page from a
   /// Map<String, dynamic> object.
-  factory EditingChapter.fromMap(Map<String, dynamic>? map) {
+  factory Chapter.fromMap(Map<String, dynamic>? map) {
     if (map == null) {
-      return EditingChapter(
+      return Chapter(
         -1,
         '',
         '',
@@ -42,7 +51,7 @@ class EditingChapter {
         ChapterGraph.empty(),
       );
     }
-    return EditingChapter(
+    return Chapter(
       map['id'] as int,
       map['storyId'] as String,
       map['title'] as String,

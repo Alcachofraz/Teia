@@ -1,13 +1,13 @@
-import 'package:teia/models/letter.dart';
-import 'package:sorted_list/sorted_list.dart';
 import 'package:flutter_quill/flutter_quill.dart';
+import 'package:sorted_list/sorted_list.dart';
+import 'package:teia/models/letter.dart';
 import 'package:teia/models/snippets/choice_snippet.dart';
 import 'package:teia/models/snippets/image_snippet.dart';
 import 'package:teia/models/snippets/snippet.dart';
 import 'package:teia/models/snippets/text_snippet.dart';
 import 'package:teia/utils/utils.dart';
 
-class ReadingPage {
+class tPage {
   final int id;
   final int chapterId;
   final String storyId;
@@ -19,7 +19,7 @@ class ReadingPage {
   static const int intMaxValue = 2147483647;
   static const int boundary = 10;
 
-  ReadingPage(
+  tPage(
     this.id,
     this.chapterId,
     this.storyId,
@@ -28,17 +28,20 @@ class ReadingPage {
     this.lastModifierUid,
   );
 
-  factory EditingPage.empty(int id, int chapterId, String storyId, {String? uid}) {
-    return EditingPage(id, chapterId, storyId, SortedList<Letter>(), [], uid);
+  factory tPage.empty(int id, int chapterId, String storyId, {String? uid}) {
+    return tPage(id, chapterId, storyId, SortedList<Letter>(), [], uid);
   }
 
-  factory EditingPage.fromMap(Map<String, dynamic>? map) {
-    if (map == null) return EditingPage(-1, -1, '', SortedList<Letter>(), [], null);
-    return EditingPage(
+  factory tPage.fromMap(Map<String, dynamic>? map) {
+    if (map == null) return tPage(-1, -1, '', SortedList<Letter>(), [], null);
+    return tPage(
       map['id'] as int,
       map['chapterId'] as int,
       map['storyId'] as String,
-      SortedList<Letter>()..addAll(map['letters'].map<Letter>((letter) => Letter.fromMap(letter)).toList()),
+      SortedList<Letter>()
+        ..addAll(map['letters']
+            .map<Letter>((letter) => Letter.fromMap(letter))
+            .toList()),
       List.from(map['snippets']).map<Snippet>((snippetJson) {
         LetterId from = LetterId.fromMap(snippetJson['from']);
         LetterId to = LetterId.fromMap(snippetJson['to']);
@@ -67,7 +70,8 @@ class ReadingPage {
 
   Snippet? findSnippetById(LetterId id) {
     try {
-      return snippets.firstWhere((snippet) => id.compareTo(snippet.from) >= 0 && id.compareTo(snippet.to) <= 0);
+      return snippets.firstWhere((snippet) =>
+          id.compareTo(snippet.from) >= 0 && id.compareTo(snippet.to) <= 0);
     } catch (e) {
       return null;
     }
@@ -97,19 +101,35 @@ class ReadingPage {
     /// 2)
     else if (s2.from.compareTo(s1.from) > 0 && s2.to.compareTo(s1.to) < 0) {
       return [
-        s1.deepCopy(to: letters.lastWhere((letter) => letter.id.compareTo(s2.from) < 0).id),
-        s1.deepCopy(from: letters.firstWhere((letter) => letter.id.compareTo(s2.to) > 0).id),
+        s1.deepCopy(
+            to: letters
+                .lastWhere((letter) => letter.id.compareTo(s2.from) < 0)
+                .id),
+        s1.deepCopy(
+            from: letters
+                .firstWhere((letter) => letter.id.compareTo(s2.to) > 0)
+                .id),
       ];
     }
 
     /// 3)
     else if (s2.from.compareTo(s1.from) > 0 && s2.to.compareTo(s1.to) >= 0) {
-      return [s1.deepCopy(to: letters.lastWhere((letter) => letter.id.compareTo(s2.from) < 0).id)];
+      return [
+        s1.deepCopy(
+            to: letters
+                .lastWhere((letter) => letter.id.compareTo(s2.from) < 0)
+                .id)
+      ];
     }
 
     /// 4)
     else if (s2.from.compareTo(s1.from) <= 0 && s2.to.compareTo(s1.to) < 0) {
-      return [s1.deepCopy(from: letters.firstWhere((letter) => letter.id.compareTo(s2.to) > 0).id)];
+      return [
+        s1.deepCopy(
+            from: letters
+                .firstWhere((letter) => letter.id.compareTo(s2.to) > 0)
+                .id)
+      ];
     } else {
       return [];
     }
@@ -201,7 +221,8 @@ class ReadingPage {
     for (int i = skip; i < skip + length; i++) {
       temp += letters[i].letter;
     }
-    delete(skip, length); // Deletes text and automatically rectifies the snipepts, deleting the desired extent
+    delete(skip,
+        length); // Deletes text and automatically rectifies the snipepts, deleting the desired extent
     insert(skip, temp);
   }
 
@@ -212,7 +233,9 @@ class ReadingPage {
         letters.firstWhere((letter) => letter.id.compareTo(snippet.from) == 0);
       } catch (e) {
         try {
-          snippet.from = letters.firstWhere((letter) => letter.id.compareTo(snippet.from) > 0).id;
+          snippet.from = letters
+              .firstWhere((letter) => letter.id.compareTo(snippet.from) > 0)
+              .id;
         } catch (e) {
           continue;
         }
@@ -224,7 +247,9 @@ class ReadingPage {
         letters.firstWhere((letter) => letter.id.compareTo(snippet.to) == 0);
       } catch (e) {
         try {
-          snippet.to = letters.lastWhere((letter) => letter.id.compareTo(snippet.to) < 0).id;
+          snippet.to = letters
+              .lastWhere((letter) => letter.id.compareTo(snippet.to) < 0)
+              .id;
         } catch (e) {
           continue;
         }
@@ -270,8 +295,10 @@ class ReadingPage {
         'id': id,
         'chapterId': chapterId,
         'storyId': storyId,
-        'letters': letters.map<Map<String, dynamic>>((letter) => letter.toMap()),
-        'snippets': snippets.map<Map<String, dynamic>>((snippet) => snippet.toMap()),
+        'letters':
+            letters.map<Map<String, dynamic>>((letter) => letter.toMap()),
+        'snippets':
+            snippets.map<Map<String, dynamic>>((snippet) => snippet.toMap()),
         'lastModifierUid': lastModifierUid,
       };
 

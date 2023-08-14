@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:graphview/GraphView.dart';
 
 class TreeViewPageFromJson extends StatefulWidget {
+  const TreeViewPageFromJson({super.key});
+
   @override
   _TreeViewPageFromJsonState createState() => _TreeViewPageFromJsonState();
 }
@@ -38,44 +40,44 @@ class _TreeViewPageFromJsonState extends State<TreeViewPageFromJson> {
           children: [
             Wrap(
               children: [
-                Container(
+                SizedBox(
                   width: 100,
                   child: TextFormField(
                     initialValue: builder.siblingSeparation.toString(),
-                    decoration: InputDecoration(labelText: 'Sibling Separation'),
+                    decoration: const InputDecoration(labelText: 'Sibling Separation'),
                     onChanged: (text) {
                       builder.siblingSeparation = int.tryParse(text) ?? 100;
                       setState(() {});
                     },
                   ),
                 ),
-                Container(
+                SizedBox(
                   width: 100,
                   child: TextFormField(
                     initialValue: builder.levelSeparation.toString(),
-                    decoration: InputDecoration(labelText: 'Level Separation'),
+                    decoration: const InputDecoration(labelText: 'Level Separation'),
                     onChanged: (text) {
                       builder.levelSeparation = int.tryParse(text) ?? 100;
                       setState(() {});
                     },
                   ),
                 ),
-                Container(
+                SizedBox(
                   width: 100,
                   child: TextFormField(
                     initialValue: builder.subtreeSeparation.toString(),
-                    decoration: InputDecoration(labelText: 'Subtree separation'),
+                    decoration: const InputDecoration(labelText: 'Subtree separation'),
                     onChanged: (text) {
                       builder.subtreeSeparation = int.tryParse(text) ?? 100;
                       setState(() {});
                     },
                   ),
                 ),
-                Container(
+                SizedBox(
                   width: 100,
                   child: TextFormField(
                     initialValue: builder.orientation.toString(),
-                    decoration: InputDecoration(labelText: 'Orientation'),
+                    decoration: const InputDecoration(labelText: 'Orientation'),
                     onChanged: (text) {
                       builder.orientation = int.tryParse(text) ?? 100;
                       setState(() {});
@@ -87,7 +89,7 @@ class _TreeViewPageFromJsonState extends State<TreeViewPageFromJson> {
             Expanded(
               child: InteractiveViewer(
                   constrained: false,
-                  boundaryMargin: EdgeInsets.all(100),
+                  boundaryMargin: const EdgeInsets.all(100),
                   minScale: 0.01,
                   maxScale: 5.6,
                   child: GraphView(
@@ -116,14 +118,14 @@ class _TreeViewPageFromJsonState extends State<TreeViewPageFromJson> {
         print('clicked');
       },
       child: Container(
-          padding: EdgeInsets.all(16),
+          padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(4),
             boxShadow: [
               BoxShadow(color: Colors.blue[100]!, spreadRadius: 1),
             ],
           ),
-          child: Text('${a}')),
+          child: Text('$a')),
     );
   }
 
@@ -133,11 +135,11 @@ class _TreeViewPageFromJsonState extends State<TreeViewPageFromJson> {
   @override
   void initState() {
     var edges = json['edges']!;
-    edges.forEach((element) {
+    for (var element in edges) {
       var fromNodeId = element['from'];
       var toNodeId = element['to'];
       graph.addEdge(Node.Id(fromNodeId), Node.Id(toNodeId));
-    });
+    }
 
     builder
       ..siblingSeparation = (100)

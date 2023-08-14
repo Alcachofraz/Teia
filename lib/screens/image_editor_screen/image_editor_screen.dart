@@ -1,12 +1,10 @@
 import 'dart:async';
 import 'dart:typed_data';
+import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_painter/flutter_painter.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
-
-import 'dart:ui' as ui;
-
 import 'package:teia/models/stable_diffusion/generation.dart';
 import 'package:teia/services/stable_diffusion/al_service.dart';
 import 'package:teia/services/stable_diffusion/sd_service.dart';
@@ -68,8 +66,11 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
       Uint8List? mask;
       try {
         if (painterController.drawables.isNotEmpty) {
-          final ui.Image renderedImage = await painterController.renderImage(const Size(512, 512));
-          mask = StableDiffusionService.normalizeMask(await renderedImage.pngBytes, resize: false);
+          final ui.Image renderedImage =
+              await painterController.renderImage(const Size(512, 512));
+          mask = StableDiffusionService.normalizeMask(
+              await renderedImage.pngBytes,
+              resize: false);
         } else {
           mask == null;
         }
@@ -148,7 +149,8 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
                           children: [
                             const VerticalDivider(),
                             TapIcon(
-                              icon: const Icon(Icons.undo_rounded, color: Colors.black),
+                              icon: const Icon(Icons.undo_rounded,
+                                  color: Colors.black),
                               onTap: () {
                                 if (painterController.canUndo) {
                                   painterController.undo();
@@ -157,7 +159,8 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
                             ),
                             const VerticalDivider(),
                             TapIcon(
-                              icon: const Icon(Icons.redo_rounded, color: Colors.black),
+                              icon: const Icon(Icons.redo_rounded,
+                                  color: Colors.black),
                               onTap: () {
                                 if (painterController.canRedo) {
                                   painterController.redo();
@@ -165,7 +168,7 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
                               },
                             ),
                             const VerticalDivider(),
-                            const TapIcon(
+                            TapIcon(
                               icon: Icon(MdiIcons.eraser, color: Colors.black),
                               onTap: null,
                             ),
@@ -177,14 +180,15 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
                                 onChanged: (value) {
                                   setState(() {
                                     eraserSize = value;
-                                    painterController.freeStyleStrokeWidth = eraserSize;
+                                    painterController.freeStyleStrokeWidth =
+                                        eraserSize;
                                   });
                                 },
                               ),
                             ),
                             const VerticalDivider(),
                             TapIcon(
-                              icon: const Icon(MdiIcons.image),
+                              icon: Icon(MdiIcons.image),
                               onTap: () {
                                 setState(() {
                                   painterController.clearDrawables();

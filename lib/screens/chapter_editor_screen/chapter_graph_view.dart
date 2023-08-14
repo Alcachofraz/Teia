@@ -1,12 +1,12 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:graphview/GraphView.dart';
-import 'package:teia/models/editing/editing_chapter.dart';
+import 'package:teia/models/chapter.dart';
 import 'package:teia/utils/utils.dart';
 import 'package:teia/views/graph_page_node.dart';
 
 class ChapterGraphView extends StatefulWidget {
-  final EditingChapter chapter;
+  final Chapter chapter;
   final double? width;
   final double? height;
   final Function(int)? createPage;
@@ -30,7 +30,7 @@ class _ChapterGraphViewState extends State<ChapterGraphView> {
   Function eq = const ListEquality().equals;
 
   /// Returns a list with [Graph, BuchheimWalkerAlgorithm];
-  List<dynamic> buildGraph(EditingChapter chapter) {
+  List<dynamic> buildGraph(Chapter chapter) {
     Graph graph = Graph();
     graph.addNode(Node.Id(1));
 

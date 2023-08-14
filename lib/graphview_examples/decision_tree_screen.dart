@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:graphview/GraphView.dart';
 
 class DecisionTreeScreen extends StatefulWidget {
+  const DecisionTreeScreen({super.key});
+
   @override
   _DecisionTreeScreenState createState() => _DecisionTreeScreenState();
 }

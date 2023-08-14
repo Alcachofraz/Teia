@@ -3,8 +3,8 @@ import 'dart:async';
 import 'package:flutter/material.dart' hide Page;
 import 'package:flutter_quill/flutter_quill.dart' hide Text;
 import 'package:just_the_tooltip/just_the_tooltip.dart';
-import 'package:teia/models/editing/editing_chapter.dart';
-import 'package:teia/models/editing/editing_page.dart';
+import 'package:teia/models/chapter.dart';
+import 'package:teia/models/page.dart';
 import 'package:teia/models/snippets/choice_snippet.dart';
 import 'package:teia/models/snippets/image_snippet.dart';
 import 'package:teia/models/snippets/snippet.dart';
@@ -25,11 +25,11 @@ import 'package:universal_html/html.dart';
 class PageEditor extends StatefulWidget {
   final String pageId;
   final FocusNode? focusNode;
-  final Future<void> Function(EditingPage page)? pushPageToRemote;
-  final Future<void> Function(EditingChapter chapter)? pushChapterToRemote;
+  final Future<void> Function(tPage page)? pushPageToRemote;
+  final Future<void> Function(Chapter chapter)? pushChapterToRemote;
   final Size screenSize;
   final List<int> missingLinks;
-  final EditingChapter chapter;
+  final Chapter chapter;
   final Function(int pageId) onPageTap;
 
   const PageEditor({
@@ -55,7 +55,7 @@ class _PageEditorState extends State<PageEditor> {
   late ScrollController _scrollController;
   FocusNode focus = FocusNode();
 
-  EditingPage? page;
+  tPage? page;
 
   TextSelection? _selection;
   Snippet? _atSnippet;
@@ -100,14 +100,14 @@ class _PageEditorState extends State<PageEditor> {
     super.dispose();
   }
 
-  Future<void> _pushChapterToRemote(EditingChapter chapter) async {
+  Future<void> _pushChapterToRemote(Chapter chapter) async {
     //Logs.d('Sending:\n${chapter.toString()}');
     if (widget.pushChapterToRemote != null) {
       await widget.pushChapterToRemote!(widget.chapter);
     }
   }
 
-  Future<void> _pushPageToRemote(EditingPage? page) async {
+  Future<void> _pushPageToRemote(tPage? page) async {
     //Logs.d('Sending:\n${page.toString()}');
     if (widget.pushPageToRemote != null && page != null) {
       await widget.pushPageToRemote!(page);
@@ -181,7 +181,7 @@ class _PageEditorState extends State<PageEditor> {
   /// Receive remote document change (Page object).
   ///
   /// * [page] Page object containing the new [snippets] and the [lastModifierUid]
-  void _onRemoteChange(EditingPage page) {
+  void _onRemoteChange(tPage page) {
     bool firstFetch = this.page == null;
     if (firstFetch) {
       Delta delta = page.toDelta();

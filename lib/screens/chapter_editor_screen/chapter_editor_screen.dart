@@ -3,9 +3,9 @@ import 'dart:async';
 import 'package:flutter/material.dart' hide Page;
 import 'package:multi_split_view/multi_split_view.dart';
 import 'package:sorted_list/sorted_list.dart';
-import 'package:teia/models/editing/editing_chapter.dart';
-import 'package:teia/models/editing/editing_page.dart';
+import 'package:teia/models/chapter.dart';
 import 'package:teia/models/letter.dart';
+import 'package:teia/models/page.dart';
 import 'package:teia/screens/chapter_editor_screen/chapter_graph_view.dart';
 import 'package:teia/screens/chapter_editor_screen/widgets/page_editor.dart';
 import 'package:teia/services/authentication_service.dart';
@@ -32,7 +32,7 @@ class ChapterEditorScreen extends StatefulWidget {
 }
 
 class _ChapterEditorScreenState extends State<ChapterEditorScreen> {
-  EditingChapter? _chapter;
+  Chapter? _chapter;
   late double textEditorWeight;
   late double loosePagesMenuHeight;
   late StreamSubscription _chapterSubscription;
@@ -68,11 +68,11 @@ class _ChapterEditorScreenState extends State<ChapterEditorScreen> {
     super.dispose();
   }
 
-  Future<void> _pushChapterToRemote(EditingChapter chapter) async {
+  Future<void> _pushChapterToRemote(Chapter chapter) async {
     await ChapterManagementService.chapterSet(chapter);
   }
 
-  Future<void> _pushPageToRemote(EditingPage page) async {
+  Future<void> _pushPageToRemote(tPage page) async {
     await ChapterManagementService.pageSet(page, AuthenticationService.uid);
   }
 
@@ -109,7 +109,7 @@ class _ChapterEditorScreenState extends State<ChapterEditorScreen> {
     // Update local
     setState(() {});
     ChapterManagementService.pageCreate(
-      EditingPage(
+      tPage(
         newId,
         int.parse(widget.chapterId),
         widget.storyId,

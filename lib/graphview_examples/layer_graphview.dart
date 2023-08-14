@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:graphview/GraphView.dart';
 
 class LayeredGraphViewPage extends StatefulWidget {
+  const LayeredGraphViewPage({super.key});
+
   @override
   _LayeredGraphViewPageState createState() => _LayeredGraphViewPageState();
 }
@@ -18,44 +20,44 @@ class _LayeredGraphViewPageState extends State<LayeredGraphViewPage> {
           children: [
             Wrap(
               children: [
-                Container(
+                SizedBox(
                   width: 100,
                   child: TextFormField(
                     initialValue: builder.nodeSeparation.toString(),
-                    decoration: InputDecoration(labelText: 'Node Separation'),
+                    decoration: const InputDecoration(labelText: 'Node Separation'),
                     onChanged: (text) {
                       builder.nodeSeparation = int.tryParse(text) ?? 100;
-                      this.setState(() {});
+                      setState(() {});
                     },
                   ),
                 ),
-                Container(
+                SizedBox(
                   width: 100,
                   child: TextFormField(
                     initialValue: builder.levelSeparation.toString(),
-                    decoration: InputDecoration(labelText: 'Level Separation'),
+                    decoration: const InputDecoration(labelText: 'Level Separation'),
                     onChanged: (text) {
                       builder.levelSeparation = int.tryParse(text) ?? 100;
-                      this.setState(() {});
+                      setState(() {});
                     },
                   ),
                 ),
-                Container(
+                SizedBox(
                   width: 100,
                   child: TextFormField(
                     initialValue: builder.orientation.toString(),
-                    decoration: InputDecoration(labelText: 'Orientation'),
+                    decoration: const InputDecoration(labelText: 'Orientation'),
                     onChanged: (text) {
                       builder.orientation = int.tryParse(text) ?? 100;
-                      this.setState(() {});
+                      setState(() {});
                     },
                   ),
                 ),
-                Container(
+                SizedBox(
                   width: 100,
                   child: Column(
                     children: [
-                      Text('Alignment'),
+                      const Text('Alignment'),
                       DropdownButton<CoordinateAssignment>(
                         value: builder.coordinateAssignment,
                         items: CoordinateAssignment.values.map((coordinateAssignment) {
@@ -81,14 +83,14 @@ class _LayeredGraphViewPageState extends State<LayeredGraphViewPage> {
                     graph.addEdge(edge, node12);
                     setState(() {});
                   },
-                  child: Text('Add'),
+                  child: const Text('Add'),
                 )
               ],
             ),
             Expanded(
               child: InteractiveViewer(
                   constrained: false,
-                  boundaryMargin: EdgeInsets.all(100),
+                  boundaryMargin: const EdgeInsets.all(100),
                   minScale: 0.0001,
                   maxScale: 10.6,
                   child: GraphView(
@@ -113,14 +115,14 @@ class _LayeredGraphViewPageState extends State<LayeredGraphViewPage> {
 
   Widget rectangleWidget(int? a) {
     return Container(
-        padding: EdgeInsets.all(16),
+        padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(4),
           boxShadow: [
             BoxShadow(color: Colors.blue[100]!, spreadRadius: 1),
           ],
         ),
-        child: Text('Node ${a}'));
+        child: Text('Node $a'));
   }
 
   final Graph graph = Graph();

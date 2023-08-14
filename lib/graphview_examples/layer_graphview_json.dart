@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:graphview/GraphView.dart';
 
 class LayerGraphPageFromJson extends StatefulWidget {
+  const LayerGraphPageFromJson({super.key});
+
   @override
   _LayerGraphPageFromJsonState createState() => _LayerGraphPageFromJsonState();
 }
@@ -93,44 +95,44 @@ class _LayerGraphPageFromJsonState extends State<LayerGraphPageFromJson> {
           children: [
             Wrap(
               children: [
-                Container(
+                SizedBox(
                   width: 100,
                   child: TextFormField(
                     initialValue: builder.nodeSeparation.toString(),
-                    decoration: InputDecoration(labelText: 'Node Separation'),
+                    decoration: const InputDecoration(labelText: 'Node Separation'),
                     onChanged: (text) {
                       builder.nodeSeparation = int.tryParse(text) ?? 100;
-                      this.setState(() {});
+                      setState(() {});
                     },
                   ),
                 ),
-                Container(
+                SizedBox(
                   width: 100,
                   child: TextFormField(
                     initialValue: builder.levelSeparation.toString(),
-                    decoration: InputDecoration(labelText: 'Level Separation'),
+                    decoration: const InputDecoration(labelText: 'Level Separation'),
                     onChanged: (text) {
                       builder.levelSeparation = int.tryParse(text) ?? 100;
-                      this.setState(() {});
+                      setState(() {});
                     },
                   ),
                 ),
-                Container(
+                SizedBox(
                   width: 100,
                   child: TextFormField(
                     initialValue: builder.orientation.toString(),
-                    decoration: InputDecoration(labelText: 'Orientation'),
+                    decoration: const InputDecoration(labelText: 'Orientation'),
                     onChanged: (text) {
                       builder.orientation = int.tryParse(text) ?? 100;
-                      this.setState(() {});
+                      setState(() {});
                     },
                   ),
                 ),
-                Container(
+                SizedBox(
                   width: 100,
                   child: Column(
                     children: [
-                      Text('Alignment'),
+                      const Text('Alignment'),
                       DropdownButton<CoordinateAssignment>(
                         value: builder.coordinateAssignment,
                         items: CoordinateAssignment.values.map((coordinateAssignment) {
@@ -153,7 +155,7 @@ class _LayerGraphPageFromJsonState extends State<LayerGraphPageFromJson> {
             Expanded(
               child: InteractiveViewer(
                   constrained: false,
-                  boundaryMargin: EdgeInsets.all(100),
+                  boundaryMargin: const EdgeInsets.all(100),
                   minScale: 0.01,
                   maxScale: 5.6,
                   child: GraphView(
@@ -182,14 +184,14 @@ class _LayerGraphPageFromJsonState extends State<LayerGraphPageFromJson> {
           print('clicked');
         },
         child: Container(
-            padding: EdgeInsets.all(16),
+            padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(4),
               boxShadow: [
                 BoxShadow(color: Colors.blue[100]!, spreadRadius: 1),
               ],
             ),
-            child: Text('${a}')),
+            child: Text('$a')),
       ),
     );
   }
@@ -199,11 +201,11 @@ class _LayerGraphPageFromJsonState extends State<LayerGraphPageFromJson> {
   @override
   void initState() {
     var edges = json['edges']!;
-    edges.forEach((element) {
+    for (var element in edges) {
       var fromNodeId = element['from'];
       var toNodeId = element['to'];
       graph.addEdge(Node.Id(fromNodeId), Node.Id(toNodeId));
-    });
+    }
 
     builder
       ..nodeSeparation = (15)

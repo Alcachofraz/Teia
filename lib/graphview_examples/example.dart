@@ -36,7 +36,7 @@ class Home extends StatelessWidget {
                       MaterialPageRoute(
                           builder: (context) => Scaffold(
                                 appBar: AppBar(),
-                                body: TreeViewPage(),
+                                body: const TreeViewPage(),
                               )),
                     ),
                 child: Text(
@@ -49,7 +49,7 @@ class Home extends StatelessWidget {
                       MaterialPageRoute(
                           builder: (context) => Scaffold(
                                 appBar: AppBar(),
-                                body: GraphClusterViewPage(),
+                                body: const GraphClusterViewPage(),
                               )),
                     ),
                 child: Text(
@@ -62,7 +62,7 @@ class Home extends StatelessWidget {
                       MaterialPageRoute(
                           builder: (context) => Scaffold(
                                 appBar: AppBar(),
-                                body: LayeredGraphViewPage(),
+                                body: const LayeredGraphViewPage(),
                               )),
                     ),
                 child: Text(
