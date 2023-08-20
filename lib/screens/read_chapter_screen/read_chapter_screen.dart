@@ -3,7 +3,9 @@ import 'package:teia/models/chapter.dart';
 import 'package:teia/models/page.dart';
 import 'package:teia/models/snippet_factory.dart';
 import 'package:teia/services/chapter_management_service.dart';
+import 'package:teia/utils/utils.dart';
 import 'package:teia/views/misc/screen_wrapper.dart';
+import 'package:teia/views/misc/tile.dart';
 
 class ReadChapterScreen extends StatefulWidget {
   final Chapter chapter;
@@ -23,8 +25,7 @@ class _ReadChapterScreenState extends State<ReadChapterScreen> {
   @override
   void initState() {
     super.initState();
-    ChapterManagementService.pageGet('1', '1', '1')
-        .then((o) => setState(() => page = o));
+    ChapterManagementService.pageGet('1', '1', '1').then((o) => setState(() => page = o));
   }
 
   /// Callback to when a choice is clicked.
@@ -39,32 +40,74 @@ class _ReadChapterScreenState extends State<ReadChapterScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final screenSize = MediaQuery.of(context).size;
     return ScreenWrapper(
-      body: Column(
+      body: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisSize: MainAxisSize.max,
         children: [
-          if (page != null)
-            RichText(
-              text: TextSpan(
-                children: SnippetFactory.spansFromPage(
-                  page!,
-                  onImage,
-                  onChoice,
+          SizedBox(
+            width: screenSize.width * 0.7,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.max,
+              children: [
+                SizedBox(height: screenSize.height * 0.02),
+                Text(
+                  widget.chapter.title,
+                  style: const TextStyle(
+                    fontSize: 28.0,
+                  ),
                 ),
-              ),
-            ),
-          if (widget.chapter.isFinalPage(pageId))
-            TextButton(
-              onPressed: () {
-                // Finish chapter
-              },
-              child: const Text(
-                'Finish Chapter',
-                style: TextStyle(
-                  color: Colors.blue,
-                  decoration: TextDecoration.underline,
+                SizedBox(height: screenSize.height * 0.02),
+                Expanded(
+                  child: Tile(
+                    width: double.infinity,
+                    elevation: 2.5,
+                    padding: EdgeInsets.zero,
+                    color: Utils.pageEditorSheetColor,
+                    child: SingleChildScrollView(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          if (page != null)
+                            Padding(
+                              padding: const EdgeInsets.fromLTRB(20, 16, 20, 16),
+                              child: RichText(
+                                text: TextSpan(
+                                  style: Utils.textReadingStyle,
+                                  children: SnippetFactory.spansFromPage(
+                                    page!,
+                                    onImage,
+                                    onChoice,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          if (widget.chapter.isFinalPage(pageId))
+                            Center(
+                              child: TextButton(
+                                onPressed: () {
+                                  // Finish chapter
+                                },
+                                child: const Text(
+                                  'Finish Chapter',
+                                  style: TextStyle(
+                                    color: Colors.blue,
+                                    decoration: TextDecoration.underline,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          SizedBox(height: screenSize.height * 0.01),
+                        ],
+                      ),
+                    ),
+                  ),
                 ),
-              ),
+              ],
             ),
+          ),
         ],
       ),
     );

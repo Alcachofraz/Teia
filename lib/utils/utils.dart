@@ -1,7 +1,8 @@
+import 'dart:html';
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:teia/utils/swatch.dart';
-import 'dart:html';
 
 class ChapterGraphSettings {
   final Color backgroundColor;
@@ -59,6 +60,7 @@ class Utils {
   static const double imageEditorHeight = 0.6;
 
   static final textEditorStyle = GoogleFonts.roboto(textStyle: const TextStyle());
+  static final textReadingStyle = GoogleFonts.roboto(textStyle: const TextStyle(fontSize: 15.0));
 
   static void init() {
     graphSettings = ChapterGraphSettings(

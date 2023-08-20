@@ -67,7 +67,6 @@ class SnippetFactory {
             true,
           ),
           recognizer: TapGestureRecognizer()..onTap = onTap,
-          style: TextStyle(color: backgroundColor),
         ),
       );
       spans.add(
