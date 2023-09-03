@@ -3,10 +3,8 @@ import 'package:flutter/material.dart' hide Page;
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:teia/firebase_options.dart';
-import 'package:teia/models/chapter.dart';
 import 'package:teia/screens/auth_screen/login_screen.dart';
 import 'package:teia/screens/home_screen/home_screen.dart';
-import 'package:teia/screens/read_chapter_screen/read_chapter_screen.dart';
 import 'package:teia/services/authentication_service.dart';
 import 'package:teia/utils/swatch.dart';
 import 'package:teia/utils/utils.dart';
@@ -34,11 +32,7 @@ class Teia extends StatelessWidget {
         primarySwatch: swatch(Colors.red[300]!),
         textTheme: GoogleFonts.sourceSansProTextTheme(textTheme),
       ),
-      home: ReadChapterScreen(chapter: Chapter.empty()),
-      /*const LandingScreen(),*/ /*const ChapterEditorScreen(
-        storyId: '1',
-        chapterId: '1',
-      ),*/
+      home: const LandingScreen(),
     );
   }
 }

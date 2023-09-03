@@ -25,7 +25,8 @@ class _ReadChapterScreenState extends State<ReadChapterScreen> {
   @override
   void initState() {
     super.initState();
-    ChapterManagementService.pageGet('1', '1', '1').then((o) => setState(() => page = o));
+    ChapterManagementService.pageGet('1', '1', '1')
+        .then((o) => setState(() => page = o));
   }
 
   /// Callback to when a choice is clicked.
@@ -52,7 +53,7 @@ class _ReadChapterScreenState extends State<ReadChapterScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.max,
               children: [
-                SizedBox(height: screenSize.height * 0.02),
+                SizedBox(height: screenSize.height * 0.03),
                 Text(
                   widget.chapter.title,
                   style: const TextStyle(
@@ -72,7 +73,8 @@ class _ReadChapterScreenState extends State<ReadChapterScreen> {
                         children: [
                           if (page != null)
                             Padding(
-                              padding: const EdgeInsets.fromLTRB(20, 16, 20, 16),
+                              padding:
+                                  const EdgeInsets.fromLTRB(24, 28, 24, 24),
                               child: RichText(
                                 text: TextSpan(
                                   style: Utils.textReadingStyle,
@@ -85,7 +87,8 @@ class _ReadChapterScreenState extends State<ReadChapterScreen> {
                               ),
                             ),
                           if (widget.chapter.isFinalPage(pageId))
-                            Center(
+                            Padding(
+                              padding: const EdgeInsets.only(left: 16),
                               child: TextButton(
                                 onPressed: () {
                                   // Finish chapter
