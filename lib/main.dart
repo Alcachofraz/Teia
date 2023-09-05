@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:teia/firebase_options.dart';
 import 'package:teia/screens/auth_screen/login_screen.dart';
+import 'package:teia/screens/chapter_editor_screen/chapter_editor_screen.dart';
 import 'package:teia/screens/home_screen/home_screen.dart';
 import 'package:teia/services/authentication_service.dart';
 import 'package:teia/utils/swatch.dart';
@@ -47,7 +48,7 @@ class LandingScreen extends StatelessWidget {
       builder: (context, snapshot) {
         if (snapshot.hasData) {
           if (snapshot.data!) {
-            return const HomeScreen();
+            return const ChapterEditorScreen(storyId: '1', chapterId: '1');
           } else {
             return const LoginScreen();
           }
