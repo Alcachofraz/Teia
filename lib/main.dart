@@ -43,12 +43,13 @@ class LandingScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    return const ChapterEditorScreen(storyId: '1', chapterId: '1');
     return StreamBuilder<bool>(
       stream: AuthenticationService.authStateChanges,
       builder: (context, snapshot) {
         if (snapshot.hasData) {
           if (snapshot.data!) {
-            return const ChapterEditorScreen(storyId: '1', chapterId: '1');
+            return const HomeScreen();
           } else {
             return const LoginScreen();
           }
