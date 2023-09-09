@@ -102,13 +102,14 @@ class _PageEditorState extends State<PageEditor> {
 
   Future<void> _pushChapterToRemote(Chapter chapter) async {
     //Logs.d('Sending:\n${chapter.toString()}');
+
     if (widget.pushChapterToRemote != null) {
       await widget.pushChapterToRemote!(widget.chapter);
     }
   }
 
   Future<void> _pushPageToRemote(tPage? page) async {
-    //Logs.d('Sending:\n${page.toString()}');
+    //Logs.d('Sending:\n${page?.getRawText()}');
     if (widget.pushPageToRemote != null && page != null) {
       await widget.pushPageToRemote!(page);
     }
@@ -176,12 +177,15 @@ class _PageEditorState extends State<PageEditor> {
         skip -= length;
       }
     }
+    print('Local -> ${page!.getRawText()}');
   }
 
   /// Receive remote document change (Page object).
   ///
   /// * [page] Page object containing the new [snippets] and the [lastModifierUid]
   void _onRemoteChange(tPage page) {
+    print(
+        'Remote (${page.lastModifierUid == AuthenticationService.uid}) -> ${page.getRawText()}');
     bool firstFetch = this.page == null;
     if (firstFetch) {
       Delta delta = page.toDelta();
@@ -196,8 +200,10 @@ class _PageEditorState extends State<PageEditor> {
       }
       setState(() {});
     } else if (page.lastModifierUid == AuthenticationService.uid) {
+      //print('Myself, doing nothing.');
       return;
     } else {
+      //print('Replacing delta. $page');
       _replaceDelta(this.page!.toDelta(), page.toDelta());
     }
     this.page = page;

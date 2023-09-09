@@ -3,7 +3,7 @@ import 'package:teia/services/firebase/firestore_utils.dart';
 import 'package:teia/services/user_management_service.dart';
 
 class AuthenticationService {
-  static String? uid;
+  static String? uid = '1';
 
   static Stream<bool> authStateChanges =
       FirebaseUtils.auth.authStateChanges().map((user) {
