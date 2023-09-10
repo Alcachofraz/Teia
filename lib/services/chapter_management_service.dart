@@ -129,6 +129,19 @@ class ChapterManagementService {
           .doc(pageId)
           .collection('notes')
           .snapshots()
-          .asyncMap((snapshot) =>
-              snapshot.docs.map((map) => Note.fromMap(map.data())).toList());
+          .asyncMap(
+            (snapshot) =>
+                snapshot.docs.map((map) => Note.fromMap(map.data())).toList(),
+          );
+
+  static Stream<List<Change>> pageChanges(
+    String storyId,
+    String chapterId,
+    String pageId,
+  ) {
+    FirebaseUtils.realtime
+        .ref('stories/$storyId/chapters/$chapterId/pages/$pageId/changes')
+        .onChildAdded
+        .map((event) => null);
+  }
 }
