@@ -50,16 +50,18 @@ class ChapterManagementService {
   static Future<void> pageSet(tPage page, String? uid) async {
     //Logs.d('Sending $page - ${page.id.toString()}');
     try {
-      FirebaseUtils.firestore
+      final pageRef = FirebaseUtils.firestore
           .collection('stories')
           .doc(page.storyId)
           .collection('chapters')
           .doc(page.chapterId.toString())
           .collection('pages')
-          .doc(page.id.toString())
-          .set({
-        ...page.toMap(),
-        ...{'lastModifierUid': uid},
+          .doc(page.id.toString());
+      await FirebaseUtils.firestore.runTransaction((transaction) async {
+        transaction.update(pageRef, {
+          ...page.toMap(),
+          ...{'lastModifierUid': uid},
+        });
       });
     } catch (e) {
       Logs.d('Sending $page\n$e');

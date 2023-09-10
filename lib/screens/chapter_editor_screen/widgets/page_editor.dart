@@ -177,7 +177,7 @@ class _PageEditorState extends State<PageEditor> {
         skip -= length;
       }
     }
-    print('Local -> ${page!.getRawText()}');
+    print('Local -> ${page!.letters.toString()}');
   }
 
   /// Receive remote document change (Page object).
@@ -185,7 +185,7 @@ class _PageEditorState extends State<PageEditor> {
   /// * [page] Page object containing the new [snippets] and the [lastModifierUid]
   void _onRemoteChange(tPage page) {
     print(
-        'Remote (${page.lastModifierUid == AuthenticationService.uid}) -> ${page.getRawText()}');
+        'Remote (${page.lastModifierUid == AuthenticationService.uid}) -> ${page.letters.toString()}');
     bool firstFetch = this.page == null;
     if (firstFetch) {
       Delta delta = page.toDelta();
