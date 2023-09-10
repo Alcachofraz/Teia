@@ -166,13 +166,13 @@ class _PageEditorState extends State<PageEditor> {
       } else if (op.isInsert) {
         // If inserting, call _onInsert() with current skip
         String text = op.value as String;
-        _onInsert(skip, text);
+        _onLocalInsert(skip, text);
         // Add he inserted text length to skip
         skip += text.length;
       } else if (op.isDelete) {
         // If deleting, call _onDelete() with current skip
         int length = op.value as int;
-        _onDelete(skip, length);
+        _onLocalDelete(skip, length);
         // Remove the deleting text length from skip
         skip -= length;
       }
@@ -210,7 +210,7 @@ class _PageEditorState extends State<PageEditor> {
   }
 
   /// On document insert.
-  void _onInsert(int skip, String text) {
+  void _onLocalInsert(int skip, String text) {
     //Logs.d('Inserting($skip, $text)');
     if (page == null) {
       Logs.e('Trying to insert on a null Page!');
@@ -222,7 +222,7 @@ class _PageEditorState extends State<PageEditor> {
   }
 
   /// On document delete.
-  void _onDelete(int skip, int length) {
+  void _onLocalDelete(int skip, int length) {
     //Logs.d('Deleting($skip, $length)');
     if (page == null) {
       Logs.e('Trying to insert on a null Page!');
