@@ -184,14 +184,11 @@ class _PageEditorState extends State<PageEditor> {
   }
 
   void _onRemoteChange(Change change) {
-    print('Remote -> ${change.toString()}');
-
     if (change.uid == AuthenticationService.uid &&
         change.timestamp > _sessionStartTimestamp) {
-      print('Ignoring...');
       return;
     }
-    print('Composing...');
+    print('Remote -> ${change.toString()}');
     _controller.compose(
       change.toDelta(),
       const TextSelection(baseOffset: 0, extentOffset: 0),

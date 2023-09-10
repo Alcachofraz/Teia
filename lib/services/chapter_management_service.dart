@@ -147,11 +147,23 @@ class ChapterManagementService {
             Change.fromMap(event.snapshot.value as Map<String, dynamic>));
   }
 
-  static void pushPageChange(
-      String storyId, String chapterId, String pageId, Change change) {
-    FirebaseUtils.realtime
+  static Future<void> pushPageChange(
+      String storyId, String chapterId, String pageId, Change change) async {
+    await FirebaseUtils.realtime
         .ref('stories/$storyId/chapters/$chapterId/pages/$pageId/changes')
         .push()
         .set(change.toMap());
+  }
+
+  static Future<List<Change>> getPageChanges(
+      String storyId, String chapterId, String pageId) async {
+    return ((await FirebaseUtils.realtime
+                .ref(
+                    'stories/$storyId/chapters/$chapterId/pages/$pageId/changes')
+                .once())
+            .snapshot
+            .value as List<Map<String, dynamic>>)
+        .map((e) => Change.fromMap(e))
+        .toList();
   }
 }
