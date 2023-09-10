@@ -1,3 +1,4 @@
+import 'package:teia/models/change.dart';
 import 'package:teia/models/chapter.dart';
 import 'package:teia/models/chapter_graph.dart';
 import 'package:teia/models/note/note.dart';
@@ -134,14 +135,23 @@ class ChapterManagementService {
                 snapshot.docs.map((map) => Note.fromMap(map.data())).toList(),
           );
 
-  static Stream<List<Change>> pageChanges(
+  static Stream<Change> streamPageChanges(
     String storyId,
     String chapterId,
     String pageId,
   ) {
-    FirebaseUtils.realtime
+    return FirebaseUtils.realtime
         .ref('stories/$storyId/chapters/$chapterId/pages/$pageId/changes')
         .onChildAdded
-        .map((event) => null);
+        .map((event) =>
+            Change.fromMap(event.snapshot.value as Map<String, dynamic>));
+  }
+
+  static void pushPageChange(
+      String storyId, String chapterId, String pageId, Change change) {
+    FirebaseUtils.realtime
+        .ref('stories/$storyId/chapters/$chapterId/pages/$pageId/changes')
+        .push()
+        .set(change.toMap());
   }
 }

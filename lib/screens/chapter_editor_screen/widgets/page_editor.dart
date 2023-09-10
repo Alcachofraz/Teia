@@ -3,19 +3,17 @@ import 'dart:async';
 import 'package:flutter/material.dart' hide Page;
 import 'package:flutter_quill/flutter_quill.dart' hide Text;
 import 'package:just_the_tooltip/just_the_tooltip.dart';
+import 'package:teia/models/change.dart';
 import 'package:teia/models/chapter.dart';
 import 'package:teia/models/page.dart';
 import 'package:teia/models/snippets/choice_snippet.dart';
 import 'package:teia/models/snippets/image_snippet.dart';
 import 'package:teia/models/snippets/snippet.dart';
-import 'package:teia/screens/chapter_editor_screen/widgets/cursor/cursor_block_embed.dart';
 import 'package:teia/screens/chapter_editor_screen/widgets/cursor/cursor_embed_builder.dart';
-import 'package:teia/screens/chapter_editor_screen/widgets/remote_cursor.dart';
 import 'package:teia/screens/chapter_editor_screen/widgets/snippets/snippet_choice_card.dart';
 import 'package:teia/screens/chapter_editor_screen/widgets/snippets/snippet_image_card.dart';
 import 'package:teia/services/authentication_service.dart';
 import 'package:teia/services/chapter_management_service.dart';
-import 'package:teia/utils/loading.dart';
 import 'package:teia/utils/logs.dart';
 import 'package:teia/utils/utils.dart';
 import 'package:teia/views/misc/tap_icon.dart';
@@ -51,7 +49,7 @@ class PageEditor extends StatefulWidget {
 class _PageEditorState extends State<PageEditor> {
   late QuillController _controller;
   late StreamSubscription _documentChangesSubscription;
-  late StreamSubscription _pageSubscription;
+  late StreamSubscription _pageChangesSubscription;
   late ScrollController _scrollController;
   FocusNode focus = FocusNode();
 
@@ -63,15 +61,17 @@ class _PageEditorState extends State<PageEditor> {
   late double textEditorWeight;
   late double pageWeight;
   late double compensation;
-  double _lineOffset = 24;
+  final double _lineOffset = 24;
 
   List<int> missingLinks = [];
   bool showingChoiceOption = false;
   bool showingTextOption = false;
   bool showingImageOption = false;
+  late int _sessionStartTimestamp;
 
   @override
   void initState() {
+    _sessionStartTimestamp = DateTime.now().millisecondsSinceEpoch;
     // Scroll controller
     _scrollController = ScrollController();
     // Initialize controller
@@ -82,19 +82,23 @@ class _PageEditorState extends State<PageEditor> {
     // Listen to selection changes with _onSelectionChanged
     _controller.onSelectionChanged = _onSelectionChanged;
     // Listen to cloud document changes with _onRemoteChange
-    _pageSubscription =
+    /*_pageSubscription =
         ChapterManagementService.pageStream('1', '1', widget.pageId)
-            .listen(_onRemoteChange);
+            .listen(_onRemoteChange);*/
 
     // Prevent default event handler
     document.onContextMenu.listen((event) => event.preventDefault());
+
+    _pageChangesSubscription =
+        ChapterManagementService.streamPageChanges('1', '1', '1')
+            .listen(_onRemoteChange);
 
     super.initState();
   }
 
   @override
   void dispose() {
-    _pageSubscription.cancel();
+    _pageChangesSubscription.cancel();
     _documentChangesSubscription.cancel();
     _controller.dispose();
     super.dispose();
@@ -115,7 +119,7 @@ class _PageEditorState extends State<PageEditor> {
     }
   }
 
-  void _replaceDelta(Delta currentDelta, Delta newDelta) {
+  /*void _replaceDelta(Delta currentDelta, Delta newDelta) {
     Delta diff = currentDelta.diff(newDelta);
     _controller.compose(
       diff,
@@ -144,14 +148,14 @@ class _PageEditorState extends State<PageEditor> {
       );
       _controller.replaceText(cursor.index, 0, block, null);
     }
-  }
+  }*/
 
   /// Receive local document change.
   ///
   /// * [event] A tuple containing the deltas and change source.
   void _onLocalChange(DocChange change) {
     // If not page yet or change is remote, do nothing
-    if (page == null || change.source == ChangeSource.REMOTE) return;
+    if (change.source == ChangeSource.REMOTE) return;
     // Characters to skip.
     int skip = 0;
     // Iterate all operations
@@ -177,15 +181,29 @@ class _PageEditorState extends State<PageEditor> {
         skip -= length;
       }
     }
-    print('Local -> ${page!.letters.toString()}');
   }
 
+  void _onRemoteChange(Change change) {
+    print('Remote -> ${change.toString()}');
+
+    if (change.uid == AuthenticationService.uid &&
+        change.timestamp > _sessionStartTimestamp) {
+      print('Ignoring...');
+      return;
+    }
+    print('Composing...');
+    _controller.compose(
+      change.toDelta(),
+      const TextSelection(baseOffset: 0, extentOffset: 0),
+      ChangeSource.REMOTE,
+    );
+  }
+
+  /*
   /// Receive remote document change (Page object).
   ///
   /// * [page] Page object containing the new [snippets] and the [lastModifierUid]
   void _onRemoteChange(tPage page) {
-    print(
-        'Remote (${page.lastModifierUid == AuthenticationService.uid}) -> ${page.letters.toString()}');
     bool firstFetch = this.page == null;
     if (firstFetch) {
       Delta delta = page.toDelta();
@@ -208,9 +226,11 @@ class _PageEditorState extends State<PageEditor> {
     }
     this.page = page;
   }
+  */
 
   /// On document insert.
   void _onLocalInsert(int skip, String text) {
+    /*
     //Logs.d('Inserting($skip, $text)');
     if (page == null) {
       Logs.e('Trying to insert on a null Page!');
@@ -219,10 +239,25 @@ class _PageEditorState extends State<PageEditor> {
     page!.insert(skip, text);
     //page!.normalizeSnippets();
     _pushPageToRemote(page);
+    */
+    print('INSERT [$skip, $text]');
+    ChapterManagementService.pushPageChange(
+      '1',
+      '1',
+      '1',
+      Change(
+        skip,
+        AuthenticationService.uid ?? '-1',
+        DateTime.now().millisecondsSinceEpoch,
+        letter: text,
+      ),
+    );
   }
 
   /// On document delete.
   void _onLocalDelete(int skip, int length) {
+    print('DELETE [$skip, $length]');
+    /*
     //Logs.d('Deleting($skip, $length)');
     if (page == null) {
       Logs.e('Trying to insert on a null Page!');
@@ -231,6 +266,18 @@ class _PageEditorState extends State<PageEditor> {
     page!.delete(skip, length);
     //page!.normalizeSnippets();
     _pushPageToRemote(page);
+    */
+    ChapterManagementService.pushPageChange(
+      '1',
+      '1',
+      '1',
+      Change(
+        skip,
+        AuthenticationService.uid ?? '-1',
+        DateTime.now().millisecondsSinceEpoch,
+        length: length,
+      ),
+    );
   }
 
   void _onNeglectSnippet(int skip, int length) {
@@ -269,7 +316,7 @@ class _PageEditorState extends State<PageEditor> {
     Delta currentDelta = page!.toDelta();
     page!.createSnippet(_selection!.baseOffset, _selection!.extentOffset - 1,
         url: 'https://picsum.photos/200');
-    _replaceDelta(currentDelta, page!.toDelta());
+    //_replaceDelta(currentDelta, page!.toDelta());
     _pushPageToRemote(page);
   }
 
@@ -279,7 +326,7 @@ class _PageEditorState extends State<PageEditor> {
     id ??= widget.chapter.addPage(page!.id);
     page!.createSnippet(_selection!.baseOffset, _selection!.extentOffset - 1,
         choice: id);
-    _replaceDelta(currentDelta, page!.toDelta());
+    //_replaceDelta(currentDelta, page!.toDelta());
     widget.chapter.addLink(page!.id, childId: id);
     await _pushChapterToRemote(widget.chapter);
     await _pushPageToRemote(page);
@@ -538,58 +585,56 @@ class _PageEditorState extends State<PageEditor> {
       }
     }
 
-    return page == null
-        ? loadingRotate()
-        : Stack(
-            children: [
-              Row(
-                children: [
-                  Expanded(
-                    flex: Utils.editorPageWeight * 100 as int,
-                    child: Tile(
-                      elevation: 2.5,
-                      padding: EdgeInsets.zero,
-                      color: Utils.pageEditorSheetColor,
-                      child: Column(
-                        children: [
-                          Expanded(
-                            child: Padding(
-                              padding: const EdgeInsets.fromLTRB(
-                                  24.0, 24.0, 24.0, 24.0),
-                              child: QuillEditor(
-                                controller: _controller,
-                                readOnly: false,
-                                expands: true,
-                                paintCursorAboveText: true,
-                                placeholder: 'Once upon a time...',
-                                scrollable: true,
-                                autoFocus: true,
-                                focusNode: focus,
-                                padding: const EdgeInsets.fromLTRB(
-                                    24.0, 20.0, 24.0, 24.0),
-                                scrollController: _scrollController,
-                                onImagePaste: (bytes) => Future.value(null),
-                                onLaunchUrl: null,
-                                embedBuilders: [CursorEmbedBuilder()],
-                              ),
-                            ),
-                          ),
-                        ],
+    return Stack(
+      children: [
+        Row(
+          children: [
+            Expanded(
+              flex: Utils.editorPageWeight * 100 as int,
+              child: Tile(
+                elevation: 2.5,
+                padding: EdgeInsets.zero,
+                color: Utils.pageEditorSheetColor,
+                child: Column(
+                  children: [
+                    Expanded(
+                      child: Padding(
+                        padding:
+                            const EdgeInsets.fromLTRB(24.0, 24.0, 24.0, 24.0),
+                        child: QuillEditor(
+                          controller: _controller,
+                          readOnly: false,
+                          expands: true,
+                          paintCursorAboveText: true,
+                          placeholder: 'Once upon a time...',
+                          scrollable: true,
+                          autoFocus: true,
+                          focusNode: focus,
+                          padding:
+                              const EdgeInsets.fromLTRB(24.0, 20.0, 24.0, 24.0),
+                          scrollController: _scrollController,
+                          onImagePaste: (bytes) => Future.value(null),
+                          onLaunchUrl: null,
+                          embedBuilders: [CursorEmbedBuilder()],
+                        ),
                       ),
                     ),
-                  ),
-                  widget.screenSize.width > Utils.maxWidthShowOnlyEditorPage
-                      ? Expanded(
-                          flex: (1 - Utils.editorPageWeight) * 100 as int,
-                          child: _comments(),
-                        )
-                      : const SizedBox(
-                          width: Utils.collapseButtonSize,
-                        )
-                ],
+                  ],
+                ),
               ),
-              _textOptions(),
-            ],
-          );
+            ),
+            widget.screenSize.width > Utils.maxWidthShowOnlyEditorPage
+                ? Expanded(
+                    flex: (1 - Utils.editorPageWeight) * 100 as int,
+                    child: _comments(),
+                  )
+                : const SizedBox(
+                    width: Utils.collapseButtonSize,
+                  )
+          ],
+        ),
+        _textOptions(),
+      ],
+    );
   }
 }
