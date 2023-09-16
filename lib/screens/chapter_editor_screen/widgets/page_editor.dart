@@ -14,7 +14,6 @@ import 'package:teia/screens/chapter_editor_screen/widgets/snippets/snippet_choi
 import 'package:teia/screens/chapter_editor_screen/widgets/snippets/snippet_image_card.dart';
 import 'package:teia/services/authentication_service.dart';
 import 'package:teia/services/chapter_management_service.dart';
-import 'package:teia/utils/logs.dart';
 import 'package:teia/utils/utils.dart';
 import 'package:teia/views/misc/tap_icon.dart';
 import 'package:teia/views/misc/tile.dart';
@@ -48,12 +47,13 @@ class PageEditor extends StatefulWidget {
 
 class _PageEditorState extends State<PageEditor> {
   late QuillController _controller;
-  late StreamSubscription _documentChangesSubscription;
+  late StreamSubscription _localChangesSubscription;
   late StreamSubscription _pageChangesSubscription;
+  late StreamSubscription _pageSubscription;
   late ScrollController _scrollController;
   FocusNode focus = FocusNode();
 
-  tPage? page;
+  late tPage page;
 
   TextSelection? _selection;
   Snippet? _atSnippet;
@@ -77,14 +77,10 @@ class _PageEditorState extends State<PageEditor> {
     // Initialize controller
     _controller = QuillController.basic();
     // Listen to delta changes with _onLocalChange
-    _documentChangesSubscription =
+    _localChangesSubscription =
         _controller.document.changes.listen(_onLocalChange);
     // Listen to selection changes with _onSelectionChanged
     _controller.onSelectionChanged = _onSelectionChanged;
-    // Listen to cloud document changes with _onRemoteChange
-    /*_pageSubscription =
-        ChapterManagementService.pageStream('1', '1', widget.pageId)
-            .listen(_onRemoteChange);*/
 
     // Prevent default event handler
     document.onContextMenu.listen((event) => event.preventDefault());
@@ -93,13 +89,17 @@ class _PageEditorState extends State<PageEditor> {
         ChapterManagementService.streamPageChanges('1', '1', '1')
             .listen(_onRemoteChange);
 
+    _pageSubscription = ChapterManagementService.pageStream('1', '1', '1')
+        .listen(_onPageChange);
+
     super.initState();
   }
 
   @override
   void dispose() {
     _pageChangesSubscription.cancel();
-    _documentChangesSubscription.cancel();
+    _localChangesSubscription.cancel();
+    _pageSubscription.cancel();
     _controller.dispose();
     super.dispose();
   }
@@ -163,9 +163,9 @@ class _PageEditorState extends State<PageEditor> {
     for (Operation op in change.change.toList()) {
       if (op.isRetain) {
         // If retaining, add to skip
-        if (op.attributes != null && op.attributes!['color'] == null) {
+        /*if (op.attributes != null && op.attributes!['color'] == null) {
           _onNeglectSnippet(skip, op.length ?? 0);
-        }
+        }*/
         skip += op.value as int;
       } else if (op.isInsert) {
         // If inserting, call _onInsert() with current skip
@@ -183,14 +183,20 @@ class _PageEditorState extends State<PageEditor> {
     }
   }
 
+  void _onPageChange(tPage page) {}
+
   void _onRemoteChange(Change change) {
     if (change.uid == AuthenticationService.uid &&
         change.timestamp > _sessionStartTimestamp) {
       return;
     }
     print('Remote -> ${change.toString()}');
+
+    page.compose(change);
+    Delta diff = _controller.document.toDelta().diff(page.toDelta());
+
     _controller.compose(
-      change.toDelta(),
+      diff,
       const TextSelection(baseOffset: 0, extentOffset: 0),
       ChangeSource.REMOTE,
     );
@@ -238,12 +244,13 @@ class _PageEditorState extends State<PageEditor> {
     _pushPageToRemote(page);
     */
     print('INSERT [$skip, $text]');
+    page.insert(skip, text);
     ChapterManagementService.pushPageChange(
       '1',
       '1',
       '1',
       Change(
-        skip,
+        page.letters[skip].id,
         AuthenticationService.uid ?? '-1',
         DateTime.now().millisecondsSinceEpoch,
         letter: text,
@@ -264,12 +271,13 @@ class _PageEditorState extends State<PageEditor> {
     //page!.normalizeSnippets();
     _pushPageToRemote(page);
     */
+
     ChapterManagementService.pushPageChange(
       '1',
       '1',
       '1',
       Change(
-        skip,
+        page.letters[skip].id,
         AuthenticationService.uid ?? '-1',
         DateTime.now().millisecondsSinceEpoch,
         length: length,
@@ -277,7 +285,7 @@ class _PageEditorState extends State<PageEditor> {
     );
   }
 
-  void _onNeglectSnippet(int skip, int length) {
+  /*void _onNeglectSnippet(int skip, int length) {
     //Logs.d('Inserting($skip, $text)');
     if (page == null) {
       Logs.e('Trying to insert on a null Page!');
@@ -286,7 +294,7 @@ class _PageEditorState extends State<PageEditor> {
     page!.forgetSnippets(skip, length);
     //page!.normalizeSnippets();
     _pushPageToRemote(page);
-  }
+  }*/
 
   void _onSelectionChanged(TextSelection selection) {
     if (selection.baseOffset != selection.extentOffset) {
@@ -302,7 +310,7 @@ class _PageEditorState extends State<PageEditor> {
       // Find local snippet
       setState(() {
         _selection = null;
-        _atSnippet = page!.findSnippetByIndex(selection.baseOffset);
+        _atSnippet = page.findSnippetByIndex(selection.baseOffset);
       });
     }
     //_controller.formatSelection(const ColorAttribute('#000000'));
@@ -310,8 +318,8 @@ class _PageEditorState extends State<PageEditor> {
 
   void _onAddImage() {
     if (_selection == null) return;
-    Delta currentDelta = page!.toDelta();
-    page!.createSnippet(_selection!.baseOffset, _selection!.extentOffset - 1,
+    Delta currentDelta = page.toDelta();
+    page.createSnippet(_selection!.baseOffset, _selection!.extentOffset - 1,
         url: 'https://picsum.photos/200');
     //_replaceDelta(currentDelta, page!.toDelta());
     _pushPageToRemote(page);
@@ -319,12 +327,12 @@ class _PageEditorState extends State<PageEditor> {
 
   void _onAddChoice([int? id]) async {
     if (_selection == null) return;
-    Delta currentDelta = page!.toDelta();
-    id ??= widget.chapter.addPage(page!.id);
-    page!.createSnippet(_selection!.baseOffset, _selection!.extentOffset - 1,
+    Delta currentDelta = page.toDelta();
+    id ??= widget.chapter.addPage(page.id);
+    page.createSnippet(_selection!.baseOffset, _selection!.extentOffset - 1,
         choice: id);
     //_replaceDelta(currentDelta, page!.toDelta());
-    widget.chapter.addLink(page!.id, childId: id);
+    widget.chapter.addLink(page.id, childId: id);
     await _pushChapterToRemote(widget.chapter);
     await _pushPageToRemote(page);
   }
@@ -344,7 +352,7 @@ class _PageEditorState extends State<PageEditor> {
     String text = '';
     if (_atSnippet != null) {
       // Get text of Snippet
-      for (var letter in page!.letters) {
+      for (var letter in page.letters) {
         if (letter.id.compareTo(_atSnippet!.from) >= 0) {
           text += letter.letter;
         }

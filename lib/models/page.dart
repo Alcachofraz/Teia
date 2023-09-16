@@ -1,5 +1,6 @@
 import 'package:flutter_quill/flutter_quill.dart';
 import 'package:sorted_list/sorted_list.dart';
+import 'package:teia/models/change.dart';
 import 'package:teia/models/letter.dart';
 import 'package:teia/models/snippets/choice_snippet.dart';
 import 'package:teia/models/snippets/image_snippet.dart';
@@ -197,69 +198,36 @@ class tPage {
     }
   }
 
-  void insert(int skip, String text) {
+  tPage compose(Change change) {
+    int index = letters.indexWhere((l) => l.id == change.id);
+    if (change.length != null) {
+      delete(index, length);
+    } else {
+      insert(index, change.letter!);
+    }
+
+    return this;
+  }
+
+  void insert(int startIndex, String text) {
+    LetterId startId = letters[startIndex].id;
+    LetterId endId = letters[startIndex + 1].id;
+
+    LetterId lastId = startId;
     for (int i = 0; i < text.length; i++) {
+      LetterId newId = generateId(lastId, endId);
       letters.add(
         Letter(
-          generateId(
-            skip + i - 1 < 0 ? null : letters[skip + i - 1].id,
-            skip + i >= letters.length ? null : letters[skip + i].id,
-          ),
+          newId,
           text[i],
         ),
       );
+      lastId = newId;
     }
   }
 
-  void delete(int skip, int length) {
-    letters.removeRange(skip, skip + length);
-    rectifySnippetsAfterDelete();
-  }
-
-  void forgetSnippets(int skip, int length) {
-    String temp = '';
-    for (int i = skip; i < skip + length; i++) {
-      temp += letters[i].letter;
-    }
-    delete(skip,
-        length); // Deletes text and automatically rectifies the snipepts, deleting the desired extent
-    insert(skip, temp);
-  }
-
-  void rectifySnippetsAfterDelete() {
-    List<Snippet> newSnippets = [];
-    for (var snippet in snippets) {
-      try {
-        letters.firstWhere((letter) => letter.id.compareTo(snippet.from) == 0);
-      } catch (e) {
-        try {
-          snippet.from = letters
-              .firstWhere((letter) => letter.id.compareTo(snippet.from) > 0)
-              .id;
-        } catch (e) {
-          continue;
-        }
-        if (snippet.from.compareTo(snippet.to) > 0) {
-          continue;
-        }
-      }
-      try {
-        letters.firstWhere((letter) => letter.id.compareTo(snippet.to) == 0);
-      } catch (e) {
-        try {
-          snippet.to = letters
-              .lastWhere((letter) => letter.id.compareTo(snippet.to) < 0)
-              .id;
-        } catch (e) {
-          continue;
-        }
-        if (snippet.to.compareTo(snippet.from) < 0) {
-          continue;
-        }
-      }
-      newSnippets.add(snippet);
-    }
-    snippets.replaceRange(0, snippets.length, newSnippets);
+  void delete(int startIndex, int length) {
+    letters.removeRange(startIndex, startIndex + length);
   }
 
   Delta toDelta() {
