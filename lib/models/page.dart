@@ -211,13 +211,6 @@ class tPage {
 
   tPage compose(Change change) {
     int index = indexLetter(change.id);
-    if (index == -1) {
-      if (letters.isEmpty) {
-        index = 0;
-      } else {
-        return this;
-      }
-    }
     if (change.length != null) {
       delete(index, length);
     } else {
