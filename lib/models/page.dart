@@ -6,7 +6,6 @@ import 'package:teia/models/snippets/choice_snippet.dart';
 import 'package:teia/models/snippets/image_snippet.dart';
 import 'package:teia/models/snippets/snippet.dart';
 import 'package:teia/models/snippets/text_snippet.dart';
-import 'package:teia/utils/utils.dart';
 
 class tPage {
   final int id;
@@ -250,7 +249,7 @@ class tPage {
   }
 
   Delta toDelta() {
-    int currentColor = 0;
+    /*int currentColor = 0;
     bool insideSnippet = false;
     Snippet? current;
     Snippet? previous;
@@ -275,7 +274,16 @@ class tPage {
             insideSnippet ? {'color': Utils.snippetColors[currentColor]} : null,
           );
       },
-    );
+    );*/
+    return letters.fold<Delta>(
+      Delta(),
+      (delta, letter) {
+        return delta
+          ..insert(
+            letter.letter,
+          );
+      },
+    )..compose(Delta()..insert('\n'));
   }
 
   Map<String, dynamic> toMap() => {
