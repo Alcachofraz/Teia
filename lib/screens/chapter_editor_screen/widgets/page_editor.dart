@@ -3,8 +3,10 @@ import 'dart:async';
 import 'package:flutter/material.dart' hide Page;
 import 'package:flutter_quill/flutter_quill.dart' hide Text;
 import 'package:just_the_tooltip/just_the_tooltip.dart';
+import 'package:sorted_list/sorted_list.dart';
 import 'package:teia/models/change.dart';
 import 'package:teia/models/chapter.dart';
+import 'package:teia/models/letter.dart';
 import 'package:teia/models/page.dart';
 import 'package:teia/models/snippets/choice_snippet.dart';
 import 'package:teia/models/snippets/image_snippet.dart';
@@ -71,6 +73,7 @@ class _PageEditorState extends State<PageEditor> {
 
   @override
   void initState() {
+    page = tPage(1, 1, '1', SortedList<Letter>(), [], null);
     _sessionStartTimestamp = DateTime.now().millisecondsSinceEpoch;
     // Scroll controller
     _scrollController = ScrollController();
