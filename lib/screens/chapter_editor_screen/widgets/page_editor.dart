@@ -79,6 +79,7 @@ class _PageEditorState extends State<PageEditor> {
     _scrollController = ScrollController();
     // Initialize controller
     _controller = QuillController.basic();
+
     // Listen to delta changes with _onLocalChange
     _localChangesSubscription =
         _controller.document.changes.listen(_onLocalChange);
@@ -196,8 +197,10 @@ class _PageEditorState extends State<PageEditor> {
     print('Remote -> ${change.toString()}');
 
     page.compose(change);
+    print('CURRENT PAGE -> ${_controller.document.toDelta().toJson()}');
+    print('NEW PAGE -> ${page.toDelta().toJson()}');
     Delta diff = _controller.document.toDelta().diff(page.toDelta());
-
+    print('DIFF -> ${diff.toJson()}');
     _controller.compose(
       diff,
       const TextSelection(baseOffset: 0, extentOffset: 0),

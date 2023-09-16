@@ -283,7 +283,7 @@ class tPage {
             letter.letter,
           );
       },
-    )..compose(Delta()..insert('\n'));
+    )..insert('\n');
   }
 
   Map<String, dynamic> toMap() => {
