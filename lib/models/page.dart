@@ -198,22 +198,48 @@ class tPage {
     }
   }
 
+  int indexLetter(LetterId id) {
+    int index = letters.indexWhere((l) => l.id == id);
+    if (index < 0) {
+      index = letters.indexWhere((l) => l.id.compareTo(id) > 0);
+    }
+    if (index < 0) {
+      index = letters.length;
+    }
+    return index;
+  }
+
   tPage compose(Change change) {
-    int index = letters.indexWhere((l) => l.id == change.id);
+    int index = indexLetter(change.id);
+    if (index == -1) {
+      if (letters.isEmpty) {
+        index = 0;
+      } else {
+        return this;
+      }
+    }
     if (change.length != null) {
       delete(index, length);
     } else {
       insert(index, change.letter!);
     }
-
     return this;
   }
 
   void insert(int startIndex, String text) {
-    LetterId startId = letters[startIndex].id;
-    LetterId endId = letters[startIndex + 1].id;
-
-    LetterId lastId = startId;
+    LetterId? startId;
+    LetterId? endId;
+    try {
+      startId = letters[startIndex].id;
+    } catch (e) {
+      startId = null;
+    }
+    try {
+      endId = letters[startIndex + 1].id;
+    } catch (e) {
+      endId = null;
+    }
+    LetterId? lastId = startId;
     for (int i = 0; i < text.length; i++) {
       LetterId newId = generateId(lastId, endId);
       letters.add(
