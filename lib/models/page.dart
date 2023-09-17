@@ -211,7 +211,7 @@ class tPage {
 
   Delta compose(Change change) {
     if (change.length != null) {
-      int index = delete(change.id, length);
+      int index = delete(change.id, change.length!);
       return Delta()
         ..retain(index)
         ..delete(change.length!);
@@ -261,6 +261,7 @@ class tPage {
   int delete(LetterId? id, int length) {
     int index = letters.indexWhere((l) => l.id == id);
     print(index);
+    print(index + length);
     if (index < 0) return -1;
     letters.removeRange(index, index + length);
     return index;
