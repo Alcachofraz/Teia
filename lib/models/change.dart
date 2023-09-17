@@ -1,7 +1,7 @@
 import 'package:teia/models/letter.dart';
 
 class Change extends Comparable<Change> {
-  final LetterId id;
+  final LetterId? id;
   final int? length;
   final String? letter;
   final String uid;
@@ -32,7 +32,7 @@ class Change extends Comparable<Change> {
 
   Map<String, dynamic> toMap() {
     return {
-      'id': id.id,
+      'id': id?.id,
       'length': length,
       'letter': letter,
       'uid': uid,

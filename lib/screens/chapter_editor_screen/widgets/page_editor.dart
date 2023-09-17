@@ -174,13 +174,13 @@ class _PageEditorState extends State<PageEditor> {
       } else if (op.isInsert) {
         // If inserting, call _onInsert() with current skip
         String text = op.value as String;
-        _onLocalInsert(skip, text);
+        _onLocalInsert(skip == 0 ? null : page.letters[skip - 1].id, text);
         // Add he inserted text length to skip
         skip += text.length;
       } else if (op.isDelete) {
         // If deleting, call _onDelete() with current skip
         int length = op.value as int;
-        _onLocalDelete(skip, length);
+        _onLocalDelete(skip == 0 ? null : page.letters[skip - 1].id, length);
         // Remove the deleting text length from skip
         skip -= length;
       }
@@ -198,6 +198,7 @@ class _PageEditorState extends State<PageEditor> {
 
     page.compose(change);
     Delta diff = _controller.document.toDelta().diff(page.toDelta());
+    print('DIFF -> ${diff.toJson().toString()}');
     _controller.compose(
       diff,
       const TextSelection(baseOffset: 0, extentOffset: 0),
@@ -235,7 +236,7 @@ class _PageEditorState extends State<PageEditor> {
   */
 
   /// On document insert.
-  void _onLocalInsert(int skip, String text) {
+  void _onLocalInsert(LetterId? id, String text) {
     /*
     //Logs.d('Inserting($skip, $text)');
     if (page == null) {
@@ -246,14 +247,15 @@ class _PageEditorState extends State<PageEditor> {
     //page!.normalizeSnippets();
     _pushPageToRemote(page);
     */
-    print('INSERT [$skip, $text]');
-    page.insert(skip, text);
+    print('INSERT [$id, $text]');
+    page.insert(id, text);
+    print('PAGE ${page.letters.toString()}');
     ChapterManagementService.pushPageChange(
       '1',
       '1',
       '1',
       Change(
-        page.letters[skip].id,
+        id,
         AuthenticationService.uid ?? '-1',
         DateTime.now().millisecondsSinceEpoch,
         letter: text,
@@ -262,8 +264,7 @@ class _PageEditorState extends State<PageEditor> {
   }
 
   /// On document delete.
-  void _onLocalDelete(int skip, int length) {
-    print('DELETE [$skip, $length]');
+  void _onLocalDelete(LetterId? id, int length) {
     /*
     //Logs.d('Deleting($skip, $length)');
     if (page == null) {
@@ -274,13 +275,15 @@ class _PageEditorState extends State<PageEditor> {
     //page!.normalizeSnippets();
     _pushPageToRemote(page);
     */
-
+    print('DELETE [$id, $length]');
+    page.delete(id, length);
+    print('PAGE ${page.letters.toString()}');
     ChapterManagementService.pushPageChange(
       '1',
       '1',
       '1',
       Change(
-        page.letters[skip].id,
+        id,
         AuthenticationService.uid ?? '-1',
         DateTime.now().millisecondsSinceEpoch,
         length: length,

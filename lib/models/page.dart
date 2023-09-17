@@ -197,7 +197,8 @@ class tPage {
     }
   }
 
-  int indexLetter(LetterId id) {
+  int indexLetter(LetterId? id) {
+    if (id == null) return 0;
     int index = letters.indexWhere((l) => l.id == id);
     if (index < 0) {
       index = letters.indexWhere((l) => l.id.compareTo(id) > 0);
@@ -209,29 +210,35 @@ class tPage {
   }
 
   tPage compose(Change change) {
-    int index = indexLetter(change.id);
     if (change.length != null) {
-      delete(index, length);
+      delete(change.id, length);
     } else {
-      insert(index, change.letter!);
+      insert(change.id, change.letter!);
     }
     return this;
   }
 
-  void insert(int startIndex, String text) {
-    LetterId? startId;
+  void insert(LetterId? id, String text) {
     LetterId? endId;
     try {
-      startId = letters[startIndex].id;
+      // If id is null (insert at the beginning)
+      if (id == null) {
+        try {
+          // End should be the first letter
+          endId = letters.first.id;
+        } catch (e) {
+          // If there's so first letter, end should be null
+          endId = null;
+        }
+      } else {
+        // If start is not null (endId should be the first letter with id greater than id)
+        endId = letters.firstWhere((l) => l.id.compareTo(id) > 0).id;
+      }
     } catch (e) {
-      startId = null;
-    }
-    try {
-      endId = letters[startIndex + 1].id;
-    } catch (e) {
+      // If there's no letter with id greater than startId, end should be null
       endId = null;
     }
-    LetterId? lastId = startId;
+    LetterId? lastId = id;
     for (int i = 0; i < text.length; i++) {
       LetterId newId = generateId(lastId, endId);
       letters.add(
@@ -244,8 +251,10 @@ class tPage {
     }
   }
 
-  void delete(int startIndex, int length) {
-    letters.removeRange(startIndex, startIndex + length);
+  void delete(LetterId? id, int length) {
+    int index = letters.indexWhere((l) => l.id == id);
+    if (index < 0) return;
+    letters.removeRange(index, index + length);
   }
 
   Delta toDelta() {
