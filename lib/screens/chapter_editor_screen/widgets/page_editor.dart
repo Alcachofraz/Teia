@@ -52,6 +52,7 @@ class _PageEditorState extends State<PageEditor> {
   late StreamSubscription _localChangesSubscription;
   late StreamSubscription _pageChangesSubscription;
   late StreamSubscription _pageSubscription;
+  late StreamSubscription _onContextMenu;
   late ScrollController _scrollController;
   FocusNode focus = FocusNode();
 
@@ -87,7 +88,8 @@ class _PageEditorState extends State<PageEditor> {
     _controller.onSelectionChanged = _onSelectionChanged;
 
     // Prevent default event handler
-    document.onContextMenu.listen((event) => event.preventDefault());
+    _onContextMenu =
+        document.onContextMenu.listen((event) => event.preventDefault());
 
     _pageChangesSubscription =
         ChapterManagementService.streamPageChanges('1', '1', '1')
@@ -105,6 +107,8 @@ class _PageEditorState extends State<PageEditor> {
     _localChangesSubscription.cancel();
     _pageSubscription.cancel();
     _controller.dispose();
+    _onContextMenu.cancel();
+    _scrollController.dispose();
     super.dispose();
   }
 
@@ -180,7 +184,7 @@ class _PageEditorState extends State<PageEditor> {
       } else if (op.isDelete) {
         // If deleting, call _onDelete() with current skip
         int length = op.value as int;
-        _onLocalDelete(skip == 0 ? null : page.letters[skip - 1].id, length);
+        _onLocalDelete(page.letters[skip].id, length);
         // Remove the deleting text length from skip
         skip -= length;
       }
@@ -196,11 +200,11 @@ class _PageEditorState extends State<PageEditor> {
     }
     print('Remote -> ${change.toString()}');
 
-    page.compose(change);
-    Delta diff = _controller.document.toDelta().diff(page.toDelta());
-    print('DIFF -> ${diff.toJson().toString()}');
+    Delta delta = page.compose(change);
+    print('New Page (letters) -> ${page.letters.toString()}');
+    print('DELTA -> ${delta.toJson()}');
     _controller.compose(
-      diff,
+      delta,
       const TextSelection(baseOffset: 0, extentOffset: 0),
       ChangeSource.REMOTE,
     );

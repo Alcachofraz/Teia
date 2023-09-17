@@ -206,19 +206,25 @@ class tPage {
     if (index < 0) {
       index = letters.length;
     }
-    return index;
+    return index + 1;
   }
 
-  tPage compose(Change change) {
+  Delta compose(Change change) {
     if (change.length != null) {
-      delete(change.id, length);
+      int index = delete(change.id, length);
+      return Delta()
+        ..retain(index)
+        ..delete(change.length!);
     } else {
-      insert(change.id, change.letter!);
+      int index = insert(change.id, change.letter!);
+      return Delta()
+        ..retain(index)
+        ..insert(change.letter!);
     }
-    return this;
   }
 
-  void insert(LetterId? id, String text) {
+  int insert(LetterId? id, String text) {
+    int index = indexLetter(id);
     LetterId? endId;
     try {
       // If id is null (insert at the beginning)
@@ -249,12 +255,15 @@ class tPage {
       );
       lastId = newId;
     }
+    return index;
   }
 
-  void delete(LetterId? id, int length) {
+  int delete(LetterId? id, int length) {
     int index = letters.indexWhere((l) => l.id == id);
-    if (index < 0) return;
+    print(index);
+    if (index < 0) return -1;
     letters.removeRange(index, index + length);
+    return index;
   }
 
   Delta toDelta() {

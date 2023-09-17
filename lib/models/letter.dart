@@ -66,7 +66,8 @@ class LetterId extends Comparable<LetterId> {
   }
 
   @override
-  bool operator ==(other) => other is LetterId && const ListEquality().equals(id, other.id);
+  bool operator ==(other) =>
+      other is LetterId && const ListEquality().equals(id, other.id);
 
   @override
   int get hashCode => hashObjects(id);

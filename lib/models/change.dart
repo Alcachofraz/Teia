@@ -11,7 +11,7 @@ class Change extends Comparable<Change> {
 
   factory Change.fromMap(Map<String, dynamic> map) {
     return Change(
-      LetterId.fromMap(map['id']),
+      map['id'] == null ? null : LetterId.fromMap(map['id']),
       map['uid'],
       map['timestamp'],
       length: map['length'],
