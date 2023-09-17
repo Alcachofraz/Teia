@@ -260,8 +260,6 @@ class tPage {
 
   int delete(LetterId? id, int length) {
     int index = letters.indexWhere((l) => l.id == id);
-    print(index);
-    print(index + length);
     if (index < 0) return -1;
     letters.removeRange(index, index + length);
     return index;
