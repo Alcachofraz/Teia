@@ -1,4 +1,4 @@
-import 'package:flutter_quill/flutter_quill.dart';
+import 'package:flutter_quill/quill_delta.dart';
 import 'package:sorted_list/sorted_list.dart';
 import 'package:teia/models/change.dart';
 import 'package:teia/models/letter.dart';
@@ -12,6 +12,7 @@ class tPage {
   final int chapterId;
   final String storyId;
   String? lastModifierUid;
+  final Map<String, int> cursors;
 
   final SortedList<Letter> letters;
   final List<Snippet> snippets;
@@ -26,14 +27,17 @@ class tPage {
     this.letters,
     this.snippets,
     this.lastModifierUid,
+    this.cursors,
   );
 
   factory tPage.empty(int id, int chapterId, String storyId, {String? uid}) {
-    return tPage(id, chapterId, storyId, SortedList<Letter>(), [], uid);
+    return tPage(id, chapterId, storyId, SortedList<Letter>(), [], uid, {});
   }
 
   factory tPage.fromMap(Map<String, dynamic>? map) {
-    if (map == null) return tPage(-1, -1, '', SortedList<Letter>(), [], null);
+    if (map == null) {
+      return tPage(-1, -1, '', SortedList<Letter>(), [], null, {});
+    }
     return tPage(
       map['id'] as int,
       map['chapterId'] as int,
@@ -55,6 +59,9 @@ class tPage {
         }
       }).toList(),
       map['lastModifierUid'] as String?,
+      Map<String, int>.from(
+        map['cursors'] ?? {},
+      ),
     );
   }
 

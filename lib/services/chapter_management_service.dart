@@ -148,11 +148,28 @@ class ChapterManagementService {
   }
 
   static Future<void> pushPageChange(
-      String storyId, String chapterId, String pageId, Change change) async {
+      String storyId, String chapterId, String pageId, Change change,
+      {int? cursorPosition}) async {
     await FirebaseUtils.realtime
         .ref('stories/$storyId/chapters/$chapterId/pages/$pageId/changes')
         .push()
         .set(change.toMap());
+    if (cursorPosition != null) {
+      await FirebaseUtils.firestore
+          .collection('stories')
+          .doc(storyId)
+          .collection('chapters')
+          .doc(chapterId)
+          .collection('pages')
+          .doc(pageId)
+          .update(
+        {
+          'cursors': {
+            change.uid: cursorPosition,
+          },
+        },
+      );
+    }
   }
 
   static Future<List<Change>> getPageChanges(

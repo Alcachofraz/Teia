@@ -116,6 +116,7 @@ class _ChapterEditorScreenState extends State<ChapterEditorScreen> {
         SortedList<Letter>(),
         [],
         null,
+        {},
       ),
       _chapter!.graph,
     );

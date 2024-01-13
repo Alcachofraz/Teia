@@ -1,7 +1,8 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart' hide Page;
-import 'package:flutter_quill/flutter_quill.dart' hide Text;
+import 'package:flutter_quill/flutter_quill.dart';
+import 'package:flutter_quill/quill_delta.dart';
 import 'package:just_the_tooltip/just_the_tooltip.dart';
 import 'package:sorted_list/sorted_list.dart';
 import 'package:teia/models/change.dart';
@@ -11,7 +12,9 @@ import 'package:teia/models/page.dart';
 import 'package:teia/models/snippets/choice_snippet.dart';
 import 'package:teia/models/snippets/image_snippet.dart';
 import 'package:teia/models/snippets/snippet.dart';
+import 'package:teia/screens/chapter_editor_screen/widgets/cursor/cursor_block_embed.dart';
 import 'package:teia/screens/chapter_editor_screen/widgets/cursor/cursor_embed_builder.dart';
+import 'package:teia/screens/chapter_editor_screen/widgets/remote_cursor.dart';
 import 'package:teia/screens/chapter_editor_screen/widgets/snippets/snippet_choice_card.dart';
 import 'package:teia/screens/chapter_editor_screen/widgets/snippets/snippet_image_card.dart';
 import 'package:teia/services/authentication_service.dart';
@@ -74,7 +77,7 @@ class _PageEditorState extends State<PageEditor> {
 
   @override
   void initState() {
-    page = tPage(1, 1, '1', SortedList<Letter>(), [], null);
+    page = tPage(1, 1, '1', SortedList<Letter>(), [], null, {});
     _sessionStartTimestamp = DateTime.now().millisecondsSinceEpoch;
     // Scroll controller
     _scrollController = ScrollController();
@@ -147,7 +150,7 @@ class _PageEditorState extends State<PageEditor> {
     painter.layout();
 
     _lineOffset = painter.height;
-  }
+  }*/
 
   void _updateRemoteCursors(List<RemoteCursor> cursors) {
     for (RemoteCursor cursor in cursors) {
@@ -156,14 +159,14 @@ class _PageEditorState extends State<PageEditor> {
       );
       _controller.replaceText(cursor.index, 0, block, null);
     }
-  }*/
+  }
 
   /// Receive local document change.
   ///
   /// * [event] A tuple containing the deltas and change source.
   void _onLocalChange(DocChange change) {
     // If not page yet or change is remote, do nothing
-    if (change.source == ChangeSource.REMOTE) return;
+    if (change.source == ChangeSource.remote) return;
     // Characters to skip.
     int skip = 0;
     // Iterate all operations
@@ -191,7 +194,15 @@ class _PageEditorState extends State<PageEditor> {
     }
   }
 
-  void _onPageChange(tPage page) {}
+  void _onPageChange(tPage page) {
+    List<RemoteCursor> cursors = [];
+    /*for (String key in page.cursors.keys) {
+      if (page.cursors[key] != null) {
+        cursors.add(RemoteCursor(key, Colors.red, page.cursors[key]!));
+      }
+    }
+    _updateRemoteCursors(cursors);*/
+  }
 
   void _onRemoteChange(Change change) {
     if (change.uid == AuthenticationService.uid &&
@@ -206,7 +217,7 @@ class _PageEditorState extends State<PageEditor> {
     _controller.compose(
       delta,
       const TextSelection(baseOffset: 0, extentOffset: 0),
-      ChangeSource.REMOTE,
+      ChangeSource.remote,
     );
   }
 
@@ -264,6 +275,7 @@ class _PageEditorState extends State<PageEditor> {
         DateTime.now().millisecondsSinceEpoch,
         letter: text,
       ),
+      cursorPosition: _controller.selection.end,
     );
   }
 
@@ -292,6 +304,7 @@ class _PageEditorState extends State<PageEditor> {
         DateTime.now().millisecondsSinceEpoch,
         length: length,
       ),
+      cursorPosition: _controller.selection.end,
     );
   }
 
@@ -316,8 +329,6 @@ class _PageEditorState extends State<PageEditor> {
       });
     } else {
       // Positioning cursor
-      if (page == null) return;
-      // Find local snippet
       setState(() {
         _selection = null;
         _atSnippet = page.findSnippetByIndex(selection.baseOffset);
@@ -617,20 +628,23 @@ class _PageEditorState extends State<PageEditor> {
                         padding:
                             const EdgeInsets.fromLTRB(24.0, 24.0, 24.0, 24.0),
                         child: QuillEditor(
-                          controller: _controller,
-                          readOnly: false,
-                          expands: true,
-                          paintCursorAboveText: true,
-                          placeholder: 'Once upon a time...',
-                          scrollable: true,
-                          autoFocus: true,
+                          configurations: QuillEditorConfigurations(
+                            controller: _controller,
+                            readOnly: false,
+                            expands: true,
+                            paintCursorAboveText: true,
+                            placeholder: 'Once upon a time...',
+                            scrollable: true,
+                            autoFocus: true,
+                            padding: const EdgeInsets.fromLTRB(
+                                24.0, 20.0, 24.0, 24.0),
+                            onImagePaste: (bytes) => Future.value(null),
+                            onLaunchUrl: null,
+                            embedBuilders: [CursorEmbedBuilder()],
+                            showCursor: true,
+                          ),
                           focusNode: focus,
-                          padding:
-                              const EdgeInsets.fromLTRB(24.0, 20.0, 24.0, 24.0),
                           scrollController: _scrollController,
-                          onImagePaste: (bytes) => Future.value(null),
-                          onLaunchUrl: null,
-                          embedBuilders: [CursorEmbedBuilder()],
                         ),
                       ),
                     ),
