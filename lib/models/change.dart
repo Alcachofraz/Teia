@@ -1,21 +1,40 @@
 import 'package:teia/models/letter.dart';
+import 'package:teia/models/snippets/snippet.dart';
+
+enum ChangeType {
+  insert,
+  delete,
+  format,
+}
 
 class Change extends Comparable<Change> {
   final LetterId? id;
+  final ChangeType type;
   final int? length;
   final String? letter;
   final String uid;
   final int timestamp;
+  final Snippet? snippet;
 
-  Change(this.id, this.uid, this.timestamp, {this.length, this.letter});
+  Change(
+    this.id,
+    this.type,
+    this.uid,
+    this.timestamp, {
+    this.length,
+    this.letter,
+    this.snippet,
+  });
 
   factory Change.fromMap(Map<String, dynamic> map) {
     return Change(
       map['id'] == null ? null : LetterId.fromMap(map['id']),
+      ChangeType.values[map['type']],
       map['uid'],
       map['timestamp'],
       length: map['length'],
       letter: map['letter'],
+      snippet: map['snippet'] == null ? null : Snippet.fromMap(map['snippet']),
     );
   }
 
@@ -33,10 +52,12 @@ class Change extends Comparable<Change> {
   Map<String, dynamic> toMap() {
     return {
       'id': id?.id,
+      'type': type.index,
       'length': length,
       'letter': letter,
       'uid': uid,
       'timestamp': timestamp,
+      'snippet': snippet?.toMap(),
     };
   }
 

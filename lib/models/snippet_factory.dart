@@ -2,9 +2,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:teia/models/letter.dart';
 import 'package:teia/models/page.dart';
-import 'package:teia/models/snippets/choice_snippet.dart';
-import 'package:teia/models/snippets/image_snippet.dart';
-
+/*
 class SnippetFactory {
   static List<Letter> letterSublist(List<Letter> list, LetterId start,
       LetterId end, bool startInclusive, bool endInclusive) {
@@ -86,3 +84,4 @@ class SnippetFactory {
     return spans;
   }
 }
+*/

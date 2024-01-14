@@ -114,7 +114,6 @@ class _ChapterEditorScreenState extends State<ChapterEditorScreen> {
         int.parse(widget.chapterId),
         widget.storyId,
         SortedList<Letter>(),
-        [],
         null,
         {},
       ),

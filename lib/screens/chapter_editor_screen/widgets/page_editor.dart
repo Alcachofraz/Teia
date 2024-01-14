@@ -9,12 +9,8 @@ import 'package:teia/models/change.dart';
 import 'package:teia/models/chapter.dart';
 import 'package:teia/models/letter.dart';
 import 'package:teia/models/page.dart';
-import 'package:teia/models/snippets/choice_snippet.dart';
-import 'package:teia/models/snippets/image_snippet.dart';
 import 'package:teia/models/snippets/snippet.dart';
-import 'package:teia/screens/chapter_editor_screen/widgets/cursor/cursor_block_embed.dart';
 import 'package:teia/screens/chapter_editor_screen/widgets/cursor/cursor_embed_builder.dart';
-import 'package:teia/screens/chapter_editor_screen/widgets/remote_cursor.dart';
 import 'package:teia/screens/chapter_editor_screen/widgets/snippets/snippet_choice_card.dart';
 import 'package:teia/screens/chapter_editor_screen/widgets/snippets/snippet_image_card.dart';
 import 'package:teia/services/authentication_service.dart';
@@ -77,7 +73,7 @@ class _PageEditorState extends State<PageEditor> {
 
   @override
   void initState() {
-    page = tPage(1, 1, '1', SortedList<Letter>(), [], null, {});
+    page = tPage(1, 1, '1', SortedList<Letter>(), null, {});
     _sessionStartTimestamp = DateTime.now().millisecondsSinceEpoch;
     // Scroll controller
     _scrollController = ScrollController();
@@ -152,14 +148,14 @@ class _PageEditorState extends State<PageEditor> {
     _lineOffset = painter.height;
   }*/
 
-  void _updateRemoteCursors(List<RemoteCursor> cursors) {
+  /*void _updateRemoteCursors(List<RemoteCursor> cursors) {
     for (RemoteCursor cursor in cursors) {
       final block = BlockEmbed.custom(
         CursorBlockEmbed.fromDocument(cursor.toString()),
       );
       _controller.replaceText(cursor.index, 0, block, null);
     }
-  }
+  }*/
 
   /// Receive local document change.
   ///
@@ -194,14 +190,8 @@ class _PageEditorState extends State<PageEditor> {
     }
   }
 
-  void _onPageChange(tPage page) {
-    List<RemoteCursor> cursors = [];
-    /*for (String key in page.cursors.keys) {
-      if (page.cursors[key] != null) {
-        cursors.add(RemoteCursor(key, Colors.red, page.cursors[key]!));
-      }
-    }
-    _updateRemoteCursors(cursors);*/
+  void _onPageChange(tPage newPage) {
+    page.updateWith(newPage);
   }
 
   void _onRemoteChange(Change change) {
@@ -209,59 +199,30 @@ class _PageEditorState extends State<PageEditor> {
         change.timestamp > _sessionStartTimestamp) {
       return;
     }
-    print('Remote -> ${change.toString()}');
+    //print('Remote -> ${change.toString()}');
 
     Delta delta = page.compose(change);
-    print('New Page (letters) -> ${page.letters.toString()}');
-    print('DELTA -> ${delta.toJson()}');
-    _controller.compose(
-      delta,
-      const TextSelection(baseOffset: 0, extentOffset: 0),
-      ChangeSource.remote,
-    );
-  }
-
-  /*
-  /// Receive remote document change (Page object).
-  ///
-  /// * [page] Page object containing the new [snippets] and the [lastModifierUid]
-  void _onRemoteChange(tPage page) {
-    bool firstFetch = this.page == null;
-    if (firstFetch) {
-      Delta delta = page.toDelta();
-      if (delta.isNotEmpty) {
-        _controller.compose(
-          delta,
-          const TextSelection(baseOffset: 0, extentOffset: 0),
-          ChangeSource.REMOTE,
-        );
-        // Move cursor to document end
-        _controller.moveCursorToEnd();
-      }
-      setState(() {});
-    } else if (page.lastModifierUid == AuthenticationService.uid) {
-      //print('Myself, doing nothing.');
-      return;
+    //print('New Page (letters) -> ${page.letters.toString()}');
+    //print('DELTA -> ${delta.toJson()}');
+    if (change.type == ChangeType.format) {
+      _controller.formatText(
+        page.letters.indexWhere((p0) => p0.id == change.id),
+        change.length!,
+        ColorAttribute(
+          '#${colorToHex(Colors.blue)}', // Set color to blue - snippet
+        ),
+      );
     } else {
-      //print('Replacing delta. $page');
-      _replaceDelta(this.page!.toDelta(), page.toDelta());
+      _controller.compose(
+        delta,
+        const TextSelection(baseOffset: 0, extentOffset: 0),
+        ChangeSource.remote,
+      );
     }
-    this.page = page;
   }
-  */
 
   /// On document insert.
   void _onLocalInsert(LetterId? id, String text) {
-    /*
-    //Logs.d('Inserting($skip, $text)');
-    if (page == null) {
-      Logs.e('Trying to insert on a null Page!');
-      return;
-    }
-    page!.insert(skip, text);
-    //page!.normalizeSnippets();
-    _pushPageToRemote(page);
-    */
     print('INSERT [$id, $text]');
     page.insert(id, text);
     print('PAGE ${page.letters.toString()}');
@@ -271,6 +232,7 @@ class _PageEditorState extends State<PageEditor> {
       '1',
       Change(
         id,
+        ChangeType.insert,
         AuthenticationService.uid ?? '-1',
         DateTime.now().millisecondsSinceEpoch,
         letter: text,
@@ -281,16 +243,6 @@ class _PageEditorState extends State<PageEditor> {
 
   /// On document delete.
   void _onLocalDelete(LetterId? id, int length) {
-    /*
-    //Logs.d('Deleting($skip, $length)');
-    if (page == null) {
-      Logs.e('Trying to insert on a null Page!');
-      return;
-    }
-    page!.delete(skip, length);
-    //page!.normalizeSnippets();
-    _pushPageToRemote(page);
-    */
     print('DELETE [$id, $length]');
     page.delete(id, length);
     print('PAGE ${page.letters.toString()}');
@@ -300,6 +252,7 @@ class _PageEditorState extends State<PageEditor> {
       '1',
       Change(
         id,
+        ChangeType.delete,
         AuthenticationService.uid ?? '-1',
         DateTime.now().millisecondsSinceEpoch,
         length: length,
@@ -308,16 +261,26 @@ class _PageEditorState extends State<PageEditor> {
     );
   }
 
-  /*void _onNeglectSnippet(int skip, int length) {
-    //Logs.d('Inserting($skip, $text)');
-    if (page == null) {
-      Logs.e('Trying to insert on a null Page!');
-      return;
-    }
-    page!.forgetSnippets(skip, length);
-    //page!.normalizeSnippets();
-    _pushPageToRemote(page);
-  }*/
+  /// On document delete.
+  void _onLocalFormat(LetterId? id, int length, Snippet snippet) {
+    print('FORMAT [$id, $length, $snippet]');
+    page.format(id, length, snippet);
+    print('PAGE ${page.letters.toString()}');
+    ChapterManagementService.pushPageChange(
+      '1',
+      '1',
+      '1',
+      Change(
+        id,
+        ChangeType.format,
+        AuthenticationService.uid ?? '-1',
+        DateTime.now().millisecondsSinceEpoch,
+        length: length,
+        snippet: snippet,
+      ),
+      cursorPosition: _controller.selection.end,
+    );
+  }
 
   void _onSelectionChanged(TextSelection selection) {
     if (selection.baseOffset != selection.extentOffset) {
@@ -325,69 +288,77 @@ class _PageEditorState extends State<PageEditor> {
       setState(() {
         _atSnippet = null;
         _selection = selection;
-        /*_updateLineOffset();*/
       });
     } else {
       // Positioning cursor
+      _controller.formatSelection(
+        ColorAttribute(
+          '#${colorToHex(Colors.black)}', // Set color to black - in case middle of a snippet
+        ),
+      );
       setState(() {
         _selection = null;
         _atSnippet = page.findSnippetByIndex(selection.baseOffset);
       });
     }
-    //_controller.formatSelection(const ColorAttribute('#000000'));
+  }
+
+  void _createSnippet(Snippet snippet) {
+    // 1. and 3.
+    _onLocalFormat(page.letters[_selection!.baseOffset].id,
+        _selection!.extentOffset - _selection!.baseOffset, snippet);
+    // 2.
+    _controller.formatSelection(
+      ColorAttribute(
+        '#${colorToHex(Colors.blue)}', // Set color to blue - snippet
+      ),
+    );
   }
 
   void _onAddImage() {
-    if (_selection == null) return;
-    Delta currentDelta = page.toDelta();
-    page.createSnippet(_selection!.baseOffset, _selection!.extentOffset - 1,
-        url: 'https://picsum.photos/200');
-    //_replaceDelta(currentDelta, page!.toDelta());
-    _pushPageToRemote(page);
+    _createSnippet(Snippet(
+      _selection!.textInside(_controller.document.toPlainText()),
+      SnippetType.image,
+      {'url': 'https://picsum.photos/200'},
+    ));
   }
 
   void _onAddChoice([int? id]) async {
     if (_selection == null) return;
-    Delta currentDelta = page.toDelta();
+    // If id is null, create a new page and get its id
     id ??= widget.chapter.addPage(page.id);
-    page.createSnippet(_selection!.baseOffset, _selection!.extentOffset - 1,
-        choice: id);
-    //_replaceDelta(currentDelta, page!.toDelta());
+
+    // Add link from this page to [id], in chapter, and push to remote
     widget.chapter.addLink(page.id, childId: id);
     await _pushChapterToRemote(widget.chapter);
-    await _pushPageToRemote(page);
+
+    // Create the snippet
+    _createSnippet(Snippet(
+      _selection!.textInside(_controller.document.toPlainText()),
+      SnippetType.choice,
+      {'choice': id},
+    ));
   }
 
-  Widget _snippetCard(Snippet snippet, String text) {
-    if (snippet is ImageSnippet) {
-      return SnippetImageCard(snippet: snippet, text: text);
+  Widget _snippetCard(Snippet snippet) {
+    switch (snippet.type) {
+      case SnippetType.choice:
+        return SnippetChoiceCard(snippet: snippet, onPageTap: widget.onPageTap);
+
+      case SnippetType.image:
+        return SnippetImageCard(snippet: snippet);
+      default:
+        return const SizedBox.shrink();
     }
-    if (snippet is ChoiceSnippet) {
-      return SnippetChoiceCard(
-          snippet: snippet, text: text, onPageTap: widget.onPageTap);
-    }
-    return const SizedBox.shrink();
   }
 
   Widget _comments() {
-    String text = '';
-    if (_atSnippet != null) {
-      // Get text of Snippet
-      for (var letter in page.letters) {
-        if (letter.id.compareTo(_atSnippet!.from) >= 0) {
-          text += letter.letter;
-        }
-        if (letter.id.compareTo(_atSnippet!.to) >= 0) {
-          break;
-        }
-      }
-    }
     return Column(
       children: [
         if (_atSnippet != null)
           Padding(
             padding: const EdgeInsets.fromLTRB(16.0, 0.0, 16.0, 16.0),
-            child: _snippetCard(_atSnippet!, text),
+            child: _snippetCard(_atSnippet!),
           ),
         // for() comments
       ],

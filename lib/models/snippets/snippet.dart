@@ -1,13 +1,40 @@
-import 'package:teia/models/letter.dart';
+enum SnippetType { text, image, choice }
 
-abstract class Snippet {
-  LetterId from;
-  LetterId to;
+class Snippet {
+  final String text;
+  final SnippetType type;
+  final Map<String, dynamic> attributes;
+
   Snippet(
-    this.from,
-    this.to,
+    this.text,
+    this.type,
+    this.attributes,
   );
-  Snippet deepCopy({LetterId? from, LetterId? to});
-  bool joinable(Snippet snippet);
-  Map<String, dynamic> toMap();
+
+  Map<String, dynamic> toMap() => {
+        'text': text,
+        'type': type.index,
+        'attributes': attributes,
+      };
+
+  factory Snippet.fromMap(Map<String, dynamic> map) {
+    return Snippet(
+      map['text'],
+      SnippetType.values[map['type']],
+      Map<String, dynamic>.from(map['attributes'] ?? {}),
+    );
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return text == text && type == type && attributes == attributes;
+  }
+
+  @override
+  int get hashCode => text.hashCode + type.hashCode;
+
+  @override
+  String toString() {
+    return '{text: $text, type: $type, attributes: $attributes}';
+  }
 }

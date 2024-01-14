@@ -77,13 +77,13 @@ class _ReadChapterScreenState extends State<ReadChapterScreen> {
                                   const EdgeInsets.fromLTRB(24, 28, 24, 24),
                               child: RichText(
                                 text: TextSpan(
-                                  style: Utils.textReadingStyle,
-                                  children: SnippetFactory.spansFromPage(
+                                    style: Utils.textReadingStyle,
+                                    children: /*SnippetFactory.spansFromPage(
                                     page!,
                                     onImage,
                                     onChoice,
-                                  ),
-                                ),
+                                  ),*/
+                                        null),
                               ),
                             ),
                           if (widget.chapter.isFinalPage(pageId))

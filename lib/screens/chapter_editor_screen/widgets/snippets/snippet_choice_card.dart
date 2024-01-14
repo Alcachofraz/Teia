@@ -1,17 +1,15 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:teia/models/snippets/choice_snippet.dart';
+import 'package:teia/models/snippets/snippet.dart';
 import 'package:teia/views/misc/tile.dart';
 
 class SnippetChoiceCard extends StatelessWidget {
-  final ChoiceSnippet snippet;
-  final String text;
+  final Snippet snippet;
   final Function(int page) onPageTap;
   const SnippetChoiceCard({
     Key? key,
     required this.snippet,
-    required this.text,
     required this.onPageTap,
   }) : super(key: key);
 
@@ -35,16 +33,16 @@ class SnippetChoiceCard extends StatelessWidget {
               text: TextSpan(
                 style: GoogleFonts.roboto(fontSize: 14.0),
                 children: [
-                  TextSpan(text: '"$text"  🠪  '),
+                  TextSpan(text: '"${snippet.text}"  🠪  '),
                   TextSpan(
-                    text: 'Page ${snippet.choice}',
+                    text: 'Page ${snippet.attributes['choice']}',
                     style: const TextStyle(
                       color: Colors.blue,
                       decoration: TextDecoration.underline,
                     ),
                     recognizer: TapGestureRecognizer()
                       ..onTap = () {
-                        onPageTap(snippet.choice);
+                        onPageTap(snippet.attributes['choice']);
                       },
                   ),
                 ],

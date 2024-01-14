@@ -1,14 +1,20 @@
 import 'package:collection/collection.dart';
 import 'package:quiver/core.dart';
+import 'package:teia/models/snippets/snippet.dart';
 
 class Letter extends Comparable<Letter> {
   final LetterId id;
   final String letter;
+  Snippet? snippet;
 
-  Letter(this.id, this.letter);
+  Letter(this.id, this.letter, {this.snippet});
 
   factory Letter.fromMap(Map<String, dynamic> map) {
-    return Letter(LetterId.fromMap(map['id']), map['letter'] as String);
+    return Letter(
+      LetterId.fromMap(map['id']),
+      map['letter'] as String,
+      snippet: Snippet.fromMap(map['snippet']),
+    );
   }
 
   @override
@@ -26,12 +32,13 @@ class Letter extends Comparable<Letter> {
     return {
       'id': id.id,
       'letter': letter,
+      'snippet': snippet?.toMap(),
     };
   }
 
   @override
   String toString() {
-    return '{$letter, $id}';
+    return '{$letter, $id, $snippet}';
   }
 }
 

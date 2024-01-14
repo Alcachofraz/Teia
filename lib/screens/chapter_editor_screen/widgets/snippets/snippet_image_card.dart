@@ -1,16 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/material.dart' hide Page;
 import 'package:google_fonts/google_fonts.dart';
-import 'package:teia/models/snippets/image_snippet.dart';
+import 'package:teia/models/snippets/snippet.dart';
 import 'package:teia/views/misc/expandable_tile.dart';
 
 class SnippetImageCard extends StatelessWidget {
-  final ImageSnippet snippet;
-  final String text;
+  final Snippet snippet;
   const SnippetImageCard({
     Key? key,
     required this.snippet,
-    required this.text,
   }) : super(key: key);
 
   @override
@@ -23,7 +21,7 @@ class SnippetImageCard extends StatelessWidget {
             ClipRRect(
               borderRadius: BorderRadius.circular(3.0),
               child: Image.network(
-                snippet.url,
+                snippet.attributes['url'],
                 width: 48.0,
                 height: 48.0,
               ),
@@ -38,7 +36,7 @@ class SnippetImageCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 8.0),
                 Text(
-                  '"$text"',
+                  '"${snippet.text}"',
                   style: GoogleFonts.roboto(fontSize: 14.0),
                 ),
               ],
@@ -59,7 +57,7 @@ class SnippetImageCard extends StatelessWidget {
               ),
               const SizedBox(height: 8.0),
               Text(
-                '"$text"',
+                '"${snippet.text}"',
                 style: GoogleFonts.roboto(fontSize: 14.0),
               ),
               const SizedBox(height: 12.0),
@@ -69,7 +67,7 @@ class SnippetImageCard extends StatelessWidget {
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(3.0),
                       child: Image.network(
-                        snippet.url,
+                        snippet.attributes['url'],
                         fit: BoxFit.fitWidth,
                       ),
                     ),

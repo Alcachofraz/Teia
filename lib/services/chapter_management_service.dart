@@ -154,7 +154,7 @@ class ChapterManagementService {
         .ref('stories/$storyId/chapters/$chapterId/pages/$pageId/changes')
         .push()
         .set(change.toMap());
-    if (cursorPosition != null) {
+    /*if (cursorPosition != null) {
       await FirebaseUtils.firestore
           .collection('stories')
           .doc(storyId)
@@ -169,7 +169,7 @@ class ChapterManagementService {
           },
         },
       );
-    }
+    }*/
   }
 
   static Future<List<Change>> getPageChanges(
