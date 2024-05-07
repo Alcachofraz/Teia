@@ -1,62 +1,111 @@
 import 'package:flutter/material.dart';
+import 'package:gap/gap.dart';
+import 'package:get/get.dart';
 
 class RoundedButton extends StatelessWidget {
-  final Color color;
+  final Color? color;
   final Widget? leading;
-  final Widget? text;
+  final String text;
   final Function()? onTap;
   final bool strokeOnly;
   final bool matchParent;
-  final EdgeInsets padding;
+  final double padding;
   final List<Color>? gradient;
-  const RoundedButton({
-    Key? key,
-    this.color = Colors.blue,
+  final TextStyle? textStyle;
+  final double? height;
+  final double borderRadius;
+  final Color? borderColor;
+  final bool enabled;
+  final bool expand;
+
+  RoundedButton({
+    super.key,
+    this.color,
     this.leading,
-    this.text,
+    required this.text,
     required this.onTap,
     this.strokeOnly = false,
     this.matchParent = true,
-    this.padding = const EdgeInsets.fromLTRB(20.0, 14.0, 20.0, 16.0),
+    this.padding = 12,
     this.gradient,
-  }) : super(key: key);
+    this.textStyle,
+    this.height,
+    this.borderRadius = 8.0,
+    this.borderColor,
+    this.enabled = true,
+    this.expand = false,
+  });
+
+  final RxBool loading = false.obs;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(1024.0),
-        color: strokeOnly ? Colors.transparent : color,
-        gradient: gradient != null
-            ? LinearGradient(
-                begin: Alignment.centerRight,
-                end: Alignment.topLeft,
-                colors: gradient!,
-              )
-            : null,
-        border: strokeOnly ? Border.all(color: color, width: 2) : null,
-      ),
-      child: Material(
-        color: Colors.transparent,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(1024.0),
+    Text getText() => Text(
+          text,
+          overflow: TextOverflow.ellipsis,
+          textAlign: TextAlign.center,
+          style: textStyle ?? const TextStyle(color: Colors.white),
+          maxLines: 1,
+        );
+
+    return SizedBox(
+      height: height,
+      child: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          padding: EdgeInsets.all(padding),
+          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+          backgroundColor: color ?? Colors.black,
+          disabledBackgroundColor: Colors.grey[600],
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(borderRadius),
+            side: borderColor != null
+                ? BorderSide(
+                    color: borderColor!,
+                    width: 2,
+                  )
+                : BorderSide.none,
+          ),
         ),
-        child: InkWell(
-          borderRadius: BorderRadius.circular(1024.0),
-          splashColor: strokeOnly ? color.withOpacity(0.4) : Colors.grey.withOpacity(0.5),
-          onTap: onTap,
-          child: Padding(
-            padding: padding,
-            child: Row(
+        onPressed: loading.value || !enabled
+            ? null
+            : () async {
+                if (onTap != null) {
+                  loading.value = true;
+                  await onTap!.call();
+                  loading.value = false;
+                }
+              },
+        child: Padding(
+          padding: const EdgeInsets.all(8),
+          child: Obx(
+            () => Row(
+              mainAxisSize: expand ? MainAxisSize.max : MainAxisSize.min,
               mainAxisAlignment: MainAxisAlignment.center,
-              mainAxisSize: matchParent ? MainAxisSize.max : MainAxisSize.min,
-              children: [
-                if (leading != null)
-                  Padding(
-                    padding: text != null ? const EdgeInsets.only(right: 12.0) : EdgeInsets.zero,
-                    child: leading!,
+              children: <Widget>[
+                if (loading.value) const Gap(4),
+                if (loading.value)
+                  const SizedBox(
+                    height: 16,
+                    width: 16,
                   ),
-                if (text != null) text!,
+                if (expand)
+                  Expanded(
+                    child: getText(),
+                  )
+                else
+                  getText(),
+                if (loading.value) const Gap(4),
+                if (loading.value)
+                  SizedBox(
+                    height: 16,
+                    width: 16,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 1.5,
+                      color: enabled ? Colors.white : Colors.grey[400],
+                    ),
+                  )
+                else
+                  const SizedBox.shrink(),
               ],
             ),
           ),

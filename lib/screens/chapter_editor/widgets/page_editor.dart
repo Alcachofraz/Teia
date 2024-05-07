@@ -1,8 +1,10 @@
 import 'dart:async';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart' hide Page;
 import 'package:flutter_quill/flutter_quill.dart';
 import 'package:flutter_quill/quill_delta.dart';
+import 'package:get/get.dart';
 import 'package:just_the_tooltip/just_the_tooltip.dart';
 import 'package:sorted_list/sorted_list.dart';
 import 'package:teia/models/change.dart';
@@ -10,11 +12,13 @@ import 'package:teia/models/chapter.dart';
 import 'package:teia/models/letter.dart';
 import 'package:teia/models/page.dart';
 import 'package:teia/models/snippets/snippet.dart';
-import 'package:teia/screens/chapter_editor_screen/widgets/cursor/cursor_embed_builder.dart';
-import 'package:teia/screens/chapter_editor_screen/widgets/snippets/snippet_choice_card.dart';
-import 'package:teia/screens/chapter_editor_screen/widgets/snippets/snippet_image_card.dart';
+import 'package:teia/screens/chapter_editor/widgets/chat_gpt_view.dart';
+import 'package:teia/screens/chapter_editor/widgets/cursor/cursor_embed_builder.dart';
+import 'package:teia/screens/chapter_editor/widgets/snippets/snippet_choice_card.dart';
+import 'package:teia/screens/chapter_editor/widgets/snippets/snippet_image_card.dart';
 import 'package:teia/services/authentication_service.dart';
 import 'package:teia/services/chapter_management_service.dart';
+import 'package:teia/services/storage_service.dart';
 import 'package:teia/utils/utils.dart';
 import 'package:teia/views/misc/tap_icon.dart';
 import 'package:teia/views/misc/tile.dart';
@@ -71,6 +75,14 @@ class _PageEditorState extends State<PageEditor> {
   bool showingImageOption = false;
   late int _sessionStartTimestamp;
 
+  final ChapterManagementService chapterManagementService =
+      Get.put(ChapterManagementService());
+
+  final AuthenticationService authenticationService =
+      Get.put(AuthenticationService());
+
+  final StorageService storageService = Get.put(StorageService());
+
   @override
   void initState() {
     page = tPage(1, 1, '1', SortedList<Letter>(), null, {});
@@ -90,11 +102,12 @@ class _PageEditorState extends State<PageEditor> {
     _onContextMenu =
         document.onContextMenu.listen((event) => event.preventDefault());
 
-    _pageChangesSubscription =
-        ChapterManagementService.streamPageChanges('1', '1', '1')
-            .listen(_onRemoteChange);
+    _pageChangesSubscription = chapterManagementService
+        .streamPageChanges('1', '1', '1')
+        .listen(_onRemoteChange);
 
-    _pageSubscription = ChapterManagementService.pageStream('1', '1', '1')
+    _pageSubscription = chapterManagementService
+        .pageStream('1', '1', '1')
         .listen(_onPageChange);
 
     super.initState();
@@ -195,7 +208,7 @@ class _PageEditorState extends State<PageEditor> {
   }
 
   void _onRemoteChange(Change change) {
-    if (change.uid == AuthenticationService.uid &&
+    if (change.uid == authenticationService.uid &&
         change.timestamp > _sessionStartTimestamp) {
       return;
     }
@@ -223,17 +236,16 @@ class _PageEditorState extends State<PageEditor> {
 
   /// On document insert.
   void _onLocalInsert(LetterId? id, String text) {
-    print('INSERT [$id, $text]');
+    //print('INSERT [$id, $text]');
     page.insert(id, text);
-    print('PAGE ${page.letters.toString()}');
-    ChapterManagementService.pushPageChange(
+    chapterManagementService.pushPageChange(
       '1',
       '1',
       '1',
       Change(
         id,
         ChangeType.insert,
-        AuthenticationService.uid ?? '-1',
+        authenticationService.uid ?? '-1',
         DateTime.now().millisecondsSinceEpoch,
         letter: text,
       ),
@@ -243,17 +255,16 @@ class _PageEditorState extends State<PageEditor> {
 
   /// On document delete.
   void _onLocalDelete(LetterId? id, int length) {
-    print('DELETE [$id, $length]');
+    //print('DELETE [$id, $length]');
     page.delete(id, length);
-    print('PAGE ${page.letters.toString()}');
-    ChapterManagementService.pushPageChange(
+    chapterManagementService.pushPageChange(
       '1',
       '1',
       '1',
       Change(
         id,
         ChangeType.delete,
-        AuthenticationService.uid ?? '-1',
+        authenticationService.uid ?? '-1',
         DateTime.now().millisecondsSinceEpoch,
         length: length,
       ),
@@ -263,17 +274,16 @@ class _PageEditorState extends State<PageEditor> {
 
   /// On document delete.
   void _onLocalFormat(LetterId? id, int length, Snippet snippet) {
-    print('FORMAT [$id, $length, $snippet]');
+    //print('FORMAT [$id, $length, $snippet]');
     page.format(id, length, snippet);
-    print('PAGE ${page.letters.toString()}');
-    ChapterManagementService.pushPageChange(
+    chapterManagementService.pushPageChange(
       '1',
       '1',
       '1',
       Change(
         id,
         ChangeType.format,
-        AuthenticationService.uid ?? '-1',
+        authenticationService.uid ?? '-1',
         DateTime.now().millisecondsSinceEpoch,
         length: length,
         snippet: snippet,
@@ -315,11 +325,14 @@ class _PageEditorState extends State<PageEditor> {
     );
   }
 
-  void _onAddImage() {
+  Future<void> _onAddImage(Uint8List image) async {
     _createSnippet(Snippet(
       _selection!.textInside(_controller.document.toPlainText()),
       SnippetType.image,
-      {'url': 'https://picsum.photos/200'},
+      {
+        'url': await storageService.uploadImage(
+            widget.chapter.storyId, widget.chapter.id.toString(), image),
+      },
     ));
   }
 
@@ -357,9 +370,16 @@ class _PageEditorState extends State<PageEditor> {
       children: [
         if (_atSnippet != null)
           Padding(
-            padding: const EdgeInsets.fromLTRB(16.0, 0.0, 16.0, 16.0),
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
             child: _snippetCard(_atSnippet!),
           ),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(0, 0, 0, 16),
+          child: ChatGPTView(
+            getPageContent: () => _controller.document.toPlainText(),
+          ),
+        ),
+
         // for() comments
       ],
     );
@@ -505,15 +525,16 @@ class _PageEditorState extends State<PageEditor> {
                                     icon: const Icon(
                                       Icons.brush_rounded,
                                     ),
-                                    onTap: () {
+                                    onTap: () async {
                                       setState(() {
                                         showingImageOption = false;
                                       });
-                                      /* Navigator.push(
-                                        context,
-                                        MaterialPageRoute(builder: (context) => const ImageEditorScreen()),
-                                      );*/
-                                      _onAddImage();
+                                      var image = await Get.toNamed(
+                                        '/chapter_editor/generate',
+                                      );
+                                      if (image != null) {
+                                        await _onAddImage(image);
+                                      }
                                     },
                                   ),
                                   TapIcon(
@@ -525,6 +546,7 @@ class _PageEditorState extends State<PageEditor> {
                                       setState(() {
                                         showingImageOption = false;
                                       });
+
                                       // Load image from device
                                     },
                                   ),

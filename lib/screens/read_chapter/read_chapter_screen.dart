@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:teia/models/chapter.dart';
 import 'package:teia/models/page.dart';
-import 'package:teia/models/snippet_factory.dart';
 import 'package:teia/services/chapter_management_service.dart';
 import 'package:teia/utils/utils.dart';
 import 'package:teia/views/misc/screen_wrapper.dart';
@@ -10,9 +10,9 @@ import 'package:teia/views/misc/tile.dart';
 class ReadChapterScreen extends StatefulWidget {
   final Chapter chapter;
   const ReadChapterScreen({
-    Key? key,
+    super.key,
     required this.chapter,
-  }) : super(key: key);
+  });
 
   @override
   State<ReadChapterScreen> createState() => _ReadChapterScreenState();
@@ -22,10 +22,14 @@ class _ReadChapterScreenState extends State<ReadChapterScreen> {
   int pageId = 0; // Get this from database
   tPage? page;
 
+  ChapterManagementService chapterManagementService =
+      Get.put(ChapterManagementService());
+
   @override
   void initState() {
     super.initState();
-    ChapterManagementService.pageGet('1', '1', '1')
+    chapterManagementService
+        .pageGet('1', '1', '1')
         .then((o) => setState(() => page = o));
   }
 

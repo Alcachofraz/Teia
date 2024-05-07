@@ -7,9 +7,9 @@ import 'package:teia/views/misc/expandable_tile.dart';
 class SnippetImageCard extends StatelessWidget {
   final Snippet snippet;
   const SnippetImageCard({
-    Key? key,
+    super.key,
     required this.snippet,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -22,24 +22,27 @@ class SnippetImageCard extends StatelessWidget {
               borderRadius: BorderRadius.circular(3.0),
               child: Image.network(
                 snippet.attributes['url'],
-                width: 48.0,
-                height: 48.0,
+                width: 56.0,
+                height: 56.0,
               ),
             ),
             const SizedBox(width: 12.0),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  "Choice Snippet",
-                  style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.w600),
-                ),
-                const SizedBox(height: 8.0),
-                Text(
-                  '"${snippet.text}"',
-                  style: GoogleFonts.roboto(fontSize: 14.0),
-                ),
-              ],
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    "Choice Snippet",
+                    style:
+                        TextStyle(fontSize: 18.0, fontWeight: FontWeight.w600),
+                  ),
+                  const SizedBox(height: 8.0),
+                  Text(
+                    '"${snippet.text}"',
+                    style: GoogleFonts.roboto(fontSize: 14.0),
+                  ),
+                ],
+              ),
             ),
           ],
         ),

@@ -24,7 +24,8 @@ class _TreeViewPageState extends State<TreeViewPage> {
                   width: 100,
                   child: TextFormField(
                     initialValue: builder.siblingSeparation.toString(),
-                    decoration: const InputDecoration(labelText: 'Sibling Separation'),
+                    decoration:
+                        const InputDecoration(labelText: 'Sibling Separation'),
                     onChanged: (text) {
                       builder.siblingSeparation = int.tryParse(text) ?? 100;
                       setState(() {});
@@ -35,7 +36,8 @@ class _TreeViewPageState extends State<TreeViewPage> {
                   width: 100,
                   child: TextFormField(
                     initialValue: builder.levelSeparation.toString(),
-                    decoration: const InputDecoration(labelText: 'Level Separation'),
+                    decoration:
+                        const InputDecoration(labelText: 'Level Separation'),
                     onChanged: (text) {
                       builder.levelSeparation = int.tryParse(text) ?? 100;
                       setState(() {});
@@ -46,7 +48,8 @@ class _TreeViewPageState extends State<TreeViewPage> {
                   width: 100,
                   child: TextFormField(
                     initialValue: builder.subtreeSeparation.toString(),
-                    decoration: const InputDecoration(labelText: 'Subtree separation'),
+                    decoration:
+                        const InputDecoration(labelText: 'Subtree separation'),
                     onChanged: (text) {
                       builder.subtreeSeparation = int.tryParse(text) ?? 100;
                       setState(() {});
@@ -67,8 +70,8 @@ class _TreeViewPageState extends State<TreeViewPage> {
                 ElevatedButton(
                   onPressed: () {
                     final node12 = Node.Id(r.nextInt(100));
-                    var edge = graph.getNodeAtPosition(r.nextInt(graph.nodeCount()));
-                    print(edge);
+                    var edge =
+                        graph.getNodeAtPosition(r.nextInt(graph.nodeCount()));
                     graph.addEdge(edge, node12);
                     setState(() {});
                   },
@@ -84,7 +87,8 @@ class _TreeViewPageState extends State<TreeViewPage> {
                   maxScale: 5.6,
                   child: GraphView(
                     graph: graph,
-                    algorithm: BuchheimWalkerAlgorithm(builder, TreeEdgeRenderer(builder)),
+                    algorithm: BuchheimWalkerAlgorithm(
+                        builder, TreeEdgeRenderer(builder)),
                     paint: Paint()
                       ..color = Colors.green
                       ..strokeWidth = 1

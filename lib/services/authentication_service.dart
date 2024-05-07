@@ -1,48 +1,68 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:get/get.dart';
 import 'package:teia/services/firebase/firestore_utils.dart';
 import 'package:teia/services/user_management_service.dart';
 
-class AuthenticationService {
-  static String? uid = '1';
+class AuthResponse {
+  final String message;
+  final bool success;
 
-  static Stream<bool> authStateChanges =
+  AuthResponse(this.message, this.success);
+}
+
+class AuthenticationService extends GetxService {
+  String? uid;
+
+  Stream<bool> authStateChanges =
       FirebaseUtils.auth.authStateChanges().map((user) {
     return user != null;
   });
 
-  static Future<String> login(String email, String password) async {
+  Future<AuthResponse> login(String email, String password) async {
     try {
       final credential = await FirebaseUtils.auth
           .signInWithEmailAndPassword(email: email, password: password);
       final user = credential.user;
-      if (user == null) return 'An error occurred';
-      return 'Success';
+      if (user == null) return AuthResponse('An error occurred', false);
+      uid = user.uid;
+      return AuthResponse('Success', true);
     } on FirebaseAuthException catch (e) {
-      return e.message.toString();
+      return AuthResponse(e.message.toString(), false);
     }
   }
 
-  static Future<String> register(String email, String password) async {
-    return await FirebaseUtils.firestore
-        .collection('users')
-        .where('email', isEqualTo: email)
-        .get()
-        .then<String>((value) async {
-      if (value.docs.isNotEmpty) {
-        return 'A user with that email already exists';
-      } else {
-        UserCredential userCredential = await FirebaseUtils.auth
-            .createUserWithEmailAndPassword(email: email, password: password);
-        if (userCredential.user == null) {
-          return 'An error occurred';
+  Future<AuthResponse> register(String email, String password) async {
+    try {
+      return await FirebaseUtils.firestore
+          .collection('users')
+          .where('email', isEqualTo: email)
+          .get()
+          .then<AuthResponse>((value) async {
+        if (value.docs.isNotEmpty) {
+          return AuthResponse('A user with that email already exists', false);
+        } else {
+          UserCredential userCredential = await FirebaseUtils.auth
+              .createUserWithEmailAndPassword(email: email, password: password);
+          if (userCredential.user == null) {
+            return AuthResponse('An error occurred', false);
+          }
+          uid = userCredential.user!.uid;
+          await UserManagementService.createUser(userCredential.user!);
+          return AuthResponse('Success', true);
         }
-        await UserManagementService.createUser(userCredential.user!);
-        return 'Success';
-      }
-    });
+      });
+    } on FirebaseAuthException catch (e) {
+      return AuthResponse(e.message.toString(), false);
+    } on Exception catch (e) {
+      return AuthResponse(e.toString(), false);
+    }
   }
 
-  static Future<void> sendPasswordResetEmail(String email) async {
+  Future<void> sendPasswordResetEmail(String email) async {
     await FirebaseUtils.auth.sendPasswordResetEmail(email: email);
+  }
+
+  Future<void> logout() async {
+    await FirebaseUtils.auth.signOut();
   }
 }

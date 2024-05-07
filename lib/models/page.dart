@@ -84,6 +84,7 @@ class tPage {
 
   Snippet? findSnippetByIndex(int index) {
     if (index >= length) return null;
+    print(letters[index].snippet);
     return letters[index].snippet;
   }
 
@@ -204,7 +205,7 @@ class tPage {
   /// Formats [length] letters after [id]. Returns index of [id].
   int format(LetterId? id, int length, Snippet? snippet) {
     int index = letters.indexWhere((l) => l.id == id);
-    for (int i = 0; i < index + length; i++) {
+    for (int i = index; i < index + length; i++) {
       letters[i].snippet = snippet;
     }
     return index;

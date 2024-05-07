@@ -4,6 +4,7 @@ import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_painter/flutter_painter.dart';
+import 'package:get/get.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:teia/models/stable_diffusion/generation.dart';
 import 'package:teia/services/stable_diffusion/al_service.dart';
@@ -14,8 +15,8 @@ import 'package:teia/views/misc/screen_wrapper.dart';
 import 'package:teia/views/misc/tap_icon.dart';
 import 'package:teia/views/misc/tile.dart';
 
-class ImageEditorScreen extends StatefulWidget {
-  const ImageEditorScreen({Key? key}) : super(key: key);
+class ImageEditorScreen<Uint8List> extends StatefulWidget {
+  const ImageEditorScreen({super.key});
 
   @override
   State<ImageEditorScreen> createState() => _ImageEditorScreenState();
@@ -91,6 +92,10 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
     } else {
       return null;
     }
+  }
+
+  void useImage() {
+    Get.back(result: image);
   }
 
   @override
@@ -236,15 +241,45 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
                           Expanded(
                             child: Padding(
                               padding: const EdgeInsets.all(16.0),
-                              child: generateBusy
-                                  ? loadingDots(color: Colors.white, size: 16.0)
-                                  : const Text(
-                                      "Generate",
-                                      textAlign: TextAlign.center,
-                                      style: TextStyle(
-                                        color: Colors.white,
+                              child: SizedBox(
+                                height: 24,
+                                child: generateBusy
+                                    ? loadingDots(
+                                        color: Colors.white, size: 16.0)
+                                    : const Text(
+                                        "Generate",
+                                        textAlign: TextAlign.center,
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                        ),
                                       ),
-                                    ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 8.0),
+                    Tile(
+                      padding: EdgeInsets.zero,
+                      color: Colors.black,
+                      onTap: useImage,
+                      child: const Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Expanded(
+                            child: Padding(
+                              padding: EdgeInsets.all(16.0),
+                              child: SizedBox(
+                                height: 24,
+                                child: Text(
+                                  "Use image",
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ),
                             ),
                           ),
                         ],

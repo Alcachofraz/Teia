@@ -10,13 +10,13 @@ class ConfirmUpwardOverlay extends StatefulWidget {
   final dynamic Function()? onCancel;
 
   const ConfirmUpwardOverlay({
-    Key? key,
+    super.key,
     required this.title,
     required this.message,
     required this.buttonText,
     this.onConfirm,
     this.onCancel,
-  }) : super(key: key);
+  });
 
   @override
   State<ConfirmUpwardOverlay> createState() => _ConfirmUpwardOverlayState();
@@ -42,7 +42,7 @@ class _ConfirmUpwardOverlayState extends State<ConfirmUpwardOverlay> {
                     padding: const EdgeInsets.only(right: 4.0),
                     child: RoundedButton(
                       matchParent: true,
-                      text: Text(widget.buttonText),
+                      text: widget.buttonText,
                       onTap: widget.onConfirm,
                     ),
                   ),
@@ -50,7 +50,10 @@ class _ConfirmUpwardOverlayState extends State<ConfirmUpwardOverlay> {
                 Expanded(
                   child: Padding(
                     padding: const EdgeInsets.only(left: 4.0),
-                    child: RoundedButton(matchParent: true, text: const Text('Cancel'), onTap: widget.onCancel),
+                    child: RoundedButton(
+                        matchParent: true,
+                        text: 'Cancel',
+                        onTap: widget.onCancel),
                   ),
                 ),
               ],

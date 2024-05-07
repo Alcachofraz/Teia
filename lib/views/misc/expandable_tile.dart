@@ -11,13 +11,13 @@ class ExpandableTile extends StatefulWidget {
   final void Function(bool)? onExpansionChanged;
 
   const ExpandableTile({
-    Key? key,
+    super.key,
     required this.collapsed,
     required this.expanded,
     this.onExpansionChanged,
     this.duration,
     this.borderRadius,
-  }) : super(key: key);
+  });
 
   @override
   State<ExpandableTile> createState() => _ExpandableTileState();
@@ -38,10 +38,13 @@ class _ExpandableTileState extends State<ExpandableTile> {
         setState(() {
           expanded = !expanded;
           log(expanded.toString());
-          if (widget.onExpansionChanged != null) widget.onExpansionChanged!(expanded);
+          if (widget.onExpansionChanged != null) {
+            widget.onExpansionChanged!(expanded);
+          }
         });
       },
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Expanded(
             child: AnimatedSize(
@@ -50,7 +53,7 @@ class _ExpandableTileState extends State<ExpandableTile> {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.fromLTRB(8.0, 8.0, 8.0, 8.0),
+            padding: const EdgeInsets.fromLTRB(0, 28.0, 8.0, 28.0),
             child: AnimatedRotation(
               turns: expanded ? 0.25 : 0.75,
               duration: widget.duration ?? const Duration(milliseconds: 300),

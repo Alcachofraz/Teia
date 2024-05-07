@@ -7,110 +7,33 @@ import 'package:image/image.dart' as img;
 import 'package:teia/models/stable_diffusion/prompt.dart';
 
 class StableDiffusionService {
-  static const String engineId = 'stable-diffusion-xl-beta-v2-2-2';
-  static const String maskingEngineId = 'stable-inpainting-512-v2-0';
+  static const String engineId = 'stable-diffusion-v1-6';
+  static const String maskingEngineId = 'stable-diffusion-v1-6';
 
-  static const String promptStyler = '''8k, detailed, sharp, vivid, soft glow, artstation, 
-  (Midjourney style) hyperrealism, highly detailed, insanely detailed, intricate, cinematic 
-  lighting, depth of field, god ray, glow, glare, cinematic, dynamic lighting, behance, 
-  sharp focus, concept art, spike painting, illustration, concept art, key visual''';
+  static const String promptStyler = '''detailed, cinematic, high quality''';
 
-  static const String negativePromptStyler = '''bad, ugly, overexposed, low contrast, 
+  static const String negativePromptStyler =
+      '''bad, ugly, overexposed, low contrast, 
   cut off, tiling, watermark, blurry, deformed, weird colors, mutated color, muted color, 
   photo realistic, fused, less detail, lowres, out of frame, worst quality, low quality, 
   normal quality, displaced object''';
 
-  /*
-  [
-    {
-        "description": "Real-ESRGAN_x2plus upscaler model",
-        "id": "esrgan-v1-x2plus",
-        "name": "Real-ESRGAN x2",
-        "type": "PICTURE"
-    },
-    {
-        "description": "Stability-AI Stable Diffusion v1.4",
-        "id": "stable-diffusion-v1",
-        "name": "Stable Diffusion v1.4",
-        "type": "PICTURE"
-    },
-    {
-        "description": "Stability-AI Stable Diffusion v1.5",
-        "id": "stable-diffusion-v1-5",
-        "name": "Stable Diffusion v1.5",
-        "type": "PICTURE"
-    },
-    {
-        "description": "Stability-AI Stable Diffusion v2.0",
-        "id": "stable-diffusion-512-v2-0",
-        "name": "Stable Diffusion v2.0",
-        "type": "PICTURE"
-    },
-    {
-        "description": "Stability-AI Stable Diffusion 768 v2.0",
-        "id": "stable-diffusion-768-v2-0",
-        "name": "Stable Diffusion v2.0-768",
-        "type": "PICTURE"
-    },
-    {
-        "description": "Stability-AI Stable Diffusion Depth v2.0",
-        "id": "stable-diffusion-depth-v2-0",
-        "name": "Stable Diffusion v2.0-depth",
-        "type": "PICTURE"
-    },
-    {
-        "description": "Stability-AI Stable Diffusion v2.1",
-        "id": "stable-diffusion-512-v2-1",
-        "name": "Stable Diffusion v2.1",
-        "type": "PICTURE"
-    },
-    {
-        "description": "Stability-AI Stable Diffusion 768 v2.1",
-        "id": "stable-diffusion-768-v2-1",
-        "name": "Stable Diffusion v2.1-768",
-        "type": "PICTURE"
-    },
-    {
-        "description": "Stability-AI Stable Diffusion XL Beta v2.2.2",
-        "id": "stable-diffusion-xl-beta-v2-2-2",
-        "name": "Stable Diffusion v2.2.2-XL Beta",
-        "type": "PICTURE"
-    },
-    {
-        "description": "Stable Diffusion x4 Latent Upscaler",
-        "id": "stable-diffusion-x4-latent-upscaler",
-        "name": "Stable Diffusion x4 Latent Upscaler",
-        "type": "PICTURE"
-    },
-    {
-        "description": "Stability-AI Stable Inpainting v1.0",
-        "id": "stable-inpainting-v1-0",
-        "name": "Stable Inpainting v1.0",
-        "type": "PICTURE"
-    },
-    {
-        "description": "Stability-AI Stable Inpainting v2.0",
-        "id": "stable-inpainting-512-v2-0",
-        "name": "Stable Inpainting v2.0",
-        "type": "PICTURE"
-    }
-  ]
-  */
-
   /// ERROR
   static List<dynamic> ERRORS = [];
 
-  static Uri apiHost = Uri.https('api.stability.ai', 'v1alpha/generation/$engineId');
+  static Uri apiHost = Uri.https('api.stability.ai', 'v1/generation/$engineId');
   //static Uri apiHost = Uri.https('lovely-clowns-carry-34-87-173-242.loca.lt', 'inator');
 
-  static const String apiKey = 'sk-DY0hd8PcPKrQCRtiGL6bzRObUbOmBjgGHuQJudHTGHdjcCZa';
+  static const String apiKey =
+      'sk-DY0hd8PcPKrQCRtiGL6bzRObUbOmBjgGHuQJudHTGHdjcCZa';
 
   static const int SAMPLES = 1;
 
   static final dio = Dio();
 
   /// Replaces transparent pixels with white pixels and resizes the frame to 512x512.
-  static Uint8List? normalizeMask(Uint8List? toBeMask, {bool resize = true, bool replaceTransparent = true}) {
+  static Uint8List? normalizeMask(Uint8List? toBeMask,
+      {bool resize = true, bool replaceTransparent = true}) {
     if (toBeMask == null) return null;
     img.Image? image = img.decodeImage(toBeMask);
     if (image == null) return null;
@@ -157,7 +80,8 @@ class StableDiffusionService {
     }
   }
 
-  static Future<Response<dynamic>?> inpaint(Map<String, dynamic> body, Uint8List initImage, Uint8List maskImage) async {
+  static Future<Response<dynamic>?> inpaint(Map<String, dynamic> body,
+      Uint8List initImage, Uint8List maskImage) async {
     log('INPAINT -> $maskingEngineId');
     var headers = {
       "Authorization": "Bearer $apiKey",
@@ -167,8 +91,10 @@ class StableDiffusionService {
 
     FormData formData = FormData.fromMap({
       ...{
-        'init_image': MultipartFile.fromBytes(initImage, filename: 'init_image'),
-        'mask_image': MultipartFile.fromBytes(maskImage, filename: 'mask_image'),
+        'init_image':
+            MultipartFile.fromBytes(initImage, filename: 'init_image'),
+        'mask_image':
+            MultipartFile.fromBytes(maskImage, filename: 'mask_image'),
       },
       ...body,
     });
@@ -187,7 +113,8 @@ class StableDiffusionService {
     }
   }
 
-  static Future<Uint8List?> generate(double cfgScale, String clipGuidancePreset, int width, int height, int steps, List<Prompt> prompts, int samples,
+  static Future<Uint8List?> generate(double cfgScale, String clipGuidancePreset,
+      int width, int height, int steps, List<Prompt> prompts, int samples,
       {Uint8List? initImage, Uint8List? maskImage}) async {
     List<Map<String, dynamic>> textPrompts = [];
     for (Prompt prompt in prompts) {

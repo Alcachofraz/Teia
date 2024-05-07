@@ -15,7 +15,7 @@ class AccessLayerService {
         [
           Prompt(
             1,
-            'a xenomorph playing a grand piano inside a library',
+            'a dragon attacking a medieval village from the skies',
           ),
         ],
       ),

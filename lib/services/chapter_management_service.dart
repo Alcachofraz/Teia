@@ -1,3 +1,4 @@
+import 'package:get/get.dart';
 import 'package:teia/models/change.dart';
 import 'package:teia/models/chapter.dart';
 import 'package:teia/models/chapter_graph.dart';
@@ -6,8 +7,8 @@ import 'package:teia/models/page.dart';
 import 'package:teia/services/firebase/firestore_utils.dart';
 import 'package:teia/utils/logs.dart';
 
-class ChapterManagementService {
-  static Stream<Chapter> chapterStream(
+class ChapterManagementService extends GetxService {
+  Stream<Chapter> chapterStream(
     String storyId,
     String chapterId,
   ) =>
@@ -19,7 +20,7 @@ class ChapterManagementService {
           .snapshots()
           .asyncMap((doc) => Chapter.fromMap(doc.data()));
 
-  static Stream<tPage> pageStream(
+  Stream<tPage> pageStream(
     String storyId,
     String chapterId,
     String pageId,
@@ -34,7 +35,7 @@ class ChapterManagementService {
           .snapshots()
           .asyncMap((doc) => tPage.fromMap(doc.data()));
 
-  static Future<void> chapterSet(Chapter chapter) async {
+  Future<void> chapterSet(Chapter chapter) async {
     //Logs.d('Sending $page');
     try {
       FirebaseUtils.firestore
@@ -48,7 +49,7 @@ class ChapterManagementService {
     }
   }
 
-  static Future<void> pageSet(tPage page, String? uid) async {
+  Future<void> pageSet(tPage page, String? uid) async {
     //Logs.d('Sending $page - ${page.id.toString()}');
     try {
       final pageRef = FirebaseUtils.firestore
@@ -69,7 +70,7 @@ class ChapterManagementService {
     }
   }
 
-  static Future<tPage?> pageGet(
+  Future<tPage?> pageGet(
     String storyId,
     String chapterId,
     String pageId,
@@ -90,7 +91,7 @@ class ChapterManagementService {
     }
   }
 
-  static Future<void> pageCreate(tPage page, ChapterGraph newGraph) async {
+  Future<void> pageCreate(tPage page, ChapterGraph newGraph) async {
     FirebaseUtils.firestore.runTransaction((transaction) async {
       transaction.update(
         FirebaseUtils.firestore
@@ -116,7 +117,7 @@ class ChapterManagementService {
     });
   }
 
-  static Stream<List<Note>> commentThreadsStream(
+  Stream<List<Note>> commentThreadsStream(
     String storyId,
     String chapterId,
     String pageId,
@@ -135,7 +136,7 @@ class ChapterManagementService {
                 snapshot.docs.map((map) => Note.fromMap(map.data())).toList(),
           );
 
-  static Stream<Change> streamPageChanges(
+  Stream<Change> streamPageChanges(
     String storyId,
     String chapterId,
     String pageId,
@@ -147,7 +148,7 @@ class ChapterManagementService {
             Change.fromMap(event.snapshot.value as Map<String, dynamic>));
   }
 
-  static Future<void> pushPageChange(
+  Future<void> pushPageChange(
       String storyId, String chapterId, String pageId, Change change,
       {int? cursorPosition}) async {
     await FirebaseUtils.realtime
@@ -172,7 +173,7 @@ class ChapterManagementService {
     }*/
   }
 
-  static Future<List<Change>> getPageChanges(
+  Future<List<Change>> getPageChanges(
       String storyId, String chapterId, String pageId) async {
     return ((await FirebaseUtils.realtime
                 .ref(

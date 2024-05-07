@@ -1,13 +1,13 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart' hide Page;
-import 'package:multi_split_view/multi_split_view.dart';
+import 'package:get/get.dart';
 import 'package:sorted_list/sorted_list.dart';
 import 'package:teia/models/chapter.dart';
 import 'package:teia/models/letter.dart';
 import 'package:teia/models/page.dart';
-import 'package:teia/screens/chapter_editor_screen/chapter_graph_view.dart';
-import 'package:teia/screens/chapter_editor_screen/widgets/page_editor.dart';
+import 'package:teia/screens/chapter_editor/chapter_graph_view.dart';
+import 'package:teia/screens/chapter_editor/widgets/page_editor.dart';
 import 'package:teia/services/authentication_service.dart';
 import 'package:teia/services/chapter_management_service.dart';
 import 'package:teia/utils/loading.dart';
@@ -17,15 +17,13 @@ import 'package:teia/views/misc/tile.dart';
 
 class ChapterEditorScreen extends StatefulWidget {
   final bool picking;
-  final String chapterId;
-  final String storyId;
+  final String chapterId = Get.parameters['chapterId']!;
+  final String storyId = Get.parameters['storyId']!;
 
-  const ChapterEditorScreen({
-    Key? key,
-    required this.storyId,
-    required this.chapterId,
+  ChapterEditorScreen({
+    super.key,
     this.picking = false,
-  }) : super(key: key);
+  });
 
   @override
   State<ChapterEditorScreen> createState() => _ChapterEditorScreenState();
@@ -39,26 +37,18 @@ class _ChapterEditorScreenState extends State<ChapterEditorScreen> {
   int? selectedPageId;
   bool showingLoosePages = false;
   final FocusNode pageEditorFocusNode = FocusNode();
-
-  final MultiSplitViewController _loosePagesMultiSplitViewController =
-      MultiSplitViewController(
-    areas: [
-      Area(
-          minimalWeight: 1 - Utils.loosePagesMenuMaximumHeight,
-          weight: 1 - Utils.loosePagesMenuDefaultHeight),
-      Area(
-          minimalWeight: Utils.loosePagesMenuMinimumHeight,
-          weight: Utils.loosePagesMenuDefaultHeight),
-    ],
-  );
+  final ChapterManagementService chapterManagementService =
+      Get.put(ChapterManagementService());
+  final AuthenticationService authenticationService =
+      Get.put(AuthenticationService());
 
   @override
   void initState() {
     textEditorWeight = Utils.editorWeight;
     loosePagesMenuHeight = Utils.loosePagesMenuDefaultHeight;
-    _chapterSubscription =
-        ChapterManagementService.chapterStream(widget.storyId, widget.chapterId)
-            .listen((chapter) => setState(() => _chapter = chapter));
+    _chapterSubscription = chapterManagementService
+        .chapterStream(widget.storyId, widget.chapterId)
+        .listen((chapter) => setState(() => _chapter = chapter));
     super.initState();
   }
 
@@ -69,11 +59,11 @@ class _ChapterEditorScreenState extends State<ChapterEditorScreen> {
   }
 
   Future<void> _pushChapterToRemote(Chapter chapter) async {
-    await ChapterManagementService.chapterSet(chapter);
+    await chapterManagementService.chapterSet(chapter);
   }
 
   Future<void> _pushPageToRemote(tPage page) async {
-    await ChapterManagementService.pageSet(page, AuthenticationService.uid);
+    await chapterManagementService.pageSet(page, authenticationService.uid);
   }
 
   void _clickPage(pageId) {
@@ -105,10 +95,10 @@ class _ChapterEditorScreenState extends State<ChapterEditorScreen> {
   }
 
   void _createPage(pageId) {
-    int newId = _chapter!.addPage(pageId, uid: AuthenticationService.uid);
+    int newId = _chapter!.addPage(pageId, uid: authenticationService.uid);
     // Update local
     setState(() {});
-    ChapterManagementService.pageCreate(
+    chapterManagementService.pageCreate(
       tPage(
         newId,
         int.parse(widget.chapterId),

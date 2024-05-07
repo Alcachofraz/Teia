@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:teia/screens/image_editor_screen/widgets/drawn_line.dart';
+import 'package:teia/screens/image_editor/widgets/drawn_line.dart';
 
 class Sketcher extends CustomPainter {
   final List<DrawnLine?> lines;
