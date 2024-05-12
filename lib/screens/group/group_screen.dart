@@ -19,12 +19,12 @@ class GroupScreen extends GetView<GroupController> {
           children: [
             Obx(
               () => controller.group.value != null &&
-                      controller.group.value!.storyId != null
+                      controller.group.value!.story != null
                   ? Tile(
                       color: Colors.black,
                       onTap: () {
                         Get.toNamed('/chapter_editor', parameters: {
-                          'storyId': controller.group.value!.storyId!,
+                          'storyId': controller.group.value!.story!.id,
                           'chapterId': '1',
                         });
                       },

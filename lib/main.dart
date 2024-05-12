@@ -69,7 +69,7 @@ class Teia extends StatelessWidget {
       ],
       theme: ThemeData(
         primarySwatch: swatch(Colors.red[300]!),
-        textTheme: GoogleFonts.sourceSans3TextTheme(textTheme),
+        textTheme: GoogleFonts.montserratTextTheme(textTheme),
       ),
       home: const LandingScreen(),
     );

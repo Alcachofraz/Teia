@@ -1,18 +1,23 @@
+import 'package:teia/models/story.dart';
+
 class Group {
   final String name;
-  final String? storyId;
+  final Story? story;
   final List<String> users;
+  final Map<String, int> roles;
 
   Group({
     required this.name,
     required this.users,
-    this.storyId,
+    required this.roles,
+    this.story,
   });
 
-  factory Group.fromMap(Map<String, dynamic> map) {
+  factory Group.fromMap(Map<String, dynamic> map, Story? story) {
     return Group(
       name: map['name'],
-      storyId: map['story'],
+      story: story,
+      roles: Map<String, int>.from(map['roles']),
       users: (map['users'] as List).cast<String>(),
     );
   }
@@ -20,7 +25,8 @@ class Group {
   Map<String, dynamic> toMap() {
     return {
       'name': name,
-      'story': storyId,
+      'story': story,
+      'roles': roles,
       'users': users,
     };
   }

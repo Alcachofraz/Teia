@@ -3,37 +3,42 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+enum BackroundOrientation { right, left }
+
 class ArtService extends GetxService {
   static ArtService get value => Get.put(ArtService());
 
   static final r = Random();
 
   /// Count of the avatars in the assets folder.
-  static const int count = 25;
+  static const int avatarCount = 25;
+
+  /// Count of the backgrounds in the assets folder (each orientation).
+  static const int backgroundCount = 2;
 
   /// Get the avatar asset path by indez, starting at 0.
-  String asset(int index) {
+  String assetPath(int index) {
     return 'assets/images/avatars/$index.png';
   }
 
   /// Randomly select an index.
-  int random() {
-    return r.nextInt(count);
+  int randomAvatarIndex() {
+    return r.nextInt(avatarCount);
   }
 
-  /// Randomly select two indexes.
-  List<int> randomPair() {
-    final first = r.nextInt(count);
-    int second;
-    do {
-      second = r.nextInt(count);
-    } while (first == second);
-    return [first, second];
+  /// List of avatar asset paths.
+  List<String> avatarPaths() {
+    return List.generate(avatarCount, (index) => assetPath(index));
+  }
+
+  /// Randomly select two background asset paths.
+  String randomBackgroundPath(BackroundOrientation orietantion) {
+    return 'assets/images/background/${orietantion.name}/${r.nextInt(backgroundCount)}.png';
   }
 
   /// Random pastel color.
   Color pastel() {
-    return HSLColor.fromAHSL(1.0, r.nextDouble() * 360, 0.5, 0.9).toColor();
+    return HSLColor.fromAHSL(1.0, r.nextDouble() * 360, 0.4, 0.5).toColor();
   }
 
   /// Darken a given color.

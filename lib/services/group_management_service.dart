@@ -2,6 +2,7 @@ import 'package:get/get.dart';
 import 'package:teia/models/group.dart';
 import 'package:teia/services/authentication_service.dart';
 import 'package:teia/services/firebase/firestore_utils.dart';
+import 'package:teia/services/story_management_service.dart';
 
 class GroupManagementService extends GetxService {
   AuthenticationService authenticationService =
@@ -13,7 +14,13 @@ class GroupManagementService extends GetxService {
         .collection('groups')
         .where('name', isEqualTo: name)
         .get();
-    return Group.fromMap(query.docs.first.data());
+    Map<String, dynamic> data = query.docs.first.data();
+    return Group.fromMap(
+      data,
+      await Get.put(StoryManagementService()).storyGet(
+        data['story'],
+      ),
+    );
   }
 
   // Get joined groups
@@ -22,7 +29,19 @@ class GroupManagementService extends GetxService {
         .collection('groups')
         .where('users', arrayContains: authenticationService.uid)
         .get();
-    return query.docs.map((e) => Group.fromMap(e.data())).toList();
+    List<Group> groups = [];
+    for (final doc in query.docs) {
+      Map<String, dynamic> data = doc.data();
+      groups.add(
+        Group.fromMap(
+          data,
+          await Get.put(StoryManagementService()).storyGet(
+            data['storyId'],
+          ),
+        ),
+      );
+    }
+    return groups;
   }
 
   // Create new group
@@ -31,6 +50,7 @@ class GroupManagementService extends GetxService {
       'name': name,
       'password': password,
       'story': null,
+      'roles': {},
       'users': authenticationService.uid == null
           ? []
           : [

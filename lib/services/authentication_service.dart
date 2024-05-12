@@ -13,6 +13,8 @@ class AuthResponse {
 class AuthenticationService extends GetxService {
   String? uid;
 
+  static AuthenticationService get value => Get.put(AuthenticationService());
+
   Stream<bool> authStateChanges =
       FirebaseUtils.auth.authStateChanges().map((user) {
     return user != null;

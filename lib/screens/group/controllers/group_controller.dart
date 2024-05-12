@@ -13,6 +13,7 @@ class GroupController extends GetxController {
     String groupName = Get.parameters['group'] ?? '';
     if (groupName.isNotEmpty) {
       group.value = await groupManagementService.groupGet(groupName);
+      print(group.value!.story?.title ?? 'No story');
     }
 
     super.onInit();

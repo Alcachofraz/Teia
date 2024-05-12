@@ -13,58 +13,89 @@ class HomeScreen extends GetView<HomeController> {
   @override
   Widget build(BuildContext context) {
     Get.put(HomeController());
+    final screenSize = MediaQuery.of(context).size;
     return ScreenWrapper(
       body: SizedBox(
         width: double.infinity,
-        child: Column(
-          mainAxisSize: MainAxisSize.max,
-          mainAxisAlignment: MainAxisAlignment.center,
+        child: Stack(
           children: [
-            Padding(
-              padding: const EdgeInsets.all(20),
-              child: Row(
-                children: [
-                  Image.asset('assets/images/logo.png', width: 100),
-                  const Spacer(),
-                  RoundedButton(
-                    color: Colors.red,
-                    onTap: () {
-                      Get.put(AuthController()).logout();
-                    },
-                    text: 'Sign out',
+            Column(
+              mainAxisSize: MainAxisSize.max,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: Row(
+                    children: [
+                      Image.asset(
+                        'assets/images/logo.png',
+                        width: 300,
+                      ),
+                      const Spacer(),
+                      RoundedButton(
+                        color: Colors.red,
+                        onTap: () {
+                          Get.put(AuthController()).logout();
+                        },
+                        text: 'Sign out',
+                      ),
+                    ],
                   ),
-                ],
-              ),
-            ),
-            Expanded(
-              child: Obx(
-                () => Wrap(
-                  alignment: WrapAlignment.center,
-                  runAlignment: WrapAlignment.center,
-                  crossAxisAlignment: WrapCrossAlignment.center,
-                  spacing: 20,
-                  runSpacing: 20,
-                  children: [
-                    AdventureTile(
-                      onTap: () {
-                        launchJoinAdventurePopup(context).then((_) {
-                          controller.refreshJoinedGroups();
-                        });
-                      },
-                    ),
-                    for (final group in controller.joinedGroups)
+                ),
+                Obx(
+                  () => Wrap(
+                    alignment: WrapAlignment.center,
+                    runAlignment: WrapAlignment.center,
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    spacing: 20,
+                    runSpacing: 20,
+                    children: [
                       AdventureTile(
                         onTap: () {
-                          Get.toNamed('/group', parameters: {
-                            'group': group.name,
+                          launchJoinAdventurePopup(context).then((_) {
+                            controller.refreshJoinedGroups();
                           });
                         },
-                        adventure: group,
                       ),
-                  ],
+                      for (final group in controller.joinedGroups)
+                        AdventureTile(
+                          onTap: () {
+                            Get.toNamed('/group', parameters: {
+                              'group': group.name,
+                            });
+                          },
+                          adventure: group,
+                        ),
+                    ],
+                  ),
                 ),
-              ),
+                const Spacer(),
+              ],
             ),
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(40, 16, 40, 0),
+                child: screenSize.width < (screenSize.height)
+                    ? Image.asset(
+                        controller.backgroundLeft,
+                        width: screenSize.width * 0.25,
+                      )
+                    : Row(
+                        children: [
+                          Image.asset(
+                            controller.backgroundLeft,
+                            width: screenSize.width * 0.25,
+                          ),
+                          const Spacer(),
+                          Image.asset(
+                            controller.backgroundRight,
+                            width: screenSize.width * 0.25,
+                          ),
+                        ],
+                      ),
+              ),
+            )
           ],
         ),
       ),
