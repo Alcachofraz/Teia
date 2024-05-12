@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:teia/services/group_management_service.dart';
 
-launchJoinAdventurePopup(BuildContext context) {
+launchCreateAdventurePopup(BuildContext context) {
   TextEditingController adventureNameController = TextEditingController();
   TextEditingController adventurePasswordController = TextEditingController();
   GroupManagementService groupManagementService =
@@ -15,7 +15,8 @@ launchJoinAdventurePopup(BuildContext context) {
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text('Enter the name and password of the adventure:'),
+            const Text(
+                'Enter the name and password of the adventure you want to join:'),
             const SizedBox(height: 10),
             TextField(
               controller: adventureNameController,
@@ -44,7 +45,7 @@ launchJoinAdventurePopup(BuildContext context) {
           TextButton(
             onPressed: () {
               groupManagementService
-                  .groupJoin(
+                  .groupCreate(
                     adventureNameController.text,
                     adventurePasswordController.text,
                   )

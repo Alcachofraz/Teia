@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:teia/screens/auth/controller/auth_controller.dart';
 import 'package:teia/screens/home/controllers/home_controller.dart';
-import 'package:teia/screens/home/popups/create_adventure/create_adventure.dart';
+import 'package:teia/screens/home/popups/join_adventure/join_adventure.dart';
 import 'package:teia/screens/home/widgets/adventure_tile.dart';
 import 'package:teia/views/misc/rounded_button.dart';
 import 'package:teia/views/misc/screen_wrapper.dart';
@@ -20,33 +20,49 @@ class HomeScreen extends GetView<HomeController> {
           mainAxisSize: MainAxisSize.max,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            RoundedButton(
-              color: Colors.red,
-              onTap: () {
-                Get.put(AuthController()).logout();
-              },
-              text: 'Sign out',
-            ),
-            Obx(
-              () => Wrap(
+            Padding(
+              padding: const EdgeInsets.all(20),
+              child: Row(
                 children: [
-                  AdventureTile(
+                  Image.asset('assets/images/logo.png', width: 100),
+                  const Spacer(),
+                  RoundedButton(
+                    color: Colors.red,
                     onTap: () {
-                      launchJoinAdventurePopup(context).then((_) {
-                        controller.refreshJoinedGroups();
-                      });
+                      Get.put(AuthController()).logout();
                     },
+                    text: 'Sign out',
                   ),
-                  for (final group in controller.joinedGroups)
+                ],
+              ),
+            ),
+            Expanded(
+              child: Obx(
+                () => Wrap(
+                  alignment: WrapAlignment.center,
+                  runAlignment: WrapAlignment.center,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  spacing: 20,
+                  runSpacing: 20,
+                  children: [
                     AdventureTile(
                       onTap: () {
-                        Get.toNamed('/group', parameters: {
-                          'group': group.name,
+                        launchJoinAdventurePopup(context).then((_) {
+                          controller.refreshJoinedGroups();
                         });
                       },
-                      adventure: group,
                     ),
-                ],
+                    for (final group in controller.joinedGroups)
+                      AdventureTile(
+                        onTap: () {
+                          Get.toNamed('/group', parameters: {
+                            'group': group.name,
+                          });
+                        },
+                        adventure: group,
+                      ),
+                  ],
+                ),
               ),
             ),
           ],
