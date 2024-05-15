@@ -19,6 +19,30 @@ class HomeScreen extends GetView<HomeController> {
         width: double.infinity,
         child: Stack(
           children: [
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(40, 16, 40, 0),
+                child: screenSize.width < (screenSize.height)
+                    ? Image.asset(
+                        controller.backgroundLeft,
+                        width: screenSize.width * 0.25,
+                      )
+                    : Row(
+                        children: [
+                          Image.asset(
+                            controller.backgroundLeft,
+                            width: screenSize.width * 0.25,
+                          ),
+                          const Spacer(),
+                          Image.asset(
+                            controller.backgroundRight,
+                            width: screenSize.width * 0.25,
+                          ),
+                        ],
+                      ),
+              ),
+            ),
             Column(
               mainAxisSize: MainAxisSize.max,
               mainAxisAlignment: MainAxisAlignment.center,
@@ -72,30 +96,6 @@ class HomeScreen extends GetView<HomeController> {
                 const Spacer(),
               ],
             ),
-            Align(
-              alignment: Alignment.bottomCenter,
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(40, 16, 40, 0),
-                child: screenSize.width < (screenSize.height)
-                    ? Image.asset(
-                        controller.backgroundLeft,
-                        width: screenSize.width * 0.25,
-                      )
-                    : Row(
-                        children: [
-                          Image.asset(
-                            controller.backgroundLeft,
-                            width: screenSize.width * 0.25,
-                          ),
-                          const Spacer(),
-                          Image.asset(
-                            controller.backgroundRight,
-                            width: screenSize.width * 0.25,
-                          ),
-                        ],
-                      ),
-              ),
-            )
           ],
         ),
       ),

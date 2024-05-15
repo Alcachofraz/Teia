@@ -8,8 +8,15 @@ class StoryManagementService extends GetxService {
     if (storyId == null) {
       return null;
     }
-    final query =
-        await FirebaseUtils.firestore.collection('stories').doc(storyId).get();
-    return Story.fromMap(query.data()!);
+    try {
+      final query = await FirebaseUtils.firestore
+          .collection('stories')
+          .doc(storyId)
+          .get();
+      return Story.fromMap(query.data()!);
+    } catch (e) {
+      print(e);
+      return null;
+    }
   }
 }
