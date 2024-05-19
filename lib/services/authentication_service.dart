@@ -14,6 +14,8 @@ class AuthenticationService extends GetxService {
   String? uid;
 
   static AuthenticationService get value => Get.put(AuthenticationService());
+  final UserManagementService userManagementService =
+      Get.put(UserManagementService());
 
   Stream<bool> authStateChanges =
       FirebaseUtils.auth.authStateChanges().map((user) {
@@ -49,7 +51,7 @@ class AuthenticationService extends GetxService {
             return AuthResponse('An error occurred', false);
           }
           uid = userCredential.user!.uid;
-          await UserManagementService.createUser(userCredential.user!);
+          await userManagementService.createUser(userCredential.user!);
           return AuthResponse('Success', true);
         }
       });

@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:teia/screens/group/controllers/group_controller.dart';
+import 'package:teia/screens/group/widgets/story_box.dart';
+import 'package:teia/screens/group/widgets/users_box.dart';
 import 'package:teia/views/misc/screen_wrapper.dart';
-import 'package:teia/views/misc/tile.dart';
 
 class GroupScreen extends GetView<GroupController> {
   const GroupScreen({super.key});
@@ -13,32 +15,77 @@ class GroupScreen extends GetView<GroupController> {
     return ScreenWrapper(
       body: SizedBox(
         width: double.infinity,
-        child: Column(
-          mainAxisSize: MainAxisSize.max,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Obx(
-              () => controller.group.value != null &&
-                      controller.group.value!.story != null
-                  ? Tile(
-                      color: Colors.black,
-                      onTap: () {
-                        Get.toNamed('/chapter_editor', parameters: {
-                          'storyId': controller.group.value!.story!.id,
-                          'chapterId': '1',
-                        });
-                      },
-                      child: const Padding(
-                        padding: EdgeInsets.all(8.0),
+        child: Obx(
+          () => controller.loading.value
+              ? const Center(
+                  child: CircularProgressIndicator(),
+                )
+              : Column(
+                  mainAxisSize: MainAxisSize.max,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    /*Obx(
+                () => controller.group.value != null &&
+                        controller.group.value!.story != null
+                    ? Tile(
+                        color: Colors.black,
+                        onTap: () {
+                          Get.toNamed('/chapter_editor', parameters: {
+                            'storyId': controller.group.value!.story!.id,
+                            'chapterId': '1',
+                          });
+                        },
+                        child: const Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: Text(
+                            'Chapter Editor',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                        ),
+                      )
+                    : Container(),
+              ),*/
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(
+                        24,
+                        32,
+                        24,
+                        0,
+                      ),
+                      child: Align(
+                        alignment: Alignment.centerLeft,
                         child: Text(
-                          'Chapter Editor',
-                          style: TextStyle(color: Colors.white),
+                          controller.group.value!.name,
+                          style: GoogleFonts.lilitaOne(
+                            fontSize: 24.0,
+                            color: Colors.brown,
+                          ),
                         ),
                       ),
+                    ),
+                    Expanded(
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Padding(
+                              padding: const EdgeInsets.all(24),
+                              child: UsersBox(
+                                color: controller.userBoxColor,
+                                info: controller.userTileInfo,
+                              ),
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(0, 24, 24, 24),
+                            child: StoryBox(
+                              color: controller.storyBoxColor,
+                            ),
+                          ),
+                        ],
+                      ),
                     )
-                  : Container(),
-            ),
-          ],
+                  ],
+                ),
         ),
       ),
     );

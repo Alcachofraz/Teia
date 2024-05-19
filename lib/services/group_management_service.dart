@@ -46,17 +46,13 @@ class GroupManagementService extends GetxService {
 
   // Create new group
   Future<void> groupCreate(String name, String password) async {
-    await FirebaseUtils.firestore.collection('groups').add({
-      'name': name,
-      'password': password,
-      'story': null,
-      'roles': {},
-      'users': authenticationService.uid == null
-          ? []
-          : [
-              authenticationService.uid,
-            ],
-    });
+    await FirebaseUtils.firestore.collection('groups').add(
+          Group.init(
+            name,
+            password,
+            authenticationService.uid,
+          ).toMap(),
+        );
   }
 
   // Check if group exists

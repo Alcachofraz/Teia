@@ -1,12 +1,13 @@
 import 'package:firebase_auth/firebase_auth.dart' as auth;
+import 'package:get/get.dart';
 import 'package:teia/models/user.dart';
 import 'package:teia/services/firebase/firestore_utils.dart';
 
-class UserManagementService {
+class UserManagementService extends GetxService {
   /// Try to create user, in case it doesn't exists. If
   /// a user with the same uid already exists, this function
   /// does nothing, and returns false.
-  static Future<void> createUser(auth.User user) async {
+  Future<void> createUser(auth.User user) async {
     await FirebaseUtils.firestore.collection('user').doc(user.uid).set(
           User(
             user.uid,
@@ -18,15 +19,22 @@ class UserManagementService {
   }
 
   /// Update photo url for user [uid].
-  static Future<void> userSetPhotoUrl(String uid, String url) async {
+  Future<void> userSetPhotoUrl(String uid, String url) async {
     await FirebaseUtils.firestore.collection('user').doc(uid).set({'url': url});
   }
 
   /// Update name for user [uid].
-  static Future<void> userSetName(String uid, String name) async {
+  Future<void> userSetName(String uid, String name) async {
     await FirebaseUtils.firestore
         .collection('user')
         .doc(uid)
         .set({'name': name});
+  }
+
+  /// Get user by [uid].
+  Future<User> userGet(String uid) async {
+    return User.fromMap(
+      (await FirebaseUtils.firestore.collection('user').doc(uid).get()).data()!,
+    );
   }
 }

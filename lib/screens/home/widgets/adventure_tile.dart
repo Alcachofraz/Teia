@@ -1,8 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
-import 'package:get/get.dart';
 import 'package:teia/models/group.dart';
+import 'package:teia/models/user_state.dart';
 import 'package:teia/services/art_service.dart';
 import 'package:teia/services/authentication_service.dart';
 
@@ -30,8 +30,9 @@ class _AdventureTileState extends State<AdventureTile> {
   }
 
   String getRole(Group adventure) {
-    return widget.adventure!.roles.containsKey(AuthenticationService.value.uid)
-        ? 'You are a ${widget.adventure!.roles[AuthenticationService.value.uid] == 0 ? 'Narrator' : 'Reader'}'
+    return widget.adventure!.userState
+            .containsKey(AuthenticationService.value.uid)
+        ? 'You are a ${widget.adventure!.userState[AuthenticationService.value.uid]!.role == Role.writer ? 'Narrator' : 'Reader'}'
         : 'Choose your role now!';
   }
 
