@@ -57,7 +57,7 @@ class GroupScreen extends GetView<GroupController> {
                         child: Text(
                           controller.group.value!.name,
                           style: GoogleFonts.lilitaOne(
-                            fontSize: 24.0,
+                            fontSize: 32.0,
                             color: Colors.brown,
                           ),
                         ),
@@ -67,6 +67,7 @@ class GroupScreen extends GetView<GroupController> {
                       child: Row(
                         children: [
                           Expanded(
+                            flex: 4,
                             child: Padding(
                               padding: const EdgeInsets.all(24),
                               child: UsersBox(
@@ -75,10 +76,12 @@ class GroupScreen extends GetView<GroupController> {
                               ),
                             ),
                           ),
-                          Padding(
-                            padding: const EdgeInsets.fromLTRB(0, 24, 24, 24),
-                            child: StoryBox(
-                              color: controller.storyBoxColor,
+                          Expanded(
+                            child: Padding(
+                              padding: const EdgeInsets.fromLTRB(0, 24, 24, 24),
+                              child: StoryBox(
+                                color: controller.storyBoxColor,
+                              ),
                             ),
                           ),
                         ],

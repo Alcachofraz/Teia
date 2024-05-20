@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gap/gap.dart';
 
 class StoryBox extends StatelessWidget {
   const StoryBox({
@@ -10,20 +11,34 @@ class StoryBox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: Colors.white,
-      elevation: 2,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(8),
-        side: BorderSide(
-          color: color,
-          width: 1.5,
+    return Column(
+      children: [
+        const Align(
+          alignment: Alignment.centerLeft,
+          child: Text(
+            'Story',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
         ),
-      ),
-      child: const SizedBox(
-        width: 300,
-        height: double.infinity,
-      ),
+        const Gap(4),
+        Expanded(
+          child: Material(
+            color: Colors.white,
+            elevation: 2,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+              side: BorderSide(
+                color: color,
+                width: 1.5,
+              ),
+            ),
+            child: const SizedBox.expand(),
+          ),
+        ),
+      ],
     );
   }
 }
