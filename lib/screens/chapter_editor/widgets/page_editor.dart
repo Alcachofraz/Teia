@@ -78,9 +78,6 @@ class _PageEditorState extends State<PageEditor> {
   final ChapterManagementService chapterManagementService =
       Get.put(ChapterManagementService());
 
-  final AuthenticationService authenticationService =
-      Get.put(AuthenticationService());
-
   final StorageService storageService = Get.put(StorageService());
 
   @override
@@ -208,7 +205,7 @@ class _PageEditorState extends State<PageEditor> {
   }
 
   void _onRemoteChange(Change change) {
-    if (change.uid == authenticationService.uid &&
+    if (change.uid == AuthenticationService.value.user?.uid &&
         change.timestamp > _sessionStartTimestamp) {
       return;
     }
@@ -245,7 +242,7 @@ class _PageEditorState extends State<PageEditor> {
       Change(
         id,
         ChangeType.insert,
-        authenticationService.uid ?? '-1',
+        AuthenticationService.value.user?.uid ?? '-1',
         DateTime.now().millisecondsSinceEpoch,
         letter: text,
       ),
@@ -264,7 +261,7 @@ class _PageEditorState extends State<PageEditor> {
       Change(
         id,
         ChangeType.delete,
-        authenticationService.uid ?? '-1',
+        AuthenticationService.value.user?.uid ?? '-1',
         DateTime.now().millisecondsSinceEpoch,
         length: length,
       ),
@@ -283,7 +280,7 @@ class _PageEditorState extends State<PageEditor> {
       Change(
         id,
         ChangeType.format,
-        authenticationService.uid ?? '-1',
+        AuthenticationService.value.user?.uid ?? '-1',
         DateTime.now().millisecondsSinceEpoch,
         length: length,
         snippet: snippet,

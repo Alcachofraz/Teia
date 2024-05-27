@@ -1,5 +1,6 @@
 import 'package:teia/models/story.dart';
 import 'package:teia/models/user_state.dart';
+import 'package:teia/services/authentication_service.dart';
 
 enum GroupState {
   idle,
@@ -31,7 +32,17 @@ class Group {
       password: password,
       story: null,
       state: GroupState.idle,
-      userState: {},
+      userState: {
+        if (uid != null)
+          uid: UserState(
+            role: Role.reader,
+            ready: false,
+            avatar: 0,
+            name: AuthenticationService.value.user!.name,
+            uid: uid,
+            admin: true,
+          ),
+      },
       users: uid == null ? [] : [uid],
     );
   }
@@ -43,7 +54,7 @@ class Group {
       story: story,
       state: GroupState.values[map['state']],
       userState: (map['userState'] as Map<String, dynamic>).map(
-        (key, value) => MapEntry(key, UserState.fromMap(value)),
+        (key, value) => MapEntry(key, UserState.fromMap(value, key)),
       ),
       users: (map['users'] as List).cast<String>(),
     );

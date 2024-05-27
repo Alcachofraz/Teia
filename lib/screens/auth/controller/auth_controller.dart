@@ -5,33 +5,33 @@ import 'package:teia/services/authentication_service.dart';
 class AuthController {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-  final AuthenticationService authenticationService = AuthenticationService();
   final FocusNode emailFocus = FocusNode();
   final FocusNode passwordFocus = FocusNode();
   RxString error = ''.obs;
 
   Future<void> register() async {
-    AuthResponse res = await authenticationService.register(
-        emailController.text, passwordController.text);
+    AuthResponse res = await AuthenticationService.value
+        .register(emailController.text, passwordController.text);
     if (!res.success) {
       error.value = res.message;
     }
   }
 
   Future<void> logIn() async {
-    AuthResponse res = await authenticationService.login(
-        emailController.text, passwordController.text);
+    AuthResponse res = await AuthenticationService.value
+        .login(emailController.text, passwordController.text);
     if (!res.success) {
       error.value = res.message;
     }
   }
 
   Future<void> sendPasswordResetEmail() async {
-    await authenticationService.sendPasswordResetEmail(emailController.text);
+    await AuthenticationService.value
+        .sendPasswordResetEmail(emailController.text);
   }
 
   Future<void> logout() async {
-    await authenticationService.logout();
+    await AuthenticationService.value.logout();
   }
 
   void clearError() {

@@ -1,90 +1,122 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:gap/gap.dart';
-import 'package:teia/screens/group/models/user_tile_info.dart';
+import 'package:teia/models/user_state.dart';
+import 'package:teia/screens/group/models/user_info.dart';
 import 'package:teia/services/art_service.dart';
+import 'package:teia/services/authentication_service.dart';
 
 class UsersBox extends StatelessWidget {
   const UsersBox({
     super.key,
     required this.info,
     required this.color,
+    this.loadingRole = false,
+    this.onRoleChanged,
+    this.onTapEditUser,
   });
 
-  final List<UserTileInfo> info;
+  final List<UserInfo> info;
   final Color color;
+  final bool loadingRole;
+  final Function(Role?)? onRoleChanged;
+  final Function()? onTapEditUser;
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        const Align(
-          alignment: Alignment.centerLeft,
-          child: Text(
-            'Critters',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ),
-        const Gap(4),
-        Expanded(
-          child: Material(
-            color: Colors.white,
-            elevation: 2,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
-              side: BorderSide(
-                color: color,
-                width: 1.5,
+    return SizedBox(
+      height: 500,
+      child: Column(
+        children: [
+          const Align(
+            alignment: Alignment.centerLeft,
+            child: Text(
+              'Critters',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
               ),
             ),
-            child: Padding(
-              padding: const EdgeInsets.all(15),
-              child: Column(
-                children: [
-                  for (final UserTileInfo userInfo in info)
-                    Material(
-                      color: Colors.white,
-                      elevation: 2,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        side: BorderSide(
-                          color: userInfo.color,
+          ),
+          const Gap(4),
+          Expanded(
+            child: Material(
+              color: Colors.white,
+              elevation: 2,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+                side: BorderSide(
+                  color: color,
+                  width: 1.5,
+                ),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(15),
+                child: Column(
+                  children: [
+                    for (final UserInfo userInfo in info)
+                      Material(
+                        color: Colors.white,
+                        elevation: 2,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          side: BorderSide(
+                            color: userInfo.color,
+                          ),
                         ),
-                      ),
-                      child: InkWell(
-                        onTap: () {},
-                        borderRadius: BorderRadius.circular(8),
-                        child: Padding(
-                          padding: const EdgeInsets.all(8),
-                          child: Row(
-                            children: [
-                              ClipRRect(
-                                borderRadius: BorderRadius.circular(8),
-                                child: Image.asset(
-                                  ArtService.value.assetPath(
-                                    userInfo.avatar,
+                        child: InkWell(
+                          onTap: userInfo.state.uid ==
+                                  AuthenticationService.value.user!.uid
+                              ? onTapEditUser
+                              : null,
+                          borderRadius: BorderRadius.circular(8),
+                          child: Padding(
+                            padding: const EdgeInsets.all(8),
+                            child: Row(
+                              children: [
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(8),
+                                  child: Image.asset(
+                                    ArtService.value.assetPath(
+                                      userInfo.state.avatar,
+                                    ),
+                                    height: 48,
                                   ),
-                                  height: 48,
                                 ),
-                              ),
-                              const Gap(12),
-                              Expanded(
-                                child: Text(userInfo.user.name),
-                              ),
-                            ],
+                                const Gap(12),
+                                Expanded(
+                                  child: Text(
+                                    userInfo.state.name,
+                                    textAlign: TextAlign.left,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                                const Spacer(),
+                                Expanded(
+                                  child: Text(
+                                    userInfo.state.role
+                                        .toString()
+                                        .toUpperCase(),
+                                    textAlign: TextAlign.right,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                      color: userInfo.color,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                                const Gap(12),
+                              ],
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

@@ -39,8 +39,6 @@ class _ChapterEditorScreenState extends State<ChapterEditorScreen> {
   final FocusNode pageEditorFocusNode = FocusNode();
   final ChapterManagementService chapterManagementService =
       Get.put(ChapterManagementService());
-  final AuthenticationService authenticationService =
-      Get.put(AuthenticationService());
 
   @override
   void initState() {
@@ -63,7 +61,8 @@ class _ChapterEditorScreenState extends State<ChapterEditorScreen> {
   }
 
   Future<void> _pushPageToRemote(tPage page) async {
-    await chapterManagementService.pageSet(page, authenticationService.uid);
+    await chapterManagementService.pageSet(
+        page, AuthenticationService.value.user?.uid);
   }
 
   void _clickPage(pageId) {
@@ -95,7 +94,8 @@ class _ChapterEditorScreenState extends State<ChapterEditorScreen> {
   }
 
   void _createPage(pageId) {
-    int newId = _chapter!.addPage(pageId, uid: authenticationService.uid);
+    int newId =
+        _chapter!.addPage(pageId, uid: AuthenticationService.value.user?.uid);
     // Update local
     setState(() {});
     chapterManagementService.pageCreate(

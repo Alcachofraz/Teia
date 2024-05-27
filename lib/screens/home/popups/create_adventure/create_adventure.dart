@@ -32,6 +32,7 @@ launchCreateAdventurePopup(BuildContext context) {
                 border: OutlineInputBorder(),
                 labelText: 'Adventure password',
               ),
+              obscureText: true,
             ),
           ],
         ),

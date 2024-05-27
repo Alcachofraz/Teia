@@ -31,6 +31,11 @@ class ArtService extends GetxService {
     return List.generate(avatarCount, (index) => assetPath(index));
   }
 
+  /// List of avatar indexes.
+  List<int> avatarIndexes() {
+    return List.generate(avatarCount, (index) => index);
+  }
+
   /// Randomly select two background asset paths.
   String randomBackgroundPath(BackroundOrientation orietantion) {
     return 'assets/images/background/${orietantion.name}/${r.nextInt(backgroundCount)}.png';

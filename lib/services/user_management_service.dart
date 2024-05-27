@@ -4,6 +4,8 @@ import 'package:teia/models/user.dart';
 import 'package:teia/services/firebase/firestore_utils.dart';
 
 class UserManagementService extends GetxService {
+  static UserManagementService get value => Get.put(UserManagementService());
+
   /// Try to create user, in case it doesn't exists. If
   /// a user with the same uid already exists, this function
   /// does nothing, and returns false.
@@ -13,7 +15,6 @@ class UserManagementService extends GetxService {
             user.uid,
             user.email!.substring(0, user.email!.indexOf('@')),
             user.email!,
-            null,
           ).toMap(),
         );
   }

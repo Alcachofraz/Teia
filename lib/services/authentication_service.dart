@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
 import 'package:teia/services/firebase/firestore_utils.dart';
 import 'package:teia/services/user_management_service.dart';
+import 'package:teia/models/user.dart' as u;
 
 class AuthResponse {
   final String message;
@@ -11,24 +12,29 @@ class AuthResponse {
 }
 
 class AuthenticationService extends GetxService {
-  String? uid;
+  u.User? get user => _user;
+
+  static u.User? _user;
 
   static AuthenticationService get value => Get.put(AuthenticationService());
   final UserManagementService userManagementService =
       Get.put(UserManagementService());
 
   Stream<bool> authStateChanges =
-      FirebaseUtils.auth.authStateChanges().map((user) {
-    return user != null;
+      FirebaseUtils.auth.authStateChanges().asyncMap((User? fUser) async {
+    if (fUser != null) {
+      _user = await UserManagementService.value.userGet(fUser.uid);
+    }
+    return fUser != null;
   });
 
   Future<AuthResponse> login(String email, String password) async {
     try {
       final credential = await FirebaseUtils.auth
           .signInWithEmailAndPassword(email: email, password: password);
-      final user = credential.user;
-      if (user == null) return AuthResponse('An error occurred', false);
-      uid = user.uid;
+      final fUser = credential.user;
+      if (fUser == null) return AuthResponse('An error occurred', false);
+      _user = await userManagementService.userGet(fUser.uid);
       return AuthResponse('Success', true);
     } on FirebaseAuthException catch (e) {
       return AuthResponse(e.message.toString(), false);
@@ -50,7 +56,7 @@ class AuthenticationService extends GetxService {
           if (userCredential.user == null) {
             return AuthResponse('An error occurred', false);
           }
-          uid = userCredential.user!.uid;
+          _user = await userManagementService.userGet(userCredential.user!.uid);
           await userManagementService.createUser(userCredential.user!);
           return AuthResponse('Success', true);
         }

@@ -31,6 +31,7 @@ launchJoinAdventurePopup(BuildContext context) {
                 border: OutlineInputBorder(),
                 labelText: 'Adventure password',
               ),
+              obscureText: true,
             ),
           ],
         ),

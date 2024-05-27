@@ -24,18 +24,19 @@ class StoryBox extends StatelessWidget {
           ),
         ),
         const Gap(4),
-        Expanded(
-          child: Material(
-            color: Colors.white,
-            elevation: 2,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
-              side: BorderSide(
-                color: color,
-                width: 1.5,
-              ),
+        Material(
+          color: Colors.white,
+          elevation: 2,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+            side: BorderSide(
+              color: color,
+              width: 1.5,
             ),
-            child: const SizedBox.expand(),
+          ),
+          child: const SizedBox(
+            width: double.infinity,
+            height: 100,
           ),
         ),
       ],
