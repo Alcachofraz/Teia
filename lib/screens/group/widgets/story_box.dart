@@ -36,13 +36,6 @@ class StoryBox extends StatelessWidget {
             side: BorderSide(
               color: color,
               width: 1.5,
-<<<<<<< Updated upstream
-            ),
-          ),
-          child: const SizedBox(
-            width: double.infinity,
-            height: 100,
-=======
             ),
           ),
           child: Padding(
@@ -66,7 +59,6 @@ class StoryBox extends StatelessWidget {
                 ),
               ],
             ),
->>>>>>> Stashed changes
           ),
         ),
       ],

@@ -68,7 +68,6 @@ class GroupScreen extends GetView<GroupController> {
                             ),
                           ),
                           Expanded(
-<<<<<<< Updated upstream
                             child: Row(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
@@ -93,19 +92,12 @@ class GroupScreen extends GetView<GroupController> {
                                     padding: const EdgeInsets.fromLTRB(
                                         0, 24, 24, 24),
                                     child: StoryBox(
+                                      story: controller.group.value!.story,
                                       color: controller.storyBoxColor,
                                     ),
                                   ),
                                 ),
                               ],
-=======
-                            child: Padding(
-                              padding: const EdgeInsets.fromLTRB(0, 24, 24, 24),
-                              child: StoryBox(
-                                color: controller.storyBoxColor,
-                                story: controller.group.value!.story,
-                              ),
->>>>>>> Stashed changes
                             ),
                           ),
                         ],
