@@ -42,6 +42,13 @@ class StoryBox extends StatelessWidget {
             padding: const EdgeInsets.all(12),
             child: Column(
               children: [
+                const Text(
+                  "Do you want to read an already existing full story? (everyone will be a reader)",
+                  style: TextStyle(
+                    fontSize: 12,
+                  ),
+                ),
+                const Gap(4),
                 TeiaButton(
                   widget: const Icon(
                     Icons.search,
@@ -50,6 +57,13 @@ class StoryBox extends StatelessWidget {
                   text: "Search",
                 ),
                 const Gap(8),
+                const Text(
+                  "Or do you want to create a new story? (at least one of you will be a writer)",
+                  style: TextStyle(
+                    fontSize: 12,
+                  ),
+                ),
+                const Gap(4),
                 TeiaButton(
                   widget: const Icon(
                     Icons.add,
