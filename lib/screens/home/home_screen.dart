@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:teia/screens/auth/controller/auth_controller.dart';
 import 'package:teia/screens/home/controllers/home_controller.dart';
@@ -47,22 +48,24 @@ class HomeScreen extends GetView<HomeController> {
               mainAxisSize: MainAxisSize.max,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
+                const Gap(8),
                 Padding(
                   padding: const EdgeInsets.all(20),
                   child: Row(
                     children: [
+                      const Spacer(),
                       Image.asset(
                         'assets/images/logo.png',
                         width: 300,
                       ),
                       const Spacer(),
-                      RoundedButton(
+                      /*RoundedButton(
                         color: Colors.red,
                         onTap: () {
                           Get.put(AuthController()).logout();
                         },
                         text: 'Sign out',
-                      ),
+                      ),*/
                     ],
                   ),
                 ),

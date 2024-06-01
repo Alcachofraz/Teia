@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:teia/services/art_service.dart';
 
 class TeiaButton extends StatelessWidget {
   TeiaButton({
@@ -32,13 +33,13 @@ class TeiaButton extends StatelessWidget {
 
   final TextStyle? textStyle;
 
+  final Color provisoryColor = ArtService.value.pastel();
+
   @override
   Widget build(BuildContext context) {
     Text getText() => Text(
           text!,
-          overflow: TextOverflow.ellipsis,
           textAlign: TextAlign.center,
-          maxLines: 1,
           style: textStyle ??
               const TextStyle(
                 color: Colors.white,
@@ -56,7 +57,7 @@ class TeiaButton extends StatelessWidget {
         elevation: 0,
         padding: padding_,
         tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-        backgroundColor: locked ? Colors.grey : (color ?? Colors.black),
+        backgroundColor: locked ? Colors.grey : (color ?? provisoryColor),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(borderRadius),
           side: borderColor == null
@@ -85,12 +86,14 @@ class TeiaButton extends StatelessWidget {
                 height: 16,
                 width: 16,
               ),
-            if (expand)
-              Expanded(
-                child: widget ?? getText(),
-              )
-            else
-              widget ?? getText(),
+            if (widget != null) widget!,
+            if (text != null)
+              if (expand)
+                Expanded(
+                  child: getText(),
+                )
+              else
+                getText(),
             if (loading.value && expand)
               const SizedBox(
                 height: 16,
