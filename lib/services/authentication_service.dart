@@ -2,7 +2,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
 import 'package:teia/services/firebase/firestore_utils.dart';
 import 'package:teia/services/user_management_service.dart';
-import 'package:teia/models/user.dart' as u;
 
 class AuthResponse {
   final String message;
@@ -12,9 +11,9 @@ class AuthResponse {
 }
 
 class AuthenticationService extends GetxService {
-  u.User? get user => _user;
-
-  static u.User? _user;
+  String? get uid => _uid;
+  User get user => FirebaseUtils.auth.currentUser!;
+  static String? _uid;
 
   static AuthenticationService get value => Get.put(AuthenticationService());
   final UserManagementService userManagementService =
@@ -22,9 +21,7 @@ class AuthenticationService extends GetxService {
 
   Stream<bool> authStateChanges =
       FirebaseUtils.auth.authStateChanges().asyncMap((User? fUser) async {
-    if (fUser != null) {
-      _user = await UserManagementService.value.userGet(fUser.uid);
-    }
+    _uid = fUser?.uid;
     return fUser != null;
   });
 
@@ -34,7 +31,7 @@ class AuthenticationService extends GetxService {
           .signInWithEmailAndPassword(email: email, password: password);
       final fUser = credential.user;
       if (fUser == null) return AuthResponse('An error occurred', false);
-      _user = await userManagementService.userGet(fUser.uid);
+      _uid = fUser.uid;
       return AuthResponse('Success', true);
     } on FirebaseAuthException catch (e) {
       return AuthResponse(e.message.toString(), false);
@@ -56,7 +53,7 @@ class AuthenticationService extends GetxService {
           if (userCredential.user == null) {
             return AuthResponse('An error occurred', false);
           }
-          _user = await userManagementService.userGet(userCredential.user!.uid);
+          _uid = userCredential.user!.uid;
           await userManagementService.createUser(userCredential.user!);
           return AuthResponse('Success', true);
         }

@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart' as auth;
 import 'package:get/get.dart';
 import 'package:teia/models/user.dart';
 import 'package:teia/services/firebase/firestore_utils.dart';
+import 'package:teia/utils/utils.dart';
 
 class UserManagementService extends GetxService {
   static UserManagementService get value => Get.put(UserManagementService());
@@ -13,7 +14,7 @@ class UserManagementService extends GetxService {
     await FirebaseUtils.firestore.collection('user').doc(user.uid).set(
           User(
             user.uid,
-            user.email!.substring(0, user.email!.indexOf('@')),
+            Utils.getUsernameFromEmail(user.email!),
             user.email!,
           ).toMap(),
         );

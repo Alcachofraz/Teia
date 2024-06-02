@@ -10,9 +10,6 @@ import 'package:teia/screens/group/group_screen.dart';
 import 'package:teia/screens/home/home_screen.dart';
 import 'package:teia/screens/image_editor/image_editor_screen.dart';
 import 'package:teia/services/authentication_service.dart';
-import 'package:teia/services/group_management_service.dart';
-import 'package:teia/services/user_management_service.dart';
-import 'package:teia/utils/swatch.dart';
 import 'package:teia/utils/utils.dart';
 import 'package:url_strategy/url_strategy.dart';
 

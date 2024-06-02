@@ -25,6 +25,17 @@ class GroupController extends GetxController {
   RxBool loadingRole = false.obs;
   RxBool allowed = false.obs;
 
+  RxList<String> avatars = <String>[].obs;
+
+  late PageController pageController;
+  late RxInt selectedAvatar = 0.obs;
+  late String name;
+  late Rx<Role> role = Role.reader.obs;
+
+  final avatarColor = ArtService.value.pastel();
+  final nameColor = ArtService.value.pastel();
+  final roleColor = ArtService.value.pastel();
+
   late StreamSubscription<Group> groupSubscription;
 
   @override
@@ -38,14 +49,14 @@ class GroupController extends GetxController {
         (Group? newGroup) async {
           if (newGroup != null) {
             allowed.value = newGroup.users.contains(
-              AuthenticationService.value.user?.uid,
+              AuthenticationService.value.uid,
             );
             if (allowed.value) {
               group.value = newGroup;
               userInfo.clear();
               newGroup.userState.forEach((key, value) {
                 userInfo.add(UserInfo(
-                  isSelf: key == AuthenticationService.value.user?.uid,
+                  isSelf: key == AuthenticationService.value.uid,
                   color: userBoxColor,
                   state: value,
                 ));
@@ -76,6 +87,44 @@ class GroupController extends GetxController {
   }
 
   Future<void> onTapEditUser() async {
-    await launchEditUserPopup(Get.context!, group.value!);
+    avatars.value = ArtService.value.avatarPaths();
+    selectedAvatar.value =
+        group.value!.userState[AuthenticationService.value.uid]!.avatar;
+    pageController = PageController(initialPage: selectedAvatar.value);
+    name = group.value!.userState[AuthenticationService.value.uid]!.name;
+    role.value = group.value!.userState[AuthenticationService.value.uid]!.role;
+    await launchEditUserPopup(Get.context!);
+  }
+
+  void previousAvatar() {
+    pageController.previousPage(
+      duration: 200.milliseconds,
+      curve: Curves.decelerate,
+    );
+
+    if (selectedAvatar.value > 0) {
+      selectedAvatar.value--;
+    }
+  }
+
+  void nextAvatar() {
+    pageController.nextPage(
+      duration: 200.milliseconds,
+      curve: Curves.decelerate,
+    );
+
+    if (selectedAvatar.value < avatars.length - 1) {
+      selectedAvatar.value++;
+    }
+  }
+
+  Future<void> save() async {
+    await GroupManagementService.value.updateUser(
+      group.value!.name,
+      selectedAvatar.value,
+      name,
+      role.value,
+    );
+    Get.back();
   }
 }

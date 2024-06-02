@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:get/get.dart';
-import 'package:teia/screens/auth/controller/auth_controller.dart';
 import 'package:teia/screens/home/controllers/home_controller.dart';
 import 'package:teia/screens/home/popups/join_adventure/join_adventure.dart';
 import 'package:teia/screens/home/widgets/adventure_tile.dart';
-import 'package:teia/views/misc/rounded_button.dart';
 import 'package:teia/views/misc/screen_wrapper.dart';
 
 class HomeScreen extends GetView<HomeController> {
@@ -48,9 +46,9 @@ class HomeScreen extends GetView<HomeController> {
               mainAxisSize: MainAxisSize.max,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Gap(8),
+                const Gap(12),
                 Padding(
-                  padding: const EdgeInsets.all(20),
+                  padding: const EdgeInsets.all(12),
                   child: Row(
                     children: [
                       const Spacer(),

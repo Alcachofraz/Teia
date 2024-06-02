@@ -5,8 +5,11 @@ import 'package:teia/models/user_state.dart';
 import 'package:teia/services/authentication_service.dart';
 import 'package:teia/services/firebase/firestore_utils.dart';
 import 'package:teia/services/story_management_service.dart';
+import 'package:teia/utils/utils.dart';
 
 class GroupManagementService extends GetxService {
+  static GroupManagementService get value => Get.put(GroupManagementService());
+
   // Get group by name
   Future<Group> groupGet(String name) async {
     final query =
@@ -24,7 +27,7 @@ class GroupManagementService extends GetxService {
   Future<List<Group>> getJoinedGroups() async {
     final query = await FirebaseUtils.firestore
         .collection('groups')
-        .where('users', arrayContains: AuthenticationService.value.user?.uid)
+        .where('users', arrayContains: AuthenticationService.value.uid)
         .get();
     List<Group> groups = [];
     for (final doc in query.docs) {
@@ -47,7 +50,7 @@ class GroupManagementService extends GetxService {
           Group.init(
             name,
             password,
-            AuthenticationService.value.user?.uid,
+            AuthenticationService.value.uid,
           ).toMap(),
         );
   }
@@ -83,16 +86,16 @@ class GroupManagementService extends GetxService {
     final group = query.docs.first;
     final users = group.data()['users'] as List<String>;
     final userState = group.data()['userState'] as Map<String, dynamic>;
-    if (users.contains(AuthenticationService.value.user?.uid)) {
+    if (users.contains(AuthenticationService.value.uid)) {
       throw Exception('You are already in this group');
     }
-    users.add(AuthenticationService.value.user!.uid);
-    userState[AuthenticationService.value.user!.uid] = UserState(
+    users.add(AuthenticationService.value.uid!);
+    userState[AuthenticationService.value.uid!] = UserState(
       role: Role.reader,
       ready: false,
       avatar: nextAvatar(userState),
-      name: AuthenticationService.value.user!.name,
-      uid: AuthenticationService.value.user!.uid,
+      name: Utils.getUsernameFromEmail(AuthenticationService.value.user.email!),
+      uid: AuthenticationService.value.uid!,
       admin: false,
     ).toMap();
     await group.reference.update(
@@ -118,7 +121,7 @@ class GroupManagementService extends GetxService {
     await FirebaseUtils.firestore.collection('groups').doc(groupName).set(
       {
         "userState": {
-          AuthenticationService.value.user?.uid: {
+          AuthenticationService.value.user.uid: {
             "role": role.index,
           }
         }
@@ -141,5 +144,21 @@ class GroupManagementService extends GetxService {
             ),
           ),
         );
+  }
+
+  Future<void> updateUser(
+      String groupName, int avatar, String name, Role role) async {
+    await FirebaseUtils.firestore.collection('groups').doc(groupName).set(
+      {
+        'userState': {
+          AuthenticationService.value.uid: {
+            'avatar': avatar,
+            'name': name,
+            'role': role.index,
+          }
+        }
+      },
+      SetOptions(merge: true),
+    );
   }
 }

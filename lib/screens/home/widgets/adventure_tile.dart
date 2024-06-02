@@ -31,8 +31,8 @@ class _AdventureTileState extends State<AdventureTile> {
 
   String getRole(Group adventure) {
     return widget.adventure!.userState
-            .containsKey(AuthenticationService.value.user?.uid)
-        ? 'You are a ${widget.adventure!.userState[AuthenticationService.value.user?.uid]!.role == Role.writer ? 'Narrator' : 'Reader'}'
+            .containsKey(AuthenticationService.value.uid)
+        ? 'You are a ${widget.adventure!.userState[AuthenticationService.value.uid]!.role == Role.writer ? 'Narrator' : 'Reader'}'
         : 'Choose your role now!';
   }
 

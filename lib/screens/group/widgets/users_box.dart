@@ -65,7 +65,7 @@ class UsersBox extends StatelessWidget {
                         ),
                         child: InkWell(
                           onTap: userInfo.state.uid ==
-                                  AuthenticationService.value.user!.uid
+                                  AuthenticationService.value.uid
                               ? onTapEditUser
                               : null,
                           borderRadius: BorderRadius.circular(8),

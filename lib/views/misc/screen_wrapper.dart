@@ -257,7 +257,7 @@ class ScreenWrapper extends StatefulWidget {
   final String? backgroundImage;
 
   const ScreenWrapper({
-    Key? key,
+    super.key,
     this.backgroundImage,
     this.allowLandscape = true,
     this.onBack,
@@ -284,7 +284,7 @@ class ScreenWrapper extends StatefulWidget {
     this.drawerEnableOpenDragGesture = true,
     this.endDrawerEnableOpenDragGesture = true,
     this.restorationId,
-  }) : super(key: key);
+  });
 
   @override
   _ScreenWrapperState createState() => _ScreenWrapperState();

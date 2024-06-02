@@ -1,6 +1,7 @@
 import 'package:teia/models/story.dart';
 import 'package:teia/models/user_state.dart';
 import 'package:teia/services/authentication_service.dart';
+import 'package:teia/utils/utils.dart';
 
 enum GroupState {
   idle,
@@ -38,7 +39,9 @@ class Group {
             role: Role.reader,
             ready: false,
             avatar: 0,
-            name: AuthenticationService.value.user!.name,
+            name: Utils.getUsernameFromEmail(
+              AuthenticationService.value.user.email!,
+            ),
             uid: uid,
             admin: true,
           ),

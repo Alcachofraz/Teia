@@ -56,7 +56,12 @@ class StoryBox extends StatelessWidget {
                   ),
                   text: "Search",
                 ),
-                const Gap(8),
+                const Gap(4),
+                Divider(
+                  color: Colors.grey[200],
+                  thickness: 1.5,
+                ),
+                const Gap(4),
                 const Text(
                   "Or do you want to create a new story? (at least one of you will be a writer)",
                   style: TextStyle(

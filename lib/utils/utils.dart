@@ -45,11 +45,7 @@ class Utils {
   static const double dividerThickness = 16.0;
   static const int textEditorAnimationDuration = 300;
   static const double collapseButtonSize = 32;
-  static const List<String> snippetColors = [
-    '#f57c00',
-    '#4caf50',
-    '#2196f3'
-  ];
+  static const List<String> snippetColors = ['#f57c00', '#4caf50', '#2196f3'];
 
   static const double minInpaintBrushThickness = 5.0;
   static const double maxInpaintBrushThickness = 80.0;
@@ -59,8 +55,10 @@ class Utils {
 
   static const double imageEditorHeight = 0.6;
 
-  static final textEditorStyle = GoogleFonts.roboto(textStyle: const TextStyle());
-  static final textReadingStyle = GoogleFonts.roboto(textStyle: const TextStyle(fontSize: 15.0));
+  static final textEditorStyle =
+      GoogleFonts.roboto(textStyle: const TextStyle());
+  static final textReadingStyle =
+      GoogleFonts.roboto(textStyle: const TextStyle(fontSize: 15.0));
 
   static void init() {
     graphSettings = ChapterGraphSettings(
@@ -80,5 +78,10 @@ class Utils {
     height = window.screen?.height?.toDouble() ?? 1080;
   }
 
-  static String colorHex(Color color) => '#${color.red.toRadixString(16).padLeft(2, '0')}${color.green.toRadixString(16).padLeft(2, '0')}${color.blue.toRadixString(16).padLeft(2, '0')}';
+  static String colorHex(Color color) =>
+      '#${color.red.toRadixString(16).padLeft(2, '0')}${color.green.toRadixString(16).padLeft(2, '0')}${color.blue.toRadixString(16).padLeft(2, '0')}';
+
+  static String getUsernameFromEmail(String email) {
+    return email.substring(0, email.indexOf('@'));
+  }
 }

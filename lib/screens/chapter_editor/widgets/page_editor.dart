@@ -205,7 +205,7 @@ class _PageEditorState extends State<PageEditor> {
   }
 
   void _onRemoteChange(Change change) {
-    if (change.uid == AuthenticationService.value.user?.uid &&
+    if (change.uid == AuthenticationService.value.uid &&
         change.timestamp > _sessionStartTimestamp) {
       return;
     }
@@ -242,7 +242,7 @@ class _PageEditorState extends State<PageEditor> {
       Change(
         id,
         ChangeType.insert,
-        AuthenticationService.value.user?.uid ?? '-1',
+        AuthenticationService.value.uid ?? '-1',
         DateTime.now().millisecondsSinceEpoch,
         letter: text,
       ),
@@ -261,7 +261,7 @@ class _PageEditorState extends State<PageEditor> {
       Change(
         id,
         ChangeType.delete,
-        AuthenticationService.value.user?.uid ?? '-1',
+        AuthenticationService.value.uid ?? '-1',
         DateTime.now().millisecondsSinceEpoch,
         length: length,
       ),
@@ -280,7 +280,7 @@ class _PageEditorState extends State<PageEditor> {
       Change(
         id,
         ChangeType.format,
-        AuthenticationService.value.user?.uid ?? '-1',
+        AuthenticationService.value.uid ?? '-1',
         DateTime.now().millisecondsSinceEpoch,
         length: length,
         snippet: snippet,

@@ -20,4 +20,6 @@ class User {
       map['email'],
     );
   }
+
+  factory User.uidOnly(String uid) => User(uid, '', '');
 }
