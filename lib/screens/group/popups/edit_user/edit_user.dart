@@ -10,10 +10,10 @@ launchEditUserPopup(BuildContext context) {
   return showDialog(
     context: context,
     builder: (context) {
-      return const AlertDialog(
-        title: Text('Edit user'),
-        content: EditUserPopup(),
-        backgroundColor: Colors.white,
+      return AlertDialog(
+        title: const Text('Edit user'),
+        content: const EditUserPopup(),
+        backgroundColor: Colors.grey[200],
       );
     },
   );
@@ -72,13 +72,50 @@ class EditUserPopup extends GetView<GroupController> {
                     aspectRatio: 1,
                     child: SizedBox(
                       height: 200,
-                      child: PageView(
-                        controller: controller.pageController,
+                      child: Stack(
                         children: [
-                          for (String avatar in controller.avatars)
-                            Image.asset(
-                              avatar,
+                          PageView(
+                            controller: controller.pageController,
+                            children: [
+                              for (String avatar in controller.avatars)
+                                Image.asset(
+                                  avatar,
+                                ),
+                            ],
+                          ),
+                          Align(
+                            alignment: Alignment.topRight,
+                            child: Padding(
+                              padding: const EdgeInsets.only(
+                                top: 8,
+                                right: 8,
+                              ),
+                              child: Material(
+                                color: Colors.white,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(4),
+                                  side: BorderSide(
+                                    color: controller.avatarColor,
+                                    width: 1.5,
+                                  ),
+                                ),
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 6,
+                                    vertical: 3,
+                                  ),
+                                  child: Text(
+                                    '${controller.selectedAvatar.value + 1} / ${controller.avatars.length}',
+                                    style: TextStyle(
+                                      color: controller.avatarColor,
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                              ),
                             ),
+                          )
                         ],
                       ),
                     ),
@@ -147,39 +184,65 @@ class EditUserPopup extends GetView<GroupController> {
           ),
           const Gap(8),
           Obx(
-            () => Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              alignment: WrapAlignment.center,
+            () => Row(
               children: [
                 for (Role role in Role.values)
-                  Material(
-                    color: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(128),
-                      side: controller.role.value == role
-                          ? BorderSide(
-                              color: controller.roleColor,
-                              width: 1,
-                            )
-                          : BorderSide.none,
-                    ),
-                    child: InkWell(
-                      borderRadius: BorderRadius.circular(128),
-                      onTap: () {
-                        controller.role.value = role;
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-                        child: Text(
-                          role.toString().split('.').last,
-                          style: TextStyle(
-                            color: controller.role.value == role
-                                ? Colors.black
-                                : Colors.grey,
-                            fontSize: 13,
+                  Expanded(
+                    child: Padding(
+                      padding: EdgeInsets.only(
+                        right: role == Role.values.first ? 4 : 0,
+                        left: role == Role.values.last ? 4 : 0,
+                      ),
+                      child: Stack(
+                        children: [
+                          Material(
+                            color: Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
+                              side: controller.role.value == role
+                                  ? BorderSide(
+                                      color: controller.roleColor,
+                                      width: 1,
+                                    )
+                                  : BorderSide.none,
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+                              child: Column(
+                                children: [
+                                  Image.asset(
+                                    role.image,
+                                    fit: BoxFit.fitWidth,
+                                  ),
+                                  const Gap(4),
+                                  Text(
+                                    role.toString().toUpperCase(),
+                                    style: TextStyle(
+                                      color: controller.roleColor,
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
                           ),
-                        ),
+                          Positioned.fill(
+                            child: Material(
+                              color: Colors.grey.withOpacity(
+                                controller.role.value == role ? 0.0 : 0.2,
+                              ),
+                              borderRadius: BorderRadius.circular(16),
+                              child: InkWell(
+                                borderRadius: BorderRadius.circular(16),
+                                onTap: () {
+                                  controller.role.value = role;
+                                },
+                                child: const SizedBox.expand(),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ),

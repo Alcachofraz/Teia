@@ -5,7 +5,8 @@ import 'package:get/get.dart';
 import 'package:teia/models/group.dart';
 import 'package:teia/models/user_state.dart';
 import 'package:teia/screens/group/models/user_info.dart';
-import 'package:teia/screens/home/popups/edit_user/edit_user.dart';
+import 'package:teia/screens/group/popups/create_story/create_story.dart';
+import 'package:teia/screens/group/popups/edit_user/edit_user.dart';
 import 'package:teia/services/art_service.dart';
 import 'package:teia/services/authentication_service.dart';
 import 'package:teia/services/group_management_service.dart';
@@ -126,5 +127,9 @@ class GroupController extends GetxController {
       role.value,
     );
     Get.back();
+  }
+
+  Future<void> createStory() async {
+    await launchCreateStoryPopup(Get.context!, group.value!.name);
   }
 }

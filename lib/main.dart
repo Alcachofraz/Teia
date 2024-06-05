@@ -6,7 +6,7 @@ import 'package:teia/firebase_options.dart';
 import 'package:teia/screens/auth/login_screen.dart';
 import 'package:teia/screens/auth/register_screen.dart';
 import 'package:teia/screens/chapter_editor/chapter_editor_screen.dart';
-import 'package:teia/screens/group/group_screen.dart';
+import 'package:teia/screens/group/pages/group_screen.dart';
 import 'package:teia/screens/home/home_screen.dart';
 import 'package:teia/screens/image_editor/image_editor_screen.dart';
 import 'package:teia/services/authentication_service.dart';
@@ -70,6 +70,7 @@ class Teia extends StatelessWidget {
         primarySwatch: Colors.brown,
         primaryColor: Colors.brown,
         textTheme: GoogleFonts.montserratTextTheme(textTheme),
+        scaffoldBackgroundColor: Colors.white,
       ),
       home: const LandingScreen(),
     );

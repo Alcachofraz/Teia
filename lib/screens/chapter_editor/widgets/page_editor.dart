@@ -620,7 +620,6 @@ class _PageEditorState extends State<PageEditor> {
                         child: QuillEditor(
                           configurations: QuillEditorConfigurations(
                             controller: _controller,
-                            readOnly: false,
                             expands: true,
                             paintCursorAboveText: true,
                             placeholder: 'Once upon a time...',

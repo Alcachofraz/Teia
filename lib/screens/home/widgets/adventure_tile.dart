@@ -135,7 +135,7 @@ class _AdventureTileState extends State<AdventureTile> {
                             const SizedBox(width: 8),
                             Text(
                               widget.adventure!.story != null
-                                  ? widget.adventure!.story!.title
+                                  ? widget.adventure!.story!.name
                                   : 'No story yet',
                               style: const TextStyle(
                                 color: Colors.white,

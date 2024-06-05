@@ -7,7 +7,6 @@ enum GroupState {
   idle,
   writing,
   reading,
-  discussing,
 }
 
 class Group {

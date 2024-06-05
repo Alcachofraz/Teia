@@ -6,6 +6,12 @@ enum Role {
   String toString() {
     return this == Role.reader ? 'Reader' : 'Writer';
   }
+
+  String get image {
+    return this == Role.reader
+        ? "assets/images/roles/reader.png"
+        : "assets/images/roles/writer.png";
+  }
 }
 
 class UserState {

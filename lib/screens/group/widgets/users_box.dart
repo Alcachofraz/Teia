@@ -4,6 +4,7 @@ import 'package:teia/models/user_state.dart';
 import 'package:teia/screens/group/models/user_info.dart';
 import 'package:teia/services/art_service.dart';
 import 'package:teia/services/authentication_service.dart';
+import 'package:teia/utils/utils.dart';
 
 class UsersBox extends StatelessWidget {
   const UsersBox({
@@ -54,61 +55,71 @@ class UsersBox extends StatelessWidget {
                 child: Column(
                   children: [
                     for (final UserInfo userInfo in info)
-                      Material(
-                        color: Colors.white,
-                        elevation: 2,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                          side: BorderSide(
-                            color: userInfo.color,
-                          ),
-                        ),
-                        child: InkWell(
-                          onTap: userInfo.state.uid ==
-                                  AuthenticationService.value.uid
-                              ? onTapEditUser
-                              : null,
-                          borderRadius: BorderRadius.circular(8),
-                          child: Padding(
-                            padding: const EdgeInsets.all(8),
-                            child: Row(
-                              children: [
-                                ClipRRect(
-                                  borderRadius: BorderRadius.circular(8),
-                                  child: Image.asset(
-                                    ArtService.value.assetPath(
-                                      userInfo.state.avatar,
-                                    ),
-                                    height: 48,
-                                  ),
-                                ),
-                                const Gap(12),
-                                Expanded(
-                                  child: Text(
-                                    userInfo.state.name,
-                                    textAlign: TextAlign.left,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ),
-                                const Spacer(),
-                                Expanded(
-                                  child: Text(
-                                    userInfo.state.role
-                                        .toString()
-                                        .toUpperCase(),
-                                    textAlign: TextAlign.right,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: TextStyle(
-                                      color: userInfo.color,
-                                      fontWeight: FontWeight.bold,
+                      Stack(
+                        children: [
+                          Material(
+                            color: Colors.white,
+                            elevation: 2,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                              side: BorderSide(
+                                color: userInfo.color,
+                              ),
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.all(8),
+                              child: Row(
+                                children: [
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(8),
+                                    child: Image.asset(
+                                      ArtService.value.assetPath(
+                                        userInfo.state.avatar,
+                                      ),
+                                      height: 48,
                                     ),
                                   ),
-                                ),
-                                const Gap(12),
-                              ],
+                                  const Gap(12),
+                                  Expanded(
+                                    child: Text(
+                                      userInfo.state.name,
+                                      textAlign: TextAlign.left,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                  const Spacer(),
+                                  Expanded(
+                                    child: Text(
+                                      userInfo.state.role
+                                          .toString()
+                                          .toUpperCase(),
+                                      textAlign: TextAlign.right,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: TextStyle(
+                                        color: userInfo.color,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                  const Gap(12),
+                                ],
+                              ),
                             ),
                           ),
-                        ),
+                          Positioned.fill(
+                            child: Material(
+                              color: Colors.transparent,
+                              child: InkWell(
+                                onTap: userInfo.state.uid ==
+                                        AuthenticationService.value.uid
+                                    ? onTapEditUser
+                                    : null,
+                                borderRadius: BorderRadius.circular(8),
+                                child: const SizedBox.expand(),
+                              ),
+                            ),
+                          )
+                        ],
                       ),
                   ],
                 ),

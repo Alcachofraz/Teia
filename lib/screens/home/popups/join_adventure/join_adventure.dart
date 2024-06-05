@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:teia/services/group_management_service.dart';
 
-launchJoinAdventurePopup(BuildContext context) {
+Future<void> launchJoinAdventurePopup(BuildContext context) {
   TextEditingController adventureNameController = TextEditingController();
   TextEditingController adventurePasswordController = TextEditingController();
   GroupManagementService groupManagementService =

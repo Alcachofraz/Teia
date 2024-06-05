@@ -8,10 +8,12 @@ class StoryBox extends StatelessWidget {
     super.key,
     required this.color,
     required this.story,
+    this.onCreate,
   });
 
   final Color color;
   final Story? story;
+  final Function()? onCreate;
 
   @override
   Widget build(BuildContext context) {
@@ -28,6 +30,27 @@ class StoryBox extends StatelessWidget {
           ),
         ),
         const Gap(4),
+        if (story != null)
+          Material(
+            color: Colors.white,
+            elevation: 2,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+              side: BorderSide(
+                color: color,
+                width: 1.5,
+              ),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(12),
+              child: Row(
+                children: [
+                  Expanded(child: Text(story!.name)),
+                ],
+              ),
+            ),
+          ),
+        if (story != null) const Gap(12),
         Material(
           color: Colors.white,
           elevation: 2,
@@ -45,10 +68,10 @@ class StoryBox extends StatelessWidget {
                 const Text(
                   "Do you want to read an already existing full story? (everyone will be a reader)",
                   style: TextStyle(
-                    fontSize: 12,
+                    fontSize: 13,
                   ),
                 ),
-                const Gap(4),
+                const Gap(6),
                 TeiaButton(
                   widget: const Icon(
                     Icons.search,
@@ -65,11 +88,12 @@ class StoryBox extends StatelessWidget {
                 const Text(
                   "Or do you want to create a new story? (at least one of you will be a writer)",
                   style: TextStyle(
-                    fontSize: 12,
+                    fontSize: 13,
                   ),
                 ),
-                const Gap(4),
+                const Gap(6),
                 TeiaButton(
+                  onTap: onCreate,
                   widget: const Icon(
                     Icons.add,
                     color: Colors.white,

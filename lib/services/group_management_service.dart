@@ -146,6 +146,7 @@ class GroupManagementService extends GetxService {
         );
   }
 
+  /// Update user state
   Future<void> updateUser(
       String groupName, int avatar, String name, Role role) async {
     await FirebaseUtils.firestore.collection('groups').doc(groupName).set(
@@ -157,6 +158,16 @@ class GroupManagementService extends GetxService {
             'role': role.index,
           }
         }
+      },
+      SetOptions(merge: true),
+    );
+  }
+
+  // Set story for group
+  Future<void> groupSetStory(String groupName, String storyId) async {
+    await FirebaseUtils.firestore.collection('groups').doc(groupName).set(
+      {
+        'story': storyId,
       },
       SetOptions(merge: true),
     );

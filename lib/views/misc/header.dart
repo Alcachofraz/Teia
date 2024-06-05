@@ -31,7 +31,7 @@ class Header extends StatelessWidget {
               child: Text(text,
                   style: TextStyle(
                     color: color,
-                    fontSize: 12,
+                    fontSize: 13,
                   )),
             ),
             Expanded(
