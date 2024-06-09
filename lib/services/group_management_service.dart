@@ -172,4 +172,28 @@ class GroupManagementService extends GetxService {
       SetOptions(merge: true),
     );
   }
+
+  // Set user ready
+  Future<void> userReady(String groupName) async {
+    await FirebaseUtils.firestore.collection('groups').doc(groupName).set(
+      {
+        'userState': {
+          AuthenticationService.value.uid: {
+            'ready': true,
+          }
+        }
+      },
+      SetOptions(merge: true),
+    );
+  }
+
+  // Set group to 'writing' state
+  Future<void> groupSetWritingState(String groupName) async {
+    await FirebaseUtils.firestore.collection('groups').doc(groupName).set(
+      {
+        'state': GroupState.writing.index,
+      },
+      SetOptions(merge: true),
+    );
+  }
 }

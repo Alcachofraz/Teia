@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:teia/screens/group/controllers/group_controller.dart';
@@ -38,35 +39,37 @@ class IdleGroupScreen extends StatelessWidget {
                 ),
               ),
             ),
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(
-                  flex: 2,
-                  child: Padding(
-                    padding: const EdgeInsets.all(24),
-                    child: Obx(
-                      () => UsersBox(
-                        color: controller.userBoxColor,
-                        info: controller.userInfo,
-                        onRoleChanged: controller.onRoleChanged,
-                        onTapEditUser: controller.onTapEditUser,
-                        loadingRole: controller.loadingRole.value,
+            Expanded(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    flex: 2,
+                    child: Padding(
+                      padding: const EdgeInsets.all(24),
+                      child: Obx(
+                        () => UsersBox(
+                          color: controller.userBoxColor,
+                          info: controller.userInfo,
+                          onRoleChanged: controller.onRoleChanged,
+                          onTapEditUser: controller.onTapEditUser,
+                          loadingRole: controller.loadingRole.value,
+                        ),
                       ),
                     ),
                   ),
-                ),
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(0, 24, 24, 24),
-                    child: StoryBox(
-                      story: controller.group.value!.story,
-                      color: controller.storyBoxColor,
-                      onCreate: controller.createStory,
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(0, 24, 24, 24),
+                      child: StoryBox(
+                        story: controller.group.value!.story,
+                        color: controller.storyBoxColor,
+                        onCreate: controller.createStory,
+                      ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
             if (controller.group.value!.story != null)
               Padding(
@@ -76,6 +79,7 @@ class IdleGroupScreen extends StatelessWidget {
                   onTap: () => Get.back(),
                 ),
               ),
+            const Gap(40),
           ],
         ),
       ),
