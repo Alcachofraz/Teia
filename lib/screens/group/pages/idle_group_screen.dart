@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:teia/screens/group/controllers/group_controller.dart';
 import 'package:teia/screens/group/widgets/story_box.dart';
+import 'package:teia/screens/group/widgets/story_create_box.dart';
 import 'package:teia/screens/group/widgets/users_box.dart';
 import 'package:teia/views/teia_button.dart';
 
@@ -61,10 +62,19 @@ class IdleGroupScreen extends StatelessWidget {
                   Expanded(
                     child: Padding(
                       padding: const EdgeInsets.fromLTRB(0, 24, 24, 24),
-                      child: StoryBox(
-                        story: controller.group.value!.story,
-                        color: controller.storyBoxColor,
-                        onCreate: controller.createStory,
+                      child: Column(
+                        children: [
+                          StoryBox(
+                            story: controller.group.value!.story,
+                            color: controller.storyBoxColor,
+                          ),
+                          const Gap(12),
+                          StoryCreateBox(
+                            story: controller.group.value!.story,
+                            color: controller.storyBoxColor,
+                            onCreate: controller.createStory,
+                          ),
+                        ],
                       ),
                     ),
                   ),
