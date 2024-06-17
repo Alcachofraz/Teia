@@ -5,8 +5,10 @@ import 'package:teia/views/misc/tile.dart';
 import 'package:teia/views/teia_button.dart';
 
 class ChatGPTView extends GetView<ChatGPTController> {
-  const ChatGPTView({super.key, required this.getPageContent});
+  const ChatGPTView(
+      {super.key, required this.getPageContent, this.accentColor});
   final String Function() getPageContent;
+  final Color? accentColor;
 
   @override
   Widget build(BuildContext context) {
@@ -36,6 +38,7 @@ class ChatGPTView extends GetView<ChatGPTController> {
             TeiaButton(
               text: 'Get an idea',
               onTap: controller.getIdea,
+              color: accentColor,
             ),
             Obx(
               () => controller.idea.value.isNotEmpty

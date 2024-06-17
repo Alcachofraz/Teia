@@ -16,6 +16,7 @@ import 'package:teia/screens/chapter_editor/widgets/chat_gpt_view.dart';
 import 'package:teia/screens/chapter_editor/widgets/cursor/cursor_embed_builder.dart';
 import 'package:teia/screens/chapter_editor/widgets/snippets/snippet_choice_card.dart';
 import 'package:teia/screens/chapter_editor/widgets/snippets/snippet_image_card.dart';
+import 'package:teia/services/art_service.dart';
 import 'package:teia/services/authentication_service.dart';
 import 'package:teia/services/chapter_management_service.dart';
 import 'package:teia/services/storage_service.dart';
@@ -25,7 +26,7 @@ import 'package:teia/views/misc/tile.dart';
 import 'package:universal_html/html.dart';
 
 class PageEditor extends StatefulWidget {
-  final String pageId;
+  final int pageId;
   final FocusNode? focusNode;
   final Future<void> Function(tPage page)? pushPageToRemote;
   final Future<void> Function(Chapter chapter)? pushChapterToRemote;
@@ -75,6 +76,8 @@ class _PageEditorState extends State<PageEditor> {
   bool showingImageOption = false;
   late int _sessionStartTimestamp;
 
+  Color accentColor = ArtService.value.pastel();
+
   final ChapterManagementService chapterManagementService =
       Get.put(ChapterManagementService());
 
@@ -82,7 +85,8 @@ class _PageEditorState extends State<PageEditor> {
 
   @override
   void initState() {
-    page = tPage(1, 1, '1', SortedList<Letter>(), null, {});
+    page = tPage(widget.pageId, widget.chapter.id, widget.chapter.storyId,
+        SortedList<Letter>(), null, {});
     _sessionStartTimestamp = DateTime.now().millisecondsSinceEpoch;
     // Scroll controller
     _scrollController = ScrollController();
@@ -100,11 +104,19 @@ class _PageEditorState extends State<PageEditor> {
         document.onContextMenu.listen((event) => event.preventDefault());
 
     _pageChangesSubscription = chapterManagementService
-        .streamPageChanges('1', '1', '1')
+        .streamPageChanges(
+          widget.chapter.storyId,
+          widget.chapter.id.toString(),
+          widget.pageId.toString(),
+        )
         .listen(_onRemoteChange);
 
     _pageSubscription = chapterManagementService
-        .pageStream('1', '1', '1')
+        .pageStream(
+          widget.chapter.storyId,
+          widget.chapter.id.toString(),
+          widget.pageId.toString(),
+        )
         .listen(_onPageChange);
 
     super.initState();
@@ -205,29 +217,33 @@ class _PageEditorState extends State<PageEditor> {
   }
 
   void _onRemoteChange(Change change) {
-    if (change.uid == AuthenticationService.value.uid &&
-        change.timestamp > _sessionStartTimestamp) {
-      return;
-    }
-    //print('Remote -> ${change.toString()}');
+    try {
+      if (change.uid == AuthenticationService.value.uid &&
+          change.timestamp > _sessionStartTimestamp) {
+        return;
+      }
+      //print('Remote -> ${change.toString()}');
 
-    Delta delta = page.compose(change);
-    //print('New Page (letters) -> ${page.letters.toString()}');
-    //print('DELTA -> ${delta.toJson()}');
-    if (change.type == ChangeType.format) {
-      _controller.formatText(
-        page.letters.indexWhere((p0) => p0.id == change.id),
-        change.length!,
-        ColorAttribute(
-          '#${colorToHex(Colors.blue)}', // Set color to blue - snippet
-        ),
-      );
-    } else {
-      _controller.compose(
-        delta,
-        const TextSelection(baseOffset: 0, extentOffset: 0),
-        ChangeSource.remote,
-      );
+      Delta delta = page.compose(change);
+      //print('New Page (letters) -> ${page.letters.toString()}');
+      //print('DELTA -> ${delta.toJson()}');
+      if (change.type == ChangeType.format) {
+        _controller.formatText(
+          page.letters.indexWhere((p0) => p0.id == change.id),
+          change.length!,
+          ColorAttribute(
+            '#${colorToHex(Colors.blue)}', // Set color to blue - snippet
+          ),
+        );
+      } else {
+        _controller.compose(
+          delta,
+          const TextSelection(baseOffset: 0, extentOffset: 0),
+          ChangeSource.remote,
+        );
+      }
+    } catch (e) {
+      throw Exception('Error parsing remote change: $e');
     }
   }
 
@@ -236,9 +252,9 @@ class _PageEditorState extends State<PageEditor> {
     //print('INSERT [$id, $text]');
     page.insert(id, text);
     chapterManagementService.pushPageChange(
-      '1',
-      '1',
-      '1',
+      widget.chapter.storyId,
+      widget.chapter.id.toString(),
+      widget.pageId.toString(),
       Change(
         id,
         ChangeType.insert,
@@ -255,9 +271,9 @@ class _PageEditorState extends State<PageEditor> {
     //print('DELETE [$id, $length]');
     page.delete(id, length);
     chapterManagementService.pushPageChange(
-      '1',
-      '1',
-      '1',
+      widget.chapter.storyId,
+      widget.chapter.id.toString(),
+      widget.pageId.toString(),
       Change(
         id,
         ChangeType.delete,
@@ -274,9 +290,9 @@ class _PageEditorState extends State<PageEditor> {
     //print('FORMAT [$id, $length, $snippet]');
     page.format(id, length, snippet);
     chapterManagementService.pushPageChange(
-      '1',
-      '1',
-      '1',
+      widget.chapter.storyId,
+      widget.chapter.id.toString(),
+      widget.pageId.toString(),
       Change(
         id,
         ChangeType.format,
@@ -374,6 +390,7 @@ class _PageEditorState extends State<PageEditor> {
           padding: const EdgeInsets.fromLTRB(0, 0, 0, 16),
           child: ChatGPTView(
             getPageContent: () => _controller.document.toPlainText(),
+            accentColor: accentColor,
           ),
         ),
 
@@ -435,8 +452,8 @@ class _PageEditorState extends State<PageEditor> {
                               color: Colors.grey[50],
                               child: Column(
                                 children: [
-                                  for (int id in widget.chapter.graph
-                                      .nodes[int.parse(widget.pageId)]!)
+                                  for (int id in widget
+                                      .chapter.graph.nodes[widget.pageId]!)
                                     InkWell(
                                       customBorder: RoundedRectangleBorder(
                                         borderRadius:
@@ -594,7 +611,7 @@ class _PageEditorState extends State<PageEditor> {
         : -Utils.textOptionsWidth / 2;
 
     missingLinks.clear();
-    int pageId = int.parse(widget.pageId);
+    int pageId = widget.pageId;
     for (int id in widget.chapter.graph.nodes[pageId]!) {
       if (!widget.chapter.links.nodes[pageId]!.contains(id)) {
         missingLinks.add(id);

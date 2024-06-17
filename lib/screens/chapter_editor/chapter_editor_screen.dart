@@ -201,7 +201,7 @@ class _ChapterEditorScreenState extends State<ChapterEditorScreen> {
                                   ),
                                   Expanded(
                                     child: PageEditor(
-                                      pageId: selectedPageId!.toString(),
+                                      pageId: selectedPageId!,
                                       focusNode: pageEditorFocusNode,
                                       pushPageToRemote: _pushPageToRemote,
                                       pushChapterToRemote: _pushChapterToRemote,

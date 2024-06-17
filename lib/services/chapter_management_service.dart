@@ -18,7 +18,13 @@ class ChapterManagementService extends GetxService {
           .collection('chapters')
           .doc(chapterId)
           .snapshots()
-          .asyncMap((doc) => Chapter.fromMap(doc.data()));
+          .asyncMap((doc) {
+        try {
+          return Chapter.fromMap(doc.data());
+        } catch (e) {
+          throw Exception('Error parsing chapter: $e');
+        }
+      });
 
   Stream<tPage> pageStream(
     String storyId,
@@ -33,7 +39,15 @@ class ChapterManagementService extends GetxService {
           .collection('pages')
           .doc(pageId)
           .snapshots()
-          .asyncMap((doc) => tPage.fromMap(doc.data()));
+          .asyncMap(
+        (doc) {
+          try {
+            return tPage.fromMap(doc.data());
+          } catch (e) {
+            throw Exception('Error parsing page: $e');
+          }
+        },
+      );
 
   Future<void> chapterSet(Chapter chapter) async {
     //Logs.d('Sending $page');
@@ -144,17 +158,27 @@ class ChapterManagementService extends GetxService {
     return FirebaseUtils.realtime
         .ref('stories/$storyId/chapters/$chapterId/pages/$pageId/changes')
         .onChildAdded
-        .map((event) =>
-            Change.fromMap(event.snapshot.value as Map<String, dynamic>));
+        .map((event) {
+      try {
+        return Change.fromMap(
+            Map<String, dynamic>.from(event.snapshot.value as Map));
+      } catch (e) {
+        throw Exception('Error parsing change: $e');
+      }
+    });
   }
 
   Future<void> pushPageChange(
       String storyId, String chapterId, String pageId, Change change,
       {int? cursorPosition}) async {
-    await FirebaseUtils.realtime
-        .ref('stories/$storyId/chapters/$chapterId/pages/$pageId/changes')
-        .push()
-        .set(change.toMap());
+    try {
+      await FirebaseUtils.realtime
+          .ref('stories/$storyId/chapters/$chapterId/pages/$pageId/changes')
+          .push()
+          .set(change.toMap());
+    } catch (e) {
+      throw Exception('Error pushing change: $e');
+    }
     /*if (cursorPosition != null) {
       await FirebaseUtils.firestore
           .collection('stories')
