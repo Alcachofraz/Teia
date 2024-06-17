@@ -132,4 +132,18 @@ class GroupController extends GetxController {
   Future<void> createStory() async {
     await launchCreateStoryPopup(Get.context!, group.value!.name);
   }
+
+  Future<void> startStory() async {
+    await GroupManagementService.value.groupSetWritingState(group.value!.name);
+  }
+
+  Future<void> setReaderReady() async {
+    await GroupManagementService.value.setReaderReady(group.value!);
+    Get.back();
+  }
+
+  Future<void> setWriterReady() async {
+    await GroupManagementService.value.setWriterReady(group.value!);
+    Get.back();
+  }
 }

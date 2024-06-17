@@ -81,14 +81,14 @@ class IdleGroupScreen extends StatelessWidget {
                 ],
               ),
             ),
-            if (controller.group.value!.story != null)
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24),
-                child: TeiaButton(
-                  text: 'Start Story',
-                  onTap: () => Get.back(),
-                ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              child: TeiaButton(
+                locked: controller.group.value!.story == null,
+                text: 'Start Story',
+                onTap: controller.startStory,
               ),
+            ),
             const Gap(40),
           ],
         ),

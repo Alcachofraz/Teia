@@ -173,18 +173,62 @@ class GroupManagementService extends GetxService {
     );
   }
 
-  // Set user ready
-  Future<void> userReady(String groupName) async {
-    await FirebaseUtils.firestore.collection('groups').doc(groupName).set(
+  // Set reader ready
+  Future<void> setReaderReady(Group group) async {
+    GroupState state = GroupState.reading;
+    // Check if all readers are ready
+    if (group.userState.values
+        .where((element) =>
+            element.role == Role.reader &&
+            element.uid != AuthenticationService.value.uid)
+        .every((element) => element.ready)) {
+      state = GroupState.writing;
+    }
+    await FirebaseUtils.firestore.collection('groups').doc(group.name).set(
       {
         'userState': {
           AuthenticationService.value.uid: {
             'ready': true,
           }
-        }
+        },
+        'state': state.index,
       },
       SetOptions(merge: true),
     );
+  }
+
+  // Set writer ready
+  Future<void> setWriterReady(Group group) async {
+    GroupState state = GroupState.writing;
+    // Check if all readers are ready
+    if (group.userState.values
+        .where((element) =>
+            element.role == Role.writer &&
+            element.uid != AuthenticationService.value.uid)
+        .every((element) => element.ready)) {
+      state = GroupState.reading;
+    }
+    await FirebaseUtils.firestore.collection('groups').doc(group.name).set(
+      {
+        'userState': {
+          AuthenticationService.value.uid: {
+            'ready': true,
+          }
+        },
+        'state': state.index,
+      },
+      SetOptions(merge: true),
+    );
+  }
+
+  // Check if group is ready to start
+  bool groupReady(Group group) {
+    if (group.userState.values
+        .where((element) => element.role == Role.reader)
+        .every((element) => element.ready)) {
+      return true;
+    }
+    return false;
   }
 
   // Set group to 'writing' state

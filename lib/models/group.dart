@@ -15,6 +15,7 @@ class Group {
   final Story? story;
   final GroupState state;
   final List<String> users;
+  final int currentChapter;
   final Map<String, UserState> userState;
 
   Group({
@@ -22,6 +23,7 @@ class Group {
     required this.password,
     required this.users,
     required this.state,
+    required this.currentChapter,
     required this.userState,
     this.story,
   });
@@ -32,6 +34,7 @@ class Group {
       password: password,
       story: null,
       state: GroupState.idle,
+      currentChapter: 1,
       userState: {
         if (uid != null)
           uid: UserState(
@@ -55,6 +58,7 @@ class Group {
       password: map['password'],
       story: story,
       state: GroupState.values[map['state']],
+      currentChapter: map['currentChapter'],
       userState: (map['userState'] as Map<String, dynamic>).map(
         (key, value) => MapEntry(key, UserState.fromMap(value, key)),
       ),
@@ -68,6 +72,7 @@ class Group {
       'password': password,
       'story': story,
       'state': state.index,
+      'currentChapter': currentChapter,
       'userState': userState.map(
         (key, value) => MapEntry(key, value.toMap()),
       ),
