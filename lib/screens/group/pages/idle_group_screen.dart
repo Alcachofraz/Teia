@@ -66,7 +66,6 @@ class IdleGroupScreen extends StatelessWidget {
                         children: [
                           StoryBox(
                             story: controller.group.value!.story,
-                            color: controller.storyBoxColor,
                           ),
                           const Gap(12),
                           StoryCreateBox(

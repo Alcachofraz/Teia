@@ -1,15 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:teia/models/story.dart';
+import 'package:teia/utils/utils.dart';
 
 class StoryBox extends StatelessWidget {
   const StoryBox({
     super.key,
-    required this.color,
     required this.story,
   });
 
-  final Color color;
   final Story? story;
 
   @override
@@ -29,15 +28,8 @@ class StoryBox extends StatelessWidget {
         const Gap(4),
         if (story != null)
           Material(
-            color: Colors.white,
+            color: Utils.pageEditorSheetColor,
             elevation: 2,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
-              side: BorderSide(
-                color: color,
-                width: 1.5,
-              ),
-            ),
             child: Padding(
               padding: const EdgeInsets.all(12),
               child: Row(

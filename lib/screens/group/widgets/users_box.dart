@@ -4,6 +4,7 @@ import 'package:teia/models/user_state.dart';
 import 'package:teia/screens/group/models/user_info.dart';
 import 'package:teia/services/art_service.dart';
 import 'package:teia/services/authentication_service.dart';
+import 'package:teia/utils/utils.dart';
 
 class UsersBox extends StatelessWidget {
   const UsersBox({
@@ -38,15 +39,8 @@ class UsersBox extends StatelessWidget {
         const Gap(4),
         Expanded(
           child: Material(
-            color: Colors.white,
+            color: Utils.pageEditorSheetColor,
             elevation: 2,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
-              side: BorderSide(
-                color: color,
-                width: 1.5,
-              ),
-            ),
             child: Padding(
               padding: const EdgeInsets.all(15),
               child: Column(
