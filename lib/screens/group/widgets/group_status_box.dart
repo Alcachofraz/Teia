@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:teia/models/group.dart';
 import 'package:teia/models/user_state.dart';
 import 'package:teia/services/authentication_service.dart';
@@ -23,6 +24,10 @@ class GroupStatusBox extends StatelessWidget {
               Role.writer
           ? RichText(
               text: TextSpan(
+                style: GoogleFonts.robotoMono(
+                  color: Colors.black.withOpacity(0.9),
+                  fontSize: 14,
+                ),
                 children: [
                   const TextSpan(
                       text: "✍🏼 There are still users who haven't read the "),
@@ -48,6 +53,10 @@ class GroupStatusBox extends StatelessWidget {
           : (group.userState[AuthenticationService.value.uid!]!.ready
               ? RichText(
                   text: TextSpan(
+                    style: GoogleFonts.robotoMono(
+                      color: Colors.black.withOpacity(0.9),
+                      fontSize: 14,
+                    ),
                     children: [
                       const TextSpan(
                           text:
@@ -67,6 +76,10 @@ class GroupStatusBox extends StatelessWidget {
                 )
               : RichText(
                   text: TextSpan(
+                    style: GoogleFonts.robotoMono(
+                      color: Colors.black.withOpacity(0.9),
+                      fontSize: 14,
+                    ),
                     children: [
                       const TextSpan(text: "📖 You have "),
                       TextSpan(
@@ -85,6 +98,10 @@ class GroupStatusBox extends StatelessWidget {
               Role.reader
           ? RichText(
               text: TextSpan(
+                style: GoogleFonts.robotoMono(
+                  color: Colors.black.withOpacity(0.9),
+                  fontSize: 14,
+                ),
                 children: [
                   const TextSpan(text: "⌛ "),
                   TextSpan(
@@ -101,6 +118,10 @@ class GroupStatusBox extends StatelessWidget {
           : (group.userState[AuthenticationService.value.uid!]!.ready
               ? RichText(
                   text: TextSpan(
+                    style: GoogleFonts.robotoMono(
+                      color: Colors.black.withOpacity(0.9),
+                      fontSize: 14,
+                    ),
                     children: [
                       const TextSpan(
                           text:
@@ -118,6 +139,10 @@ class GroupStatusBox extends StatelessWidget {
                 )
               : RichText(
                   text: TextSpan(
+                    style: GoogleFonts.robotoMono(
+                      color: Colors.black.withOpacity(0.9),
+                      fontSize: 14,
+                    ),
                     children: [
                       const TextSpan(text: "✍🏼 The readers are waiting for "),
                       TextSpan(

@@ -58,6 +58,7 @@ class WriterGroupScreen extends StatelessWidget {
                           onRoleChanged: controller.onRoleChanged,
                           onTapEditUser: controller.onTapEditUser,
                           loadingRole: controller.loadingRole.value,
+                          group: controller.group.value!,
                         ),
                       ),
                     ),
