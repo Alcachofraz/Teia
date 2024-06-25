@@ -38,7 +38,10 @@ class GroupScreen extends GetView<GroupController> {
                 child: CircularProgressIndicator(),
               )
             : controller.allowed.value
-                ? _getGroupScreen(controller)
+                ? StatefulBuilder(builder: (context, setState) {
+                    controller.updateGroupScreen = setState;
+                    return _getGroupScreen(controller);
+                  })
                 : Center(
                     child: Column(
                       mainAxisSize: MainAxisSize.min,

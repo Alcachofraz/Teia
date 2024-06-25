@@ -8,6 +8,8 @@ import 'package:teia/services/firebase/firestore_utils.dart';
 import 'package:teia/utils/logs.dart';
 
 class ChapterManagementService extends GetxService {
+  static ChapterManagementService get value =>
+      Get.put(ChapterManagementService());
   Stream<Chapter> chapterStream(
     String storyId,
     String chapterId,
@@ -60,6 +62,20 @@ class ChapterManagementService extends GetxService {
           .set(chapter.toMap());
     } catch (e) {
       Logs.d('Sending $chapter\n$e');
+    }
+  }
+
+  // Add chapter
+  Future<void> chapterCreate(String storyId, int chapterId) async {
+    try {
+      await FirebaseUtils.firestore
+          .collection('stories')
+          .doc(storyId)
+          .collection('chapters')
+          .doc(chapterId.toString())
+          .set(Chapter.create(chapterId, storyId, 'New chapter').toMap());
+    } catch (e) {
+      Logs.d('Creating chapter $chapterId\n$e');
     }
   }
 

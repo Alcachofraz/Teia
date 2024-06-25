@@ -1,24 +1,31 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart' hide Page;
+import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:sorted_list/sorted_list.dart';
 import 'package:teia/models/chapter.dart';
+import 'package:teia/models/group.dart';
 import 'package:teia/models/letter.dart';
 import 'package:teia/models/page.dart';
+import 'package:teia/models/user_state.dart';
 import 'package:teia/screens/chapter_editor/chapter_graph_view.dart';
 import 'package:teia/screens/chapter_editor/widgets/page_editor.dart';
+import 'package:teia/services/art_service.dart';
 import 'package:teia/services/authentication_service.dart';
 import 'package:teia/services/chapter_management_service.dart';
+import 'package:teia/services/group_management_service.dart';
 import 'package:teia/utils/loading.dart';
 import 'package:teia/utils/utils.dart';
 import 'package:teia/views/misc/scrollable_static_scaffold.dart';
 import 'package:teia/views/misc/tile.dart';
+import 'package:teia/views/teia_button.dart';
 
 class ChapterEditorScreen extends StatefulWidget {
   final bool picking;
   final String chapterId = Get.parameters['chapterId']!;
   final String storyId = Get.parameters['storyId']!;
+  final String group = Get.parameters['group']!;
 
   ChapterEditorScreen({
     super.key,
@@ -31,14 +38,17 @@ class ChapterEditorScreen extends StatefulWidget {
 
 class _ChapterEditorScreenState extends State<ChapterEditorScreen> {
   Chapter? _chapter;
+  Group? _group;
   late double textEditorWeight;
   late double loosePagesMenuHeight;
   late StreamSubscription _chapterSubscription;
+  late StreamSubscription _groupSubscription;
   int? selectedPageId;
   bool showingLoosePages = false;
   final FocusNode pageEditorFocusNode = FocusNode();
   final ChapterManagementService chapterManagementService =
       Get.put(ChapterManagementService());
+  late Color buttonColor;
 
   @override
   void initState() {
@@ -47,12 +57,17 @@ class _ChapterEditorScreenState extends State<ChapterEditorScreen> {
     _chapterSubscription = chapterManagementService
         .chapterStream(widget.storyId, widget.chapterId)
         .listen((chapter) => setState(() => _chapter = chapter));
+    _groupSubscription = GroupManagementService.value
+        .groupStream(widget.group)
+        .listen((group) => setState(() => _group = group));
+    buttonColor = ArtService.value.pastel();
     super.initState();
   }
 
   @override
   void dispose() {
     _chapterSubscription.cancel();
+    _groupSubscription.cancel();
     super.dispose();
   }
 
@@ -231,6 +246,33 @@ class _ChapterEditorScreenState extends State<ChapterEditorScreen> {
         children: [
           _chapterGraph(screenSize),
           _pageEditor(screenSize),
+          if (_group != null)
+            Align(
+              alignment: Alignment.bottomLeft,
+              child: Padding(
+                padding: const EdgeInsets.all(32),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Chapter ${_chapter?.id ?? '...'}',
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 28,
+                      ),
+                    ),
+                    const Gap(4),
+                    Text(
+                      _chapter?.title ?? '...',
+                      style: const TextStyle(
+                        fontSize: 16,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
         ],
       ),
     );

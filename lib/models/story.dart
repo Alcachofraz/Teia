@@ -4,6 +4,7 @@ class Story {
   final DateTime createdAt;
   final String name;
   final bool finished;
+  final int numberOfChapters;
 
   Story(
     this.id,
@@ -11,6 +12,7 @@ class Story {
     this.createdAt,
     this.name,
     this.finished,
+    this.numberOfChapters,
   );
 
   factory Story.init(String id, String name) {
@@ -20,6 +22,7 @@ class Story {
       DateTime.now(),
       name,
       false,
+      1,
     );
   }
 
@@ -30,6 +33,7 @@ class Story {
       DateTime.fromMillisecondsSinceEpoch(map['createdAt']),
       map['name'],
       map['finished'],
+      map['numberOfChapters'],
     );
   }
 
@@ -40,6 +44,7 @@ class Story {
       'createdAt': createdAt.millisecondsSinceEpoch,
       'name': name,
       'finished': finished,
+      'numberOfChapters': numberOfChapters,
     };
   }
 }

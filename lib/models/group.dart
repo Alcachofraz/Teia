@@ -17,6 +17,7 @@ class Group {
   final List<String> users;
   final int currentChapter;
   final Map<String, UserState> userState;
+  final bool finalChapter;
 
   Group({
     required this.name,
@@ -25,6 +26,7 @@ class Group {
     required this.state,
     required this.currentChapter,
     required this.userState,
+    required this.finalChapter,
     this.story,
   });
 
@@ -49,6 +51,7 @@ class Group {
           ),
       },
       users: uid == null ? [] : [uid],
+      finalChapter: false,
     );
   }
 
@@ -63,6 +66,7 @@ class Group {
         (key, value) => MapEntry(key, UserState.fromMap(value, key)),
       ),
       users: (map['users'] as List).cast<String>(),
+      finalChapter: map['finalChapter'],
     );
   }
 
@@ -77,6 +81,7 @@ class Group {
         (key, value) => MapEntry(key, value.toMap()),
       ),
       'users': users,
+      'finalChapter': finalChapter,
     };
   }
 }

@@ -3,14 +3,18 @@ import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:teia/screens/group/controllers/group_controller.dart';
+import 'package:teia/screens/group/widgets/group_status_box.dart';
 import 'package:teia/screens/group/widgets/story_box.dart';
 import 'package:teia/screens/group/widgets/users_box.dart';
+import 'package:teia/services/art_service.dart';
 import 'package:teia/views/teia_button.dart';
 
 class WriterGroupScreen extends StatelessWidget {
-  const WriterGroupScreen({super.key, required this.controller});
+  WriterGroupScreen({super.key, required this.controller});
 
   final GroupController controller;
+
+  final Color color = ArtService.value.pastel();
 
   @override
   Widget build(BuildContext context) {
@@ -69,6 +73,7 @@ class WriterGroupScreen extends StatelessWidget {
                           const Gap(12),
                           TeiaButton(
                             text: 'Chapter Editor',
+                            color: color,
                             widget: const Icon(
                               Icons.schema_outlined,
                               color: Colors.white,
@@ -77,9 +82,15 @@ class WriterGroupScreen extends StatelessWidget {
                               Get.toNamed('/chapter_editor', parameters: {
                                 'storyId': controller.group.value!.story!.id,
                                 'chapterId': '1',
+                                'group': controller.group.value!.name,
                               });
                             },
-                          )
+                          ),
+                          const Gap(16),
+                          GroupStatusBox(
+                            group: controller.group.value!,
+                            color: color,
+                          ),
                         ],
                       ),
                     ),
@@ -88,6 +99,41 @@ class WriterGroupScreen extends StatelessWidget {
               ),
             ),
             const Gap(40),
+
+            /*Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  'Chapter ${_chapter?.id ?? '...'}',
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 24,
+                  ),
+                ),
+                const Gap(4),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Checkbox(
+                      value: _group!.finalChapter,
+                      onChanged: (bool? value) => GroupManagementService.value
+                          .setFinalChapter(_group!.name, value ?? false),
+                    ),
+                    const Text('Final Chapter'),
+                  ],
+                ),
+                const Gap(8),
+                TeiaButton(
+                  color: buttonColor,
+                  onTap: () {
+                    GroupManagementService.value.setWriterReady(_group!);
+                  },
+                  text:
+                      '(${_group!.userState.entries.where((e) => e.value.role == Role.writer && e.value.ready).length} / ${_group!.userState.entries.where((e) => e.value.role == Role.writer).length})  Finish',
+                  expand: false,
+                ),
+              ],
+            ),*/
           ],
         ),
       ),

@@ -19,7 +19,7 @@ class Chapter {
     this.links,
   );
 
-  factory Chapter.create(int id, String storyId, String title, String uid) {
+  factory Chapter.create(int id, String storyId, String title) {
     return Chapter(
       id,
       storyId,

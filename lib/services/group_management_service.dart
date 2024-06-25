@@ -182,15 +182,15 @@ class GroupManagementService extends GetxService {
             element.role == Role.reader &&
             element.uid != AuthenticationService.value.uid)
         .every((element) => element.ready)) {
-      state = GroupState.writing;
+      state = group.story!.finished
+          ? GroupState.reading
+          : (group.finalChapter ? GroupState.idle : GroupState.writing);
     }
     await FirebaseUtils.firestore.collection('groups').doc(group.name).set(
       {
-        'userState': {
-          AuthenticationService.value.uid: {
-            'ready': true,
-          }
-        },
+        'userState': group.userState.map(
+          (key, value) => MapEntry(key, value.copyWith(ready: false).toMap()),
+        ),
         'state': state.index,
       },
       SetOptions(merge: true),
@@ -200,6 +200,7 @@ class GroupManagementService extends GetxService {
   // Set writer ready
   Future<void> setWriterReady(Group group) async {
     GroupState state = GroupState.writing;
+    int currentChapter = group.currentChapter;
     // Check if all readers are ready
     if (group.userState.values
         .where((element) =>
@@ -207,14 +208,18 @@ class GroupManagementService extends GetxService {
             element.uid != AuthenticationService.value.uid)
         .every((element) => element.ready)) {
       state = GroupState.reading;
+
+      if (!group.finalChapter) {
+        await StoryManagementService.value.storyAddChapter(group.story!);
+        currentChapter++;
+      }
     }
     await FirebaseUtils.firestore.collection('groups').doc(group.name).set(
       {
-        'userState': {
-          AuthenticationService.value.uid: {
-            'ready': true,
-          }
-        },
+        'userState': group.userState.map(
+          (key, value) => MapEntry(key, value.copyWith(ready: false).toMap()),
+        ),
+        'currentChapter': currentChapter,
         'state': state.index,
       },
       SetOptions(merge: true),
@@ -236,6 +241,16 @@ class GroupManagementService extends GetxService {
     await FirebaseUtils.firestore.collection('groups').doc(groupName).set(
       {
         'state': GroupState.writing.index,
+      },
+      SetOptions(merge: true),
+    );
+  }
+
+  // Set final chapter
+  Future<void> setFinalChapter(String groupName, bool finalChapter) async {
+    await FirebaseUtils.firestore.collection('groups').doc(groupName).set(
+      {
+        'finalChapter': finalChapter,
       },
       SetOptions(merge: true),
     );

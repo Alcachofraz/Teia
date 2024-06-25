@@ -51,4 +51,22 @@ class UserState {
       'admin': admin,
     };
   }
+
+  UserState copyWith({
+    Role? role,
+    bool? ready,
+    int? avatar,
+    String? name,
+    String? uid,
+    bool? admin,
+  }) {
+    return UserState(
+      role: role ?? this.role,
+      ready: ready ?? this.ready,
+      avatar: avatar ?? this.avatar,
+      name: name ?? this.name,
+      uid: uid ?? this.uid,
+      admin: admin ?? this.admin,
+    );
+  }
 }

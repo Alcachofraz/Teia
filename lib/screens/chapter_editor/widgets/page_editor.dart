@@ -78,9 +78,6 @@ class _PageEditorState extends State<PageEditor> {
 
   Color accentColor = ArtService.value.pastel();
 
-  final ChapterManagementService chapterManagementService =
-      Get.put(ChapterManagementService());
-
   final StorageService storageService = Get.put(StorageService());
 
   @override
@@ -103,7 +100,7 @@ class _PageEditorState extends State<PageEditor> {
     _onContextMenu =
         document.onContextMenu.listen((event) => event.preventDefault());
 
-    _pageChangesSubscription = chapterManagementService
+    _pageChangesSubscription = ChapterManagementService.value
         .streamPageChanges(
           widget.chapter.storyId,
           widget.chapter.id.toString(),
@@ -111,7 +108,7 @@ class _PageEditorState extends State<PageEditor> {
         )
         .listen(_onRemoteChange);
 
-    _pageSubscription = chapterManagementService
+    _pageSubscription = ChapterManagementService.value
         .pageStream(
           widget.chapter.storyId,
           widget.chapter.id.toString(),
@@ -251,7 +248,7 @@ class _PageEditorState extends State<PageEditor> {
   void _onLocalInsert(LetterId? id, String text) {
     //print('INSERT [$id, $text]');
     page.insert(id, text);
-    chapterManagementService.pushPageChange(
+    ChapterManagementService.value.pushPageChange(
       widget.chapter.storyId,
       widget.chapter.id.toString(),
       widget.pageId.toString(),
@@ -270,7 +267,7 @@ class _PageEditorState extends State<PageEditor> {
   void _onLocalDelete(LetterId? id, int length) {
     //print('DELETE [$id, $length]');
     page.delete(id, length);
-    chapterManagementService.pushPageChange(
+    ChapterManagementService.value.pushPageChange(
       widget.chapter.storyId,
       widget.chapter.id.toString(),
       widget.pageId.toString(),
@@ -289,7 +286,7 @@ class _PageEditorState extends State<PageEditor> {
   void _onLocalFormat(LetterId? id, int length, Snippet snippet) {
     //print('FORMAT [$id, $length, $snippet]');
     page.format(id, length, snippet);
-    chapterManagementService.pushPageChange(
+    ChapterManagementService.value.pushPageChange(
       widget.chapter.storyId,
       widget.chapter.id.toString(),
       widget.pageId.toString(),

@@ -39,6 +39,8 @@ class GroupController extends GetxController {
 
   late StreamSubscription<Group> groupSubscription;
 
+  void Function(void Function())? updateGroupScreen;
+
   @override
   void onInit() async {
     loading.value = true;
@@ -53,6 +55,9 @@ class GroupController extends GetxController {
               AuthenticationService.value.uid,
             );
             if (allowed.value) {
+              if (newGroup.state != group.value?.state) {
+                updateGroupScreen?.call(() {});
+              }
               group.value = newGroup;
               userInfo.clear();
               newGroup.userState.forEach((key, value) {
