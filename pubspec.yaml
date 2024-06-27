@@ -96,6 +96,7 @@ flutter:
     - assets/images/background/right/
     - assets/images/background/left/
     - assets/images/roles/
+    - assets/images/landscapes/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

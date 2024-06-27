@@ -49,6 +49,7 @@ class _ChapterEditorScreenState extends State<ChapterEditorScreen> {
   final ChapterManagementService chapterManagementService =
       Get.put(ChapterManagementService());
   late Color buttonColor;
+  final String landscape = ArtService.value.landscape();
 
   @override
   void initState() {
@@ -244,6 +245,17 @@ class _ChapterEditorScreenState extends State<ChapterEditorScreen> {
       backgroundColor: Utils.graphSettings.backgroundColor,
       body: Stack(
         children: [
+          Image.asset(
+            landscape,
+            fit: BoxFit.cover,
+            width: screenSize.width,
+            height: screenSize.height,
+          ),
+          Container(
+            color: Colors.grey.withOpacity(0.9),
+            width: screenSize.width,
+            height: screenSize.height,
+          ),
           _chapterGraph(screenSize),
           _pageEditor(screenSize),
           if (_group != null)

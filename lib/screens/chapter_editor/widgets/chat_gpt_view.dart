@@ -44,17 +44,11 @@ class ChatGPTView extends GetView<ChatGPTController> {
               () => controller.idea.value.isNotEmpty
                   ? Padding(
                       padding: const EdgeInsets.only(top: 16),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: SelectableText(
-                              controller.idea.value,
-                              style: const TextStyle(
-                                  color: Colors.black, fontSize: 13),
-                              textAlign: TextAlign.start,
-                            ),
-                          ),
-                        ],
+                      child: SelectableText(
+                        controller.idea.value,
+                        style:
+                            const TextStyle(color: Colors.black, fontSize: 13),
+                        textAlign: TextAlign.start,
                       ),
                     )
                   : Container(),

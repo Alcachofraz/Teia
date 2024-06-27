@@ -376,23 +376,26 @@ class _PageEditorState extends State<PageEditor> {
   }
 
   Widget _comments() {
-    return Column(
-      children: [
-        if (_atSnippet != null)
+    return SingleChildScrollView(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          if (_atSnippet != null)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+              child: _snippetCard(_atSnippet!),
+            ),
           Padding(
-            padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-            child: _snippetCard(_atSnippet!),
+            padding: const EdgeInsets.fromLTRB(0, 0, 0, 16),
+            child: ChatGPTView(
+              getPageContent: () => _controller.document.toPlainText(),
+              accentColor: accentColor,
+            ),
           ),
-        Padding(
-          padding: const EdgeInsets.fromLTRB(0, 0, 0, 16),
-          child: ChatGPTView(
-            getPageContent: () => _controller.document.toPlainText(),
-            accentColor: accentColor,
-          ),
-        ),
 
-        // for() comments
-      ],
+          // for() comments
+        ],
+      ),
     );
   }
 
@@ -618,6 +621,7 @@ class _PageEditorState extends State<PageEditor> {
     return Stack(
       children: [
         Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Expanded(
               flex: Utils.editorPageWeight * 100 as int,

@@ -46,6 +46,10 @@ class ArtService extends GetxService {
     return HSLColor.fromAHSL(1.0, r.nextDouble() * 360, 0.4, 0.5).toColor();
   }
 
+  String landscape() {
+    return 'assets/images/landscapes/${r.nextInt(4) + 1}.png';
+  }
+
   /// Darken a given color.
   Color darken(Color c, [int percent = 10]) {
     assert(1 <= percent && percent <= 100);
