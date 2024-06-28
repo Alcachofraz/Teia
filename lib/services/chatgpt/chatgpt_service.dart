@@ -23,11 +23,11 @@ class ChatGPTService extends GetxService {
           {
             "role": "user",
             "content":
-                'I\'m writing a chapter for my book. This is what I have so far: "$context"',
+                "You are a narrative idea tool. I will provide you with context for the previous pages of my Choose Your Own Adventure book, and you'll give me an idea on how the current page should end. You are not a chat bot, so don't answer like one. Just give me the idea.",
           },
           {
             "role": "user",
-            "content": "Tell me the next part of the story.",
+            "content": context,
           },
         ]
       };

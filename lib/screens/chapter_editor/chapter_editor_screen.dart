@@ -8,7 +8,6 @@ import 'package:teia/models/chapter.dart';
 import 'package:teia/models/group.dart';
 import 'package:teia/models/letter.dart';
 import 'package:teia/models/page.dart';
-import 'package:teia/models/user_state.dart';
 import 'package:teia/screens/chapter_editor/chapter_graph_view.dart';
 import 'package:teia/screens/chapter_editor/widgets/page_editor.dart';
 import 'package:teia/services/art_service.dart';
@@ -17,6 +16,7 @@ import 'package:teia/services/chapter_management_service.dart';
 import 'package:teia/services/group_management_service.dart';
 import 'package:teia/utils/loading.dart';
 import 'package:teia/utils/utils.dart';
+import 'package:teia/views/misc/screen_wrapper.dart';
 import 'package:teia/views/misc/scrollable_static_scaffold.dart';
 import 'package:teia/views/misc/tile.dart';
 import 'package:teia/views/teia_button.dart';
@@ -48,20 +48,36 @@ class _ChapterEditorScreenState extends State<ChapterEditorScreen> {
   final FocusNode pageEditorFocusNode = FocusNode();
   final ChapterManagementService chapterManagementService =
       Get.put(ChapterManagementService());
+  final RxBool allowed = false.obs;
   late Color buttonColor;
   final String landscape = ArtService.value.landscape();
+  RxBool loading = false.obs;
 
   @override
   void initState() {
+    loading.value = true;
     textEditorWeight = Utils.editorWeight;
     loosePagesMenuHeight = Utils.loosePagesMenuDefaultHeight;
     _chapterSubscription = chapterManagementService
         .chapterStream(widget.storyId, widget.chapterId)
         .listen((chapter) => setState(() => _chapter = chapter));
-    _groupSubscription = GroupManagementService.value
-        .groupStream(widget.group)
-        .listen((group) => setState(() => _group = group));
+    _groupSubscription =
+        GroupManagementService.value.groupStream(widget.group).listen(
+      (group) {
+        allowed.value = group.users.contains(
+          AuthenticationService.value.uid,
+        );
+        if (allowed.value) {
+          if (group.state != (_group?.state ?? group.state)) {
+            Get.back();
+          }
+          setState(() => _group = group);
+        }
+        loading.value = false;
+      },
+    );
     buttonColor = ArtService.value.pastel();
+
     super.initState();
   }
 
@@ -241,52 +257,84 @@ class _ChapterEditorScreenState extends State<ChapterEditorScreen> {
   @override
   Widget build(BuildContext context) {
     var screenSize = MediaQuery.of(context).size;
-    return ScrollableStaticScaffold(
-      backgroundColor: Utils.graphSettings.backgroundColor,
-      body: Stack(
-        children: [
-          Image.asset(
-            landscape,
-            fit: BoxFit.cover,
-            width: screenSize.width,
-            height: screenSize.height,
-          ),
-          Container(
-            color: Colors.grey.withOpacity(0.9),
-            width: screenSize.width,
-            height: screenSize.height,
-          ),
-          _chapterGraph(screenSize),
-          _pageEditor(screenSize),
-          if (_group != null)
-            Align(
-              alignment: Alignment.bottomLeft,
-              child: Padding(
-                padding: const EdgeInsets.all(32),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Chapter ${_chapter?.id ?? '...'}',
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 28,
-                      ),
-                    ),
-                    const Gap(4),
-                    Text(
-                      _chapter?.title ?? '...',
-                      style: const TextStyle(
-                        fontSize: 16,
-                      ),
-                    ),
-                  ],
-                ),
+    return Obx(
+      () => loading.value
+          ? const ScreenWrapper(
+              body: Center(
+                child: CircularProgressIndicator(),
               ),
-            ),
-        ],
-      ),
+            )
+          : allowed.value
+              ? ScrollableStaticScaffold(
+                  backgroundColor: Utils.graphSettings.backgroundColor,
+                  body: Stack(
+                    children: [
+                      Image.asset(
+                        landscape,
+                        fit: BoxFit.cover,
+                        width: screenSize.width,
+                        height: screenSize.height,
+                      ),
+                      Container(
+                        color: Colors.white.withOpacity(0.85),
+                        width: screenSize.width,
+                        height: screenSize.height,
+                      ),
+                      _chapterGraph(screenSize),
+                      _pageEditor(screenSize),
+                      if (_group != null)
+                        Align(
+                          alignment: Alignment.bottomLeft,
+                          child: Padding(
+                            padding: const EdgeInsets.all(32),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Chapter ${_chapter?.id ?? '...'}',
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 28,
+                                  ),
+                                ),
+                                const Gap(4),
+                                Text(
+                                  _chapter?.title ?? '...',
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
+                )
+              : ScreenWrapper(
+                  body: Center(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Text(
+                          'You don\'t have permission to see this page.',
+                          style: TextStyle(
+                            fontSize: 24,
+                          ),
+                        ),
+                        const Gap(20),
+                        SizedBox(
+                          width: 300,
+                          child: TeiaButton(
+                            text: 'Go Back',
+                            onTap: () => Get.back(),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
     );
   }
 }
