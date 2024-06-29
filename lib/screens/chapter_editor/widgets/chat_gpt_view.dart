@@ -1,3 +1,4 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:teia/screens/chapter_editor/controller/chatgpt_controller.dart';
@@ -28,8 +29,9 @@ class ChatGPTView extends GetView<ChatGPTController> {
                   size: 24.0,
                 ),
                 SizedBox(width: 8),
-                Text(
+                AutoSizeText(
                   'Need inspiration?',
+                  minFontSize: 16,
                   style: TextStyle(color: Colors.black, fontSize: 18),
                 ),
               ],

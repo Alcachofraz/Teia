@@ -23,7 +23,7 @@ class ChatGPTService extends GetxService {
           {
             "role": "user",
             "content":
-                "You are a narrative idea tool. I will provide you with context for the previous pages of my Choose Your Own Adventure book, and you'll give me an idea on how the current page should end. You are not a chat bot, so don't answer like one. Just give me the idea.",
+                "You are a narrative idea tool. I will provide you with context for the previous pages of my Choose Your Own Adventure book, and you'll give me an idea on how the current page should end. You are not a chat bot, so don't answer like one. Just give me the idea. The idea you give should be written in the same language as the context.",
           },
           {
             "role": "user",

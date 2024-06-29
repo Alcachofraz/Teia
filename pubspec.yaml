@@ -66,6 +66,7 @@ dependencies:
   url_strategy: ^0.2.0
   gap: ^3.0.1
   flutter_animate: ^4.5.0
+  auto_size_text: ^3.0.0
 
 dev_dependencies:
   flutter_test:
