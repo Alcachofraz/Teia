@@ -281,7 +281,6 @@ class _ChapterEditorScreenState extends State<ChapterEditorScreen> {
                         height: screenSize.height,
                       ),
                       _chapterGraph(screenSize),
-                      _pageEditor(screenSize),
                       if (_group != null)
                         Align(
                           alignment: Alignment.bottomLeft,
@@ -298,17 +297,17 @@ class _ChapterEditorScreenState extends State<ChapterEditorScreen> {
                                     fontSize: 28,
                                   ),
                                 ),
-                                const Gap(4),
                                 Text(
                                   _chapter?.title ?? '...',
                                   style: const TextStyle(
-                                    fontSize: 16,
+                                    fontSize: 14,
                                   ),
                                 ),
                               ],
                             ),
                           ),
                         ),
+                      _pageEditor(screenSize),
                     ],
                   ),
                 )

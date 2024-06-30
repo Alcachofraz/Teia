@@ -222,10 +222,6 @@ class _PageEditorState extends State<PageEditor> {
       }
       //print('Remote -> ${change.toString()}');
 
-      if (change.length != null && change.length! <= 0) {
-        print(change.length);
-      }
-
       Delta delta = page.compose(change);
       //print('New Page (letters) -> ${page.letters.toString()}');
       //print('DELTA -> ${delta.toJson()}');
