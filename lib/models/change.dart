@@ -34,7 +34,13 @@ class Change extends Comparable<Change> {
       map['timestamp'],
       length: map['length'],
       letter: map['letter'],
-      snippet: map['snippet'] == null ? null : Snippet.fromMap(map['snippet']),
+      snippet: map['snippet'] == null
+          ? null
+          : Snippet.fromMap(
+              Map<String, dynamic>.from(
+                map['snippet'] as dynamic,
+              ),
+            ),
     );
   }
 

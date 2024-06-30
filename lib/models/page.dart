@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter_quill/quill_delta.dart';
 import 'package:sorted_list/sorted_list.dart';
 import 'package:teia/models/change.dart';
@@ -133,25 +135,31 @@ class tPage {
 
   /// Add change to local [letters] and return delta of that change.
   Delta compose(Change change) {
-    switch (change.type) {
-      case ChangeType.insert:
-        int index = insert(change.id, change.letter!);
-        return Delta()
-          ..retain(index)
-          ..insert(change.letter!);
-      case ChangeType.delete:
-        int index = delete(change.id, change.length!);
-        return Delta()
-          ..retain(index)
-          ..delete(change.length!);
-      case ChangeType.format:
-        int index = format(change.id!, change.length!, change.snippet);
-        return Delta()
-          ..retain(index)
-          ..retain(
-            change.length!,
-            change.snippet != null ? null : {'color': '#0000FF'},
-          );
+    int index;
+    try {
+      switch (change.type) {
+        case ChangeType.insert:
+          index = insert(change.id, change.letter!);
+          return Delta()
+            ..retain(index)
+            ..insert(change.letter!);
+        case ChangeType.delete:
+          index = delete(change.id, change.length!);
+          return Delta()
+            ..retain(index)
+            ..delete(change.length ?? 0);
+        case ChangeType.format:
+          index = format(change.id!, change.length!, change.snippet);
+          return Delta()
+            ..retain(index)
+            ..retain(
+              change.length ?? 0,
+              change.snippet != null ? null : {'color': '#0000FF'},
+            );
+      }
+    } catch (e) {
+      print(e);
+      rethrow;
     }
   }
 
@@ -196,15 +204,19 @@ class tPage {
 
   /// Delete [length] letters after [id]. Returns index of [id].
   int delete(LetterId? id, int length) {
-    int index = letters.indexWhere((l) => l.id == id);
+    //int index = letters.indexWhere((l) => l.id == id);
+    int index = indexLetter(id);
     if (index < 0) return -1;
-    letters.removeRange(index, index + length);
+    if (index + length < letters.length) {
+      letters.removeRange(index, index + length);
+    }
     return index;
   }
 
   /// Formats [length] letters after [id]. Returns index of [id].
   int format(LetterId? id, int length, Snippet? snippet) {
-    int index = letters.indexWhere((l) => l.id == id);
+    //int index = letters.indexWhere((l) => l.id == id);
+    int index = indexLetter(id);
     for (int i = index; i < index + length; i++) {
       letters[i].snippet = snippet;
     }

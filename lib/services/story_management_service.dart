@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
+import 'package:teia/models/change.dart';
+import 'package:teia/models/chapter.dart';
 import 'package:teia/models/story.dart';
 import 'package:teia/services/chapter_management_service.dart';
 import 'package:teia/services/firebase/firestore_utils.dart';
@@ -49,7 +51,13 @@ class StoryManagementService extends GetxService {
         .update({'numberOfChapters': FieldValue.increment(1)});
   }
 
-  Future<bool> convertToReadableChapter(Story story, int chapterId) async {
-    return true;
+  Future<void> convertToReadableChapter(Story story, int chapterId) async {
+    Chapter? chapter = await ChapterManagementService.value.chapterGet(
+      story.id,
+      chapterId.toString(),
+    );
+    if (chapter == null) {
+      return;
+    }
   }
 }

@@ -216,14 +216,20 @@ class _PageEditorState extends State<PageEditor> {
   void _onRemoteChange(Change change) {
     try {
       if (change.uid == AuthenticationService.value.uid &&
-          change.timestamp > _sessionStartTimestamp) {
+          change.timestamp > _sessionStartTimestamp &&
+          change.type != ChangeType.format) {
         return;
       }
       //print('Remote -> ${change.toString()}');
 
+      if (change.length != null && change.length! <= 0) {
+        print(change.length);
+      }
+
       Delta delta = page.compose(change);
       //print('New Page (letters) -> ${page.letters.toString()}');
       //print('DELTA -> ${delta.toJson()}');
+
       if (change.type == ChangeType.format) {
         _controller.formatText(
           page.letters.indexWhere((p0) => p0.id == change.id),
@@ -240,6 +246,7 @@ class _PageEditorState extends State<PageEditor> {
         );
       }
     } catch (e) {
+      print('Error parsing remote change: $e');
       throw Exception('Error parsing remote change: $e');
     }
   }
@@ -282,7 +289,7 @@ class _PageEditorState extends State<PageEditor> {
     );
   }
 
-  /// On document delete.
+  /// On document format
   void _onLocalFormat(LetterId? id, int length, Snippet snippet) {
     //print('FORMAT [$id, $length, $snippet]');
     page.format(id, length, snippet);

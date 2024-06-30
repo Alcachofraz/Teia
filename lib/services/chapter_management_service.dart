@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:get/get.dart';
 import 'package:teia/models/change.dart';
 import 'package:teia/models/chapter.dart';
@@ -56,12 +58,27 @@ class ChapterManagementService extends GetxService {
     try {
       FirebaseUtils.firestore
           .collection('stories')
-          .doc(chapter.storyId)
+          .doc(chapter.storyId.toString())
           .collection('chapters')
           .doc(chapter.id.toString())
           .set(chapter.toMap());
+    } on TypeError catch (e) {
+      Logs.d('Sending $chapter\n$e\n${e.stackTrace}');
+    }
+  }
+
+  Future<Chapter?> chapterGet(String storyId, String chapterId) async {
+    try {
+      return Chapter.fromMap((await FirebaseUtils.firestore
+              .collection('stories')
+              .doc(storyId)
+              .collection('chapters')
+              .doc(chapterId)
+              .get())
+          .data());
     } catch (e) {
-      Logs.d('Sending $chapter\n$e');
+      print('chapterGet: $e');
+      return null;
     }
   }
 
@@ -177,8 +194,10 @@ class ChapterManagementService extends GetxService {
         .map((event) {
       try {
         return Change.fromMap(
-            Map<String, dynamic>.from(event.snapshot.value as Map));
+          Map<String, dynamic>.from(event.snapshot.value as dynamic),
+        );
       } catch (e) {
+        print('Error parsing change: $e');
         throw Exception('Error parsing change: $e');
       }
     });
@@ -213,11 +232,9 @@ class ChapterManagementService extends GetxService {
     }*/
   }
 
-  Future<List<Change>> getPageChanges(
-      String storyId, String chapterId, String pageId) async {
+  Future<List<Change>> getPageChanges(String storyId, String chapterId) async {
     return ((await FirebaseUtils.realtime
-                .ref(
-                    'stories/$storyId/chapters/$chapterId/pages/$pageId/changes')
+                .ref('stories/$storyId/chapters/$chapterId/pages')
                 .once())
             .snapshot
             .value as List<Map<String, dynamic>>)

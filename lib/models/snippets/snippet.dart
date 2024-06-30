@@ -21,7 +21,7 @@ class Snippet {
     return Snippet(
       map['text'],
       SnippetType.values[map['type']],
-      Map<String, dynamic>.from(map['attributes'] ?? {}),
+      Map<String, dynamic>.from((map['attributes'] as dynamic) ?? {}),
     );
   }
 

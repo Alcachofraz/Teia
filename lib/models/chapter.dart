@@ -92,13 +92,20 @@ class Chapter {
   }
 
   /// Convert this chapter to a Map<String, dynamic> object.
-  Map<String, dynamic> toMap() => {
+  Map<String, dynamic> toMap() {
+    try {
+      return <String, dynamic>{
         'id': id,
         'storyId': storyId,
         'title': title,
         'graph': graph.nodes,
-        'links': links.nodes
+        'links': links.nodes,
       };
+    } catch (e) {
+      print(e);
+      return <String, dynamic>{};
+    }
+  }
 
   @override
   String toString() => toMap().toString();

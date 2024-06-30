@@ -210,7 +210,7 @@ class GroupManagementService extends GetxService {
       state = GroupState.reading;
 
       // Convert to readeable chapter
-      StoryManagementService.value
+      await StoryManagementService.value
           .convertToReadableChapter(group.story!, currentChapter);
 
       // If not final chapter, add another after
