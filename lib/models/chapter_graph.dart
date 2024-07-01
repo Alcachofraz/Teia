@@ -58,7 +58,8 @@ class ChapterGraph {
   }
 
   // To map.
-  Map<String, List<int>> toMap() => _nodes.map((key, value) => MapEntry(key.toString(), value));
+  Map<String, List<int>> toMap() =>
+      _nodes.map((key, value) => MapEntry(key.toString(), value));
 
   @override
   String toString() {

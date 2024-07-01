@@ -98,8 +98,8 @@ class Chapter {
         'id': id,
         'storyId': storyId,
         'title': title,
-        'graph': graph.nodes,
-        'links': links.nodes,
+        'graph': graph.toMap(),
+        'links': links.toMap(),
       };
     } catch (e) {
       print(e);

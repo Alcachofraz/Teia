@@ -121,7 +121,7 @@ class tPage {
     }
   }
 
-  int indexLetter(LetterId? id) {
+  int indexLetter(LetterId? id, {insert = true}) {
     if (id == null) return 0;
     int index = letters.indexWhere((l) => l.id == id);
     if (index < 0) {
@@ -130,7 +130,7 @@ class tPage {
     if (index < 0) {
       index = letters.length;
     }
-    return index + 1;
+    return index + (insert ? 1 : 0);
   }
 
   /// Add change to local [letters] and return delta of that change.
@@ -205,7 +205,7 @@ class tPage {
   /// Delete [length] letters after [id]. Returns index of [id].
   int delete(LetterId? id, int length) {
     //int index = letters.indexWhere((l) => l.id == id);
-    int index = indexLetter(id);
+    int index = indexLetter(id, insert: false);
     if (index < 0) return -1;
     if (index + length < letters.length) {
       letters.removeRange(index, index + length);
@@ -216,7 +216,7 @@ class tPage {
   /// Formats [length] letters after [id]. Returns index of [id].
   int format(LetterId? id, int length, Snippet? snippet) {
     //int index = letters.indexWhere((l) => l.id == id);
-    int index = indexLetter(id);
+    int index = indexLetter(id, insert: false);
     for (int i = index; i < index + length; i++) {
       letters[i].snippet = snippet;
     }

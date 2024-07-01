@@ -62,8 +62,8 @@ class ChapterManagementService extends GetxService {
           .collection('chapters')
           .doc(chapter.id.toString())
           .set(chapter.toMap());
-    } on TypeError catch (e) {
-      Logs.d('Sending $chapter\n$e\n${e.stackTrace}');
+    } catch (e) {
+      Logs.d('Sending $chapter\n$e');
     }
   }
 
