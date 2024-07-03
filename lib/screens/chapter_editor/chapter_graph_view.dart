@@ -9,24 +9,25 @@ class ChapterGraphView extends StatefulWidget {
   final Chapter chapter;
   final double? width;
   final double? height;
+  final Set<int> missingLinks;
   final Function(int)? createPage;
   final Function(int)? clickPage;
 
   const ChapterGraphView({
-    Key? key,
+    super.key,
     required this.chapter,
     this.createPage,
     this.width,
     this.height,
+    required this.missingLinks,
     this.clickPage,
-  }) : super(key: key);
+  });
 
   @override
   State<ChapterGraphView> createState() => _ChapterGraphViewState();
 }
 
 class _ChapterGraphViewState extends State<ChapterGraphView> {
-  Set<int> missingLinks = {};
   Function eq = const ListEquality().equals;
 
   /// Returns a list with [Graph, BuchheimWalkerAlgorithm];
@@ -40,13 +41,6 @@ class _ChapterGraphViewState extends State<ChapterGraphView> {
         Node.Id(end),
       );
     });
-
-    for (var element in chapter.graph.nodes.entries) {
-      if (chapter.links.nodes.containsKey(element.key) &&
-          !eq(chapter.links.nodes[element.key], element.value)) {
-        missingLinks.add(element.key);
-      }
-    }
 
     SugiyamaConfiguration sug = SugiyamaConfiguration()
       ..bendPointShape = CurvedBendPointShape(curveLength: 20)
@@ -85,7 +79,7 @@ class _ChapterGraphViewState extends State<ChapterGraphView> {
               int id = node.key!.value as int;
               return GraphPageNode(
                 id: id,
-                missingLinks: missingLinks.contains(id),
+                missingLinks: widget.missingLinks.contains(id),
                 insideColor: Utils.graphSettings.nodeInsideColor,
                 borderColor: Utils.graphSettings.nodeBorderColor,
                 hoverColor: Utils.graphSettings.nodeHoverSplashColor,

@@ -44,6 +44,18 @@ class ChapterGraph {
     }
   }
 
+  /// Remove connection from [start] to [end] from graph.
+  /// * [start] Start node ID (page ID).
+  /// * [end] End node ID (page ID).
+  /// Returns false if [start] doesn't exist, if nodes is null or if [end] isn't a connection.
+  bool removeConnection(int start, int end) {
+    if (_nodes.containsKey(start)) {
+      return _nodes[start]!.remove(end);
+    } else {
+      return false;
+    }
+  }
+
   /// Get total number of pages in the graph.
   int numberOfPages() {
     return _nodes.keys.length;
@@ -55,6 +67,27 @@ class ChapterGraph {
     final children = _nodes[pageId];
     if (children == null) return true;
     return children.isEmpty;
+  }
+
+  /// Check if page is root (has no parent connections).
+  /// Returns true if pageId doesn't exist or nodes is null.
+  bool isRoot(int pageId) {
+    for (var children in _nodes.values) {
+      if (children.contains(pageId)) return false;
+    }
+    return true;
+  }
+
+  /// Remove node from graph.
+  void removeNode(int pageId) {
+    if (_nodes.containsKey(pageId)) {
+      _nodes.remove(pageId);
+    }
+    for (var entry in _nodes.entries) {
+      if (entry.value.contains(pageId)) {
+        entry.value.remove(pageId);
+      }
+    }
   }
 
   // To map.

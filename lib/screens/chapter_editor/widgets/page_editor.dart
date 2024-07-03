@@ -270,6 +270,7 @@ class _PageEditorState extends State<PageEditor> {
   void _onLocalDelete(LetterId? id, int length) {
     //print('DELETE [$id, $length]');
     page.delete(id, length);
+
     ChapterManagementService.value.pushPageChange(
       widget.chapter.storyId,
       widget.chapter.id.toString(),
@@ -283,6 +284,8 @@ class _PageEditorState extends State<PageEditor> {
       ),
       cursorPosition: _controller.selection.end,
     );
+    _checkLinks();
+    _pushChapterToRemote(widget.chapter);
   }
 
   /// On document format
@@ -303,6 +306,29 @@ class _PageEditorState extends State<PageEditor> {
       ),
       cursorPosition: _controller.selection.end,
     );
+  }
+
+  Future<void> _checkLinks() async {
+    Set<int> links = {};
+    links.addAll(widget.chapter.links.nodes[widget.pageId] ?? []);
+    if (links.isEmpty) return;
+
+    for (Letter letter in page.letters) {
+      for (int id in (widget.chapter.links.nodes[widget.pageId] ?? [])) {
+        if (letter.snippet != null &&
+            letter.snippet!.type == SnippetType.choice &&
+            letter.snippet!.attributes['choice'] == id) {
+          links.remove(id);
+          if (links.isEmpty) {
+            return;
+          }
+        }
+      }
+    }
+
+    for (int id in links) {
+      widget.chapter.removeLink(widget.pageId, id);
+    }
   }
 
   void _onSelectionChanged(TextSelection selection) {

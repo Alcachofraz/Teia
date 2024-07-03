@@ -80,6 +80,14 @@ class Chapter {
     return childId;
   }
 
+  /// Remove link from a page.
+  /// * [id] parent id.
+  /// * [childId] child id.
+  /// Returns true if the link was removed.
+  bool removeLink(int id, int childId) {
+    return links.removeConnection(id, childId);
+  }
+
   /// Connect page [from] to [to].
   bool connectPages(int from, int to) {
     return graph.addConnection(from, to);
@@ -89,6 +97,22 @@ class Chapter {
   /// * [id] page id.
   bool isFinalPage(int id) {
     return graph.isLeaf(id);
+  }
+
+  /// Check if page can be deleted.
+  /// If page has no parent in graph, it can't be deleted because it's the entry point.
+  /// If page has children in graph, it can't be deleted.
+  /// If page has parent in links, it can't be deleted.
+  bool canPageBeDeleted(int pageId) {
+    return !graph.isRoot(pageId) &&
+        graph.isLeaf(pageId) &&
+        links.isRoot(pageId);
+  }
+
+  /// Delete page from chapter. Undo links.
+  void deletePage(int pageId) {
+    graph.removeNode(pageId);
+    links.removeNode(pageId);
   }
 
   /// Convert this chapter to a Map<String, dynamic> object.

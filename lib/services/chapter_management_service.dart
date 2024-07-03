@@ -67,6 +67,20 @@ class ChapterManagementService extends GetxService {
     }
   }
 
+  Future<void> chapterUpdate(Chapter chapter) async {
+    //Logs.d('Sending $page');
+    try {
+      FirebaseUtils.firestore
+          .collection('stories')
+          .doc(chapter.storyId.toString())
+          .collection('chapters')
+          .doc(chapter.id.toString())
+          .update(chapter.toMap());
+    } catch (e) {
+      Logs.d('Sending $chapter\n$e');
+    }
+  }
+
   Future<Chapter?> chapterGet(String storyId, String chapterId) async {
     try {
       return Chapter.fromMap((await FirebaseUtils.firestore
@@ -162,6 +176,17 @@ class ChapterManagementService extends GetxService {
         },
       );
     });
+  }
+
+  Future<void> pageDelete(String storyId, int chapterId, int pageId) async {
+    FirebaseUtils.firestore
+        .collection('stories')
+        .doc(storyId)
+        .collection('chapters')
+        .doc(chapterId.toString())
+        .collection('pages')
+        .doc(pageId.toString())
+        .delete();
   }
 
   Stream<List<Note>> commentThreadsStream(

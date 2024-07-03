@@ -9,6 +9,7 @@ import 'package:teia/models/group.dart';
 import 'package:teia/models/letter.dart';
 import 'package:teia/models/page.dart';
 import 'package:teia/screens/chapter_editor/chapter_graph_view.dart';
+import 'package:teia/screens/chapter_editor/popups/delete_page_popup.dart';
 import 'package:teia/screens/chapter_editor/widgets/page_editor.dart';
 import 'package:teia/services/art_service.dart';
 import 'package:teia/services/authentication_service.dart';
@@ -53,6 +54,8 @@ class _ChapterEditorScreenState extends State<ChapterEditorScreen> {
   final String landscape = ArtService.value.landscape();
   RxBool loading = false.obs;
 
+  Set<int> missingLinks = {};
+
   @override
   void initState() {
     loading.value = true;
@@ -60,7 +63,11 @@ class _ChapterEditorScreenState extends State<ChapterEditorScreen> {
     loosePagesMenuHeight = Utils.loosePagesMenuDefaultHeight;
     _chapterSubscription = chapterManagementService
         .chapterStream(widget.storyId, widget.chapterId)
-        .listen((chapter) => setState(() => _chapter = chapter));
+        .listen(
+      (chapter) {
+        setState(() => _chapter = chapter);
+      },
+    );
     _groupSubscription =
         GroupManagementService.value.groupStream(widget.group).listen(
       (group) {
@@ -166,6 +173,7 @@ class _ChapterEditorScreenState extends State<ChapterEditorScreen> {
           clickPage: _clickPage,
           width: size.width,
           height: size.height,
+          missingLinks: missingLinks,
         );
 
   Widget _pageEditor(Size size) => _chapter == null
@@ -216,14 +224,57 @@ class _ChapterEditorScreenState extends State<ChapterEditorScreen> {
                                   Padding(
                                     padding: const EdgeInsets.fromLTRB(
                                         8.0, 18.0, 16.0, 0.0),
-                                    child: Text(
-                                      'Page ${selectedPageId!}',
-                                      style: TextStyle(
-                                        color:
-                                            Utils.graphSettings.nodeBorderColor,
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 18.0,
-                                      ),
+                                    child: Row(
+                                      children: [
+                                        Text(
+                                          'Page ${selectedPageId!}',
+                                          style: TextStyle(
+                                            color: Utils
+                                                .graphSettings.nodeBorderColor,
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 18.0,
+                                          ),
+                                        ),
+                                        const Gap(8),
+                                        if (missingLinks
+                                            .contains(selectedPageId))
+                                          const Icon(
+                                            Icons.link_off_rounded,
+                                            color: Colors.red,
+                                            size: 18.0,
+                                          ),
+                                        const Gap(4),
+                                        const Spacer(),
+                                        const Gap(4),
+                                        IconButton(
+                                          onPressed: () {
+                                            int pageId = selectedPageId!;
+                                            if (_chapter!
+                                                .canPageBeDeleted(pageId)) {
+                                              setState(() {
+                                                selectedPageId = null;
+                                              });
+                                              _chapter!.deletePage(pageId);
+                                              _pushChapterToRemote(_chapter!);
+                                              ChapterManagementService.value
+                                                  .pageDelete(
+                                                _chapter!.storyId,
+                                                _chapter!.id,
+                                                pageId,
+                                              );
+                                            } else {
+                                              openDeletePopupError(
+                                                context,
+                                                pageId,
+                                              );
+                                            }
+                                          },
+                                          icon: const Icon(
+                                            Icons.delete,
+                                            color: Colors.red,
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ),
                                   const Padding(
@@ -257,6 +308,18 @@ class _ChapterEditorScreenState extends State<ChapterEditorScreen> {
   @override
   Widget build(BuildContext context) {
     var screenSize = MediaQuery.of(context).size;
+
+    missingLinks.clear();
+    if (_chapter != null) {
+      for (int id in _chapter!.graph.nodes.keys) {
+        for (int link in _chapter!.graph.nodes[id] ?? []) {
+          if (_chapter!.links.nodes[id] == null ||
+              !_chapter!.links.nodes[id]!.contains(link)) {
+            missingLinks.add(id);
+          }
+        }
+      }
+    }
     return Obx(
       () => loading.value
           ? const ScreenWrapper(
