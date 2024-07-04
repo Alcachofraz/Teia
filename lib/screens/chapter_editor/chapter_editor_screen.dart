@@ -8,6 +8,7 @@ import 'package:teia/models/chapter.dart';
 import 'package:teia/models/group.dart';
 import 'package:teia/models/letter.dart';
 import 'package:teia/models/page.dart';
+import 'package:teia/models/user_state.dart';
 import 'package:teia/screens/chapter_editor/chapter_graph_view.dart';
 import 'package:teia/screens/chapter_editor/popups/delete_page_popup.dart';
 import 'package:teia/screens/chapter_editor/widgets/page_editor.dart';
@@ -72,8 +73,10 @@ class _ChapterEditorScreenState extends State<ChapterEditorScreen> {
         GroupManagementService.value.groupStream(widget.group).listen(
       (group) {
         allowed.value = group.users.contains(
-          AuthenticationService.value.uid,
-        );
+              AuthenticationService.value.uid,
+            ) &&
+            group.userState[AuthenticationService.value.uid]!.role ==
+                Role.writer;
         if (allowed.value) {
           if (group.state != (_group?.state ?? group.state)) {
             Get.back();
@@ -84,7 +87,6 @@ class _ChapterEditorScreenState extends State<ChapterEditorScreen> {
       },
     );
     buttonColor = ArtService.value.pastel();
-
     super.initState();
   }
 
@@ -137,13 +139,10 @@ class _ChapterEditorScreenState extends State<ChapterEditorScreen> {
     // Update local
     setState(() {});
     chapterManagementService.pageCreate(
-      tPage(
+      tPage.empty(
         newId,
         int.parse(widget.chapterId),
         widget.storyId,
-        SortedList<Letter>(),
-        null,
-        {},
       ),
       _chapter!.graph,
     );

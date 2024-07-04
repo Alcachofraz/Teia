@@ -1,6 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
-import 'package:teia/models/change.dart';
 import 'package:teia/models/chapter.dart';
 import 'package:teia/models/story.dart';
 import 'package:teia/services/chapter_management_service.dart';

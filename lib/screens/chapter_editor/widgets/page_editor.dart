@@ -82,8 +82,11 @@ class _PageEditorState extends State<PageEditor> {
 
   @override
   void initState() {
-    page = tPage(widget.pageId, widget.chapter.id, widget.chapter.storyId,
-        SortedList<Letter>(), null, {});
+    page = tPage.empty(
+      widget.pageId,
+      widget.chapter.id,
+      widget.chapter.storyId,
+    );
     _sessionStartTimestamp = DateTime.now().millisecondsSinceEpoch;
     // Scroll controller
     _scrollController = ScrollController();
@@ -108,13 +111,13 @@ class _PageEditorState extends State<PageEditor> {
         )
         .listen(_onRemoteChange);
 
-    _pageSubscription = ChapterManagementService.value
+    /*_pageSubscription = ChapterManagementService.value
         .pageStream(
           widget.chapter.storyId,
           widget.chapter.id.toString(),
           widget.pageId.toString(),
         )
-        .listen(_onPageChange);
+        .listen(_onPageChange);*/
 
     super.initState();
   }
@@ -123,26 +126,39 @@ class _PageEditorState extends State<PageEditor> {
   void dispose() {
     _pageChangesSubscription.cancel();
     _localChangesSubscription.cancel();
-    _pageSubscription.cancel();
+    //_pageSubscription.cancel();
     _controller.dispose();
     _onContextMenu.cancel();
     _scrollController.dispose();
     super.dispose();
   }
 
+  /// Push the chapter object to Firestore.
   Future<void> _pushChapterToRemote(Chapter chapter) async {
     //Logs.d('Sending:\n${chapter.toString()}');
-
     if (widget.pushChapterToRemote != null) {
       await widget.pushChapterToRemote!(widget.chapter);
     }
   }
 
+  /// Push the page object to Firestore.
   Future<void> _pushPageToRemote(tPage? page) async {
     //Logs.d('Sending:\n${page?.getRawText()}');
     if (widget.pushPageToRemote != null && page != null) {
       await widget.pushPageToRemote!(page);
     }
+  }
+
+  /// Push page delta changes to Firebase Realtime.
+  void _pushPageChange(Change change) {
+    ChapterManagementService.value.pushPageChange(
+      widget.chapter.storyId,
+      widget.chapter.id.toString(),
+      widget.pageId.toString(),
+      change,
+      cursorPosition: _controller.selection.end,
+    );
+    _pushPageToRemote(page);
   }
 
   /*void _replaceDelta(Delta currentDelta, Delta newDelta) {
@@ -209,10 +225,12 @@ class _PageEditorState extends State<PageEditor> {
     }
   }
 
+  /// Update page object with new page.
   void _onPageChange(tPage newPage) {
     page.updateWith(newPage);
   }
 
+  /// When a remote change is received.
   void _onRemoteChange(Change change) {
     try {
       if (change.uid == AuthenticationService.value.uid &&
@@ -251,10 +269,7 @@ class _PageEditorState extends State<PageEditor> {
   void _onLocalInsert(LetterId? id, String text) {
     //print('INSERT [$id, $text]');
     page.insert(id, text);
-    ChapterManagementService.value.pushPageChange(
-      widget.chapter.storyId,
-      widget.chapter.id.toString(),
-      widget.pageId.toString(),
+    _pushPageChange(
       Change(
         id,
         ChangeType.insert,
@@ -262,7 +277,6 @@ class _PageEditorState extends State<PageEditor> {
         DateTime.now().millisecondsSinceEpoch,
         letter: text,
       ),
-      cursorPosition: _controller.selection.end,
     );
   }
 
@@ -270,11 +284,7 @@ class _PageEditorState extends State<PageEditor> {
   void _onLocalDelete(LetterId? id, int length) {
     //print('DELETE [$id, $length]');
     page.delete(id, length);
-
-    ChapterManagementService.value.pushPageChange(
-      widget.chapter.storyId,
-      widget.chapter.id.toString(),
-      widget.pageId.toString(),
+    _pushPageChange(
       Change(
         id,
         ChangeType.delete,
@@ -282,20 +292,15 @@ class _PageEditorState extends State<PageEditor> {
         DateTime.now().millisecondsSinceEpoch,
         length: length,
       ),
-      cursorPosition: _controller.selection.end,
     );
-    _checkLinks();
-    _pushChapterToRemote(widget.chapter);
+    _checkLinksOnDelete();
   }
 
   /// On document format
   void _onLocalFormat(LetterId? id, int length, Snippet snippet) {
     //print('FORMAT [$id, $length, $snippet]');
     page.format(id, length, snippet);
-    ChapterManagementService.value.pushPageChange(
-      widget.chapter.storyId,
-      widget.chapter.id.toString(),
-      widget.pageId.toString(),
+    _pushPageChange(
       Change(
         id,
         ChangeType.format,
@@ -304,15 +309,14 @@ class _PageEditorState extends State<PageEditor> {
         length: length,
         snippet: snippet,
       ),
-      cursorPosition: _controller.selection.end,
     );
   }
 
-  Future<void> _checkLinks() async {
+  /// CHeck if there are any links that need deleting, after local delete.
+  Future<void> _checkLinksOnDelete() async {
     Set<int> links = {};
     links.addAll(widget.chapter.links.nodes[widget.pageId] ?? []);
     if (links.isEmpty) return;
-
     for (Letter letter in page.letters) {
       for (int id in (widget.chapter.links.nodes[widget.pageId] ?? [])) {
         if (letter.snippet != null &&
@@ -325,12 +329,13 @@ class _PageEditorState extends State<PageEditor> {
         }
       }
     }
-
     for (int id in links) {
       widget.chapter.removeLink(widget.pageId, id);
     }
+    _pushChapterToRemote(widget.chapter);
   }
 
+  /// When the user positions the cursor or selects text
   void _onSelectionChanged(TextSelection selection) {
     if (selection.baseOffset != selection.extentOffset) {
       // Selecting text
@@ -352,6 +357,7 @@ class _PageEditorState extends State<PageEditor> {
     }
   }
 
+  /// Create a snippet from the selected text [_selection]
   void _createSnippet(Snippet snippet) {
     // 1. and 3.
     _onLocalFormat(page.letters[_selection!.baseOffset].id,
@@ -364,6 +370,7 @@ class _PageEditorState extends State<PageEditor> {
     );
   }
 
+  /// Uploads image to Firebase Storage and creates a snippet with the image URL.
   Future<void> _onAddImage(Uint8List image) async {
     _createSnippet(Snippet(
       _selection!.textInside(_controller.document.toPlainText()),
@@ -375,6 +382,10 @@ class _PageEditorState extends State<PageEditor> {
     ));
   }
 
+  /// When the user adds a choice snippet to the text [_selection]
+  /// Adds a page to the chapter object, if it doesn't exist.
+  /// Creates the link from the current page to the new one, and creates the snippet.
+  ///
   void _onAddChoice([int? id]) async {
     if (_selection == null) return;
     // If id is null, create a new page and get its id

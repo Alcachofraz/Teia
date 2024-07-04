@@ -9,6 +9,7 @@ import 'package:teia/screens/chapter_editor/chapter_editor_screen.dart';
 import 'package:teia/screens/group/pages/group_screen.dart';
 import 'package:teia/screens/home/home_screen.dart';
 import 'package:teia/screens/image_editor/image_editor_screen.dart';
+import 'package:teia/screens/read_chapter/read_chapter_screen.dart';
 import 'package:teia/services/authentication_service.dart';
 import 'package:teia/utils/utils.dart';
 import 'package:url_strategy/url_strategy.dart';
@@ -64,6 +65,10 @@ class Teia extends StatelessWidget {
               page: () => const ImageEditorScreen(),
             ),
           ],
+        ),
+        GetPage(
+          name: '/read_chapter',
+          page: () => ReadChapterScreen(),
         ),
       ],
       theme: ThemeData(

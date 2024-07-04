@@ -27,11 +27,11 @@ class Snippet {
 
   @override
   bool operator ==(Object other) {
-    return text == text && type == type && attributes == attributes;
+    return type == type && attributes == attributes;
   }
 
   @override
-  int get hashCode => text.hashCode + type.hashCode;
+  int get hashCode => type.hashCode + attributes.hashCode;
 
   @override
   String toString() {

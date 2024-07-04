@@ -12,6 +12,7 @@ class tPage {
   final String storyId;
   String? lastModifierUid;
   final Map<String, int> cursors;
+  final List<Snippet> snippets;
 
   SortedList<Letter> letters;
 
@@ -25,15 +26,16 @@ class tPage {
     this.letters,
     this.lastModifierUid,
     this.cursors,
+    this.snippets,
   );
 
   factory tPage.empty(int id, int chapterId, String storyId, {String? uid}) {
-    return tPage(id, chapterId, storyId, SortedList<Letter>(), uid, {});
+    return tPage(id, chapterId, storyId, SortedList<Letter>(), uid, {}, []);
   }
 
   factory tPage.fromMap(Map<String, dynamic>? map) {
     if (map == null) {
-      return tPage(-1, -1, '', SortedList<Letter>(), null, {});
+      return tPage(-1, -1, '', SortedList<Letter>(), null, {}, []);
     }
     return tPage(
       map['id'] as int,
@@ -44,6 +46,9 @@ class tPage {
       Map<String, int>.from(
         map['cursors'] ?? {},
       ),
+      (map['snippets'] as List<dynamic>? ?? [])
+          .map((e) => Snippet.fromMap(e))
+          .toList(),
     );
   }
 
@@ -52,7 +57,41 @@ class tPage {
         'chapterId': chapterId,
         'storyId': storyId,
         'lastModifierUid': lastModifierUid,
+        'snippets': snippetList().map((e) => e.toMap()).toList(),
       };
+
+  List<Snippet> snippetList() {
+    List<Snippet> ret = [];
+    Snippet? currentSnippet;
+    String text = '';
+    for (var letter in letters) {
+      if (letter.snippet == currentSnippet) {
+        // If the snippet is the same
+        text += letter.letter;
+      } else {
+        // If snippet changed
+        // Save current snippet with current text
+        ret.add(
+          Snippet(
+            text,
+            currentSnippet?.type ?? SnippetType.text,
+            currentSnippet?.attributes ?? {},
+          ),
+        );
+        // Update current snippet and text
+        currentSnippet = letter.snippet;
+        text = letter.letter;
+      }
+    }
+    ret.add(
+      Snippet(
+        text,
+        currentSnippet?.type ?? SnippetType.text,
+        currentSnippet?.attributes ?? {},
+      ),
+    );
+    return ret;
+  }
 
   @override
   String toString() {
@@ -221,5 +260,15 @@ class tPage {
       letters[i].snippet = snippet;
     }
     return index;
+  }
+
+  /// Check if is leaf.
+  /// If there's no snippets with type choice, it's a leaf.
+  bool isLeaf({reading = false}) {
+    if (reading) {
+      return !snippets.any((s) => s.type == SnippetType.choice);
+    } else {
+      return !letters.any((l) => l.snippet?.type == SnippetType.choice);
+    }
   }
 }
