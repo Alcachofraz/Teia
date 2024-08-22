@@ -47,8 +47,8 @@ dependencies:
 
   get: ^4.6.6
 
-  flutter_quill: ^9.3.1
-  flutter_quill_extensions: ^9.3.1
+  flutter_quill: ^10.4.1
+  flutter_quill_extensions: ^10.4.1
   quill_delta: ^3.0.0-nullsafety.2
   logger: ^2.1.0
   tuple: ^2.0.2
@@ -56,9 +56,10 @@ dependencies:
   universal_html: ^2.2.4
   just_the_tooltip: ^0.0.12
   dropdown_button2: ^2.3.9
-  flutter_painter:
-    git:
-      url: https://github.com/Harishwarrior/flutter_painter.git
+  flutter_painter_v2: ^2.0.1
+  #flutter_painter:
+    #git:
+      #url: https://github.com/Harishwarrior/flutter_painter.git
   image: ^4.1.7
   cached_network_image: ^3.3.1
   cached_memory_image: ^1.5.0

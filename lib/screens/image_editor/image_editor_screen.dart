@@ -3,7 +3,7 @@ import 'dart:typed_data';
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
-import 'package:flutter_painter/flutter_painter.dart';
+import 'package:flutter_painter_v2/flutter_painter.dart';
 import 'package:get/get.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:teia/models/stable_diffusion/generation.dart';
@@ -73,7 +73,7 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
               await renderedImage.pngBytes,
               resize: false);
         } else {
-          mask == null;
+          mask = null;
         }
       } catch (e) {
         mask = null;
