@@ -3,8 +3,8 @@ import 'dart:typed_data';
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
-import 'package:flutter_painter_v2/flutter_painter.dart';
 import 'package:get/get.dart';
+import 'package:image_painter/image_painter.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:teia/models/stable_diffusion/generation.dart';
 import 'package:teia/services/stable_diffusion/al_service.dart';
@@ -25,7 +25,7 @@ class ImageEditorScreen<Uint8List> extends StatefulWidget {
 class _ImageEditorScreenState extends State<ImageEditorScreen> {
   Generation? generation;
 
-  late PainterController painterController;
+  late ImagePainterController painterController;
 
   Uint8List? image;
   double eraserSize = Utils.minInpaintBrushThickness;
@@ -43,22 +43,10 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
   @override
   void initState() {
     super.initState();
-    painterController = PainterController(
-      settings: PainterSettings(
-        freeStyle: const FreeStyleSettings(
-          color: Colors.black,
-          strokeWidth: 20,
-          mode: FreeStyleMode.draw,
-        ),
-        shape: ShapeSettings(
-          paint: shapePaint,
-        ),
-        scale: const ScaleSettings(
-          enabled: true,
-          minScale: 1,
-          maxScale: 5,
-        ),
-      ),
+    painterController = ImagePainterController(
+      color: Colors.black,
+      strokeWidth: 20,
+      mode: PaintMode.freeStyle,
     );
   }
 
@@ -66,15 +54,11 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
     if (generation != null) {
       Uint8List? mask;
       try {
-        if (painterController.drawables.isNotEmpty) {
-          final ui.Image renderedImage =
-              await painterController.renderImage(const Size(512, 512));
-          mask = StableDiffusionService.normalizeMask(
-              await renderedImage.pngBytes,
-              resize: false);
-        } else {
-          mask = null;
-        }
+        Uint8List? byteArray = await painterController.exportImage();
+        mask = StableDiffusionService.normalizeMask(
+          byteArray,
+          resize: true,
+        );
       } catch (e) {
         mask = null;
       }
@@ -140,7 +124,8 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
                                   ),
                                 ),
                           Positioned.fill(
-                            child: FlutterPainter(
+                            child: ImagePainter.memory(
+                              image!,
                               controller: painterController,
                             ),
                           ),
@@ -157,9 +142,7 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
                               icon: const Icon(Icons.undo_rounded,
                                   color: Colors.black),
                               onTap: () {
-                                if (painterController.canUndo) {
-                                  painterController.undo();
-                                }
+                                painterController.undo();
                               },
                             ),
                             const VerticalDivider(),
@@ -167,9 +150,7 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
                               icon: const Icon(Icons.redo_rounded,
                                   color: Colors.black),
                               onTap: () {
-                                if (painterController.canRedo) {
-                                  painterController.redo();
-                                }
+                                //painterController.undo();
                               },
                             ),
                             const VerticalDivider(),
@@ -185,8 +166,8 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
                                 onChanged: (value) {
                                   setState(() {
                                     eraserSize = value;
-                                    painterController.freeStyleStrokeWidth =
-                                        eraserSize;
+                                    painterController
+                                        .setStrokeWidth(eraserSize);
                                   });
                                 },
                               ),
@@ -196,7 +177,7 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
                               icon: Icon(MdiIcons.image),
                               onTap: () {
                                 setState(() {
-                                  painterController.clearDrawables();
+                                  painterController.clear();
                                 });
                               },
                             ),
@@ -231,7 +212,7 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
 
                               setState(() {
                                 image = imaggeBytes;
-                                painterController.clearDrawables();
+                                painterController.clear();
                                 generateBusy = false;
                               });
                             },
