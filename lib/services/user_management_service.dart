@@ -1,6 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart' as auth;
 import 'package:get/get.dart';
-import 'package:teia/models/user.dart';
+import 'package:teia/models/user_model.dart';
 import 'package:teia/services/firebase/firestore_utils.dart';
 import 'package:teia/utils/utils.dart';
 
