@@ -3,8 +3,7 @@ import 'package:flutter/material.dart' hide Page;
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:teia/firebase_options.dart';
-import 'package:teia/screens/auth/login_screen.dart';
-import 'package:teia/screens/auth/register_screen.dart';
+import 'package:teia/screens/auth/auth_screen.dart';
 import 'package:teia/screens/chapter_editor/chapter_editor_screen.dart';
 import 'package:teia/screens/group/pages/group_screen.dart';
 import 'package:teia/screens/home/home_screen.dart';
@@ -34,7 +33,7 @@ class Teia extends StatelessWidget {
     return GetMaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Teia',
-      initialRoute: '/landing',
+      initialRoute: '/auth',
       getPages: [
         GetPage(
           name: '/home',
@@ -45,16 +44,8 @@ class Teia extends StatelessWidget {
           page: () => const GroupScreen(),
         ),
         GetPage(
-          name: '/landing',
+          name: '/auth',
           page: () => const LandingScreen(),
-        ),
-        GetPage(
-          name: '/login',
-          page: () => const LoginScreen(),
-        ),
-        GetPage(
-          name: '/register',
-          page: () => const RegisterScreen(),
         ),
         GetPage(
           name: '/chapter_editor',
@@ -94,7 +85,7 @@ class LandingScreen extends StatelessWidget {
           if (snapshot.data!) {
             return const HomeScreen();
           } else {
-            return const LoginScreen();
+            return AuthScreen();
           }
         } else {
           return const Scaffold(

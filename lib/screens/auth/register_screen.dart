@@ -5,21 +5,25 @@ import 'package:get/get.dart';
 import 'package:teia/screens/auth/controller/auth_controller.dart';
 import 'package:teia/views/misc/rounded_button.dart';
 
-class RegisterScreen extends GetView<AuthController> {
-  const RegisterScreen({super.key});
+class RegisterScreen extends StatefulWidget {
+  const RegisterScreen({super.key, required this.goToLogin});
+  final void Function() goToLogin;
+  @override
+  State<RegisterScreen> createState() => _RegisterScreenState();
+}
 
+class _RegisterScreenState extends State<RegisterScreen> {
   @override
   Widget build(BuildContext context) {
-    Get.put(AuthController());
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: Center(
-        child: SingleChildScrollView(
-          child: SizedBox(
-            width: 450,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 15),
+    final AuthController controller = Get.put(AuthController());
+    return Row(
+      children: [
+        Expanded(
+          child: Center(
+            child: SizedBox(
+              width: 400,
               child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
                   const Gap(15),
                   TextField(
@@ -73,7 +77,7 @@ class RegisterScreen extends GetView<AuthController> {
                           style:
                               const TextStyle(color: Colors.blue, fontSize: 15),
                           recognizer: TapGestureRecognizer()
-                            ..onTap = controller.goToLogin,
+                            ..onTap = widget.goToLogin,
                         ),
                       ],
                     ),
@@ -84,7 +88,7 @@ class RegisterScreen extends GetView<AuthController> {
             ),
           ),
         ),
-      ),
+      ],
     );
   }
 }

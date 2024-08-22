@@ -103,8 +103,6 @@ class TeiaButton extends StatelessWidget {
                   color: Colors.white,
                 ),
               )
-            else
-              const SizedBox.shrink(),
           ],
         ),
       ),

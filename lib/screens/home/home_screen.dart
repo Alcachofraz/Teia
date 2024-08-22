@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:get/get.dart';
+import 'package:teia/screens/auth/controller/auth_controller.dart';
 import 'package:teia/screens/home/controllers/home_controller.dart';
 import 'package:teia/screens/home/popups/join_adventure/join_adventure.dart';
 import 'package:teia/screens/home/widgets/adventure_tile.dart';
 import 'package:teia/views/misc/screen_wrapper.dart';
+import 'package:teia/views/teia_button.dart';
 
 class HomeScreen extends GetView<HomeController> {
   const HomeScreen({super.key});
@@ -44,7 +46,7 @@ class HomeScreen extends GetView<HomeController> {
             ),
             Column(
               mainAxisSize: MainAxisSize.max,
-              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 const Gap(12),
                 Padding(
@@ -94,7 +96,15 @@ class HomeScreen extends GetView<HomeController> {
                     ],
                   ),
                 ),
-                const Spacer(),
+                const Gap(40),
+                TeiaButton(
+                  text: 'Logout',
+                  expand: false,
+                  color: const Color(0xFFC14545),
+                  onTap: () {
+                    AuthController().logout();
+                  },
+                ),
               ],
             ),
           ],

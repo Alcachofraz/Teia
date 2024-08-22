@@ -37,18 +37,4 @@ class AuthController {
   void clearError() {
     error.value = '';
   }
-
-  void goToRegister() {
-    clearError();
-    emailController.clear();
-    passwordController.clear();
-    Get.toNamed('/register');
-  }
-
-  void goToLogin() {
-    clearError();
-    emailController.clear();
-    passwordController.clear();
-    Get.toNamed('/login');
-  }
 }
