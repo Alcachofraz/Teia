@@ -6,7 +6,6 @@ import 'package:flutter_quill/flutter_quill.dart';
 import 'package:flutter_quill/quill_delta.dart';
 import 'package:get/get.dart';
 import 'package:just_the_tooltip/just_the_tooltip.dart';
-import 'package:sorted_list/sorted_list.dart';
 import 'package:teia/models/change.dart';
 import 'package:teia/models/chapter.dart';
 import 'package:teia/models/letter.dart';
@@ -55,7 +54,6 @@ class _PageEditorState extends State<PageEditor> {
   late QuillController _controller;
   late StreamSubscription _localChangesSubscription;
   late StreamSubscription _pageChangesSubscription;
-  late StreamSubscription _pageSubscription;
   late StreamSubscription _onContextMenu;
   late ScrollController _scrollController;
   FocusNode focus = FocusNode();
@@ -389,7 +387,17 @@ class _PageEditorState extends State<PageEditor> {
   void _onAddChoice([int? id]) async {
     if (_selection == null) return;
     // If id is null, create a new page and get its id
-    id ??= widget.chapter.addPage(page.id);
+    if (id == null) {
+      id = widget.chapter.addPage(page.id);
+      ChapterManagementService.value.pageCreate(
+        tPage.empty(
+          id,
+          int.parse(widget.chapter.id.toString()),
+          widget.chapter.storyId,
+        ),
+        widget.chapter.graph,
+      );
+    }
 
     // Add link from this page to [id], in chapter, and push to remote
     widget.chapter.addLink(page.id, childId: id);

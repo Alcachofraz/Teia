@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:teia/services/art_service.dart';
 
@@ -47,9 +48,9 @@ class TeiaButton extends StatelessWidget {
         );
     final EdgeInsets padding_ = padding ??
         const EdgeInsets.fromLTRB(
-          18,
+          8,
           22,
-          18,
+          8,
           22,
         );
     return ElevatedButton(
@@ -81,11 +82,11 @@ class TeiaButton extends StatelessWidget {
           mainAxisSize: expand ? MainAxisSize.max : MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            if (loading.value && expand)
-              const SizedBox(
-                height: 16,
-                width: 16,
-              ),
+            const SizedBox(
+              height: 16,
+              width: 16,
+            ),
+            const Gap(12),
             if (widget != null) widget!,
             if (text != null)
               if (expand)
@@ -94,15 +95,17 @@ class TeiaButton extends StatelessWidget {
                 )
               else
                 getText(),
-            if (loading.value && expand)
-              const SizedBox(
-                height: 16,
-                width: 16,
-                child: CircularProgressIndicator(
-                  strokeWidth: 1.5,
-                  color: Colors.white,
-                ),
-              )
+            const Gap(12),
+            SizedBox(
+              height: 16,
+              width: 16,
+              child: loading.value
+                  ? const CircularProgressIndicator(
+                      strokeWidth: 1.5,
+                      color: Colors.white,
+                    )
+                  : Container(),
+            )
           ],
         ),
       ),

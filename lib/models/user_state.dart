@@ -21,6 +21,7 @@ class UserState {
   final String name;
   final String uid;
   final bool admin;
+  final int currentPage;
 
   UserState({
     required this.role,
@@ -29,6 +30,7 @@ class UserState {
     required this.name,
     required this.uid,
     required this.admin,
+    required this.currentPage,
   });
 
   factory UserState.fromMap(Map<String, dynamic> map, String uid) {
@@ -39,6 +41,7 @@ class UserState {
       name: map['name'],
       uid: uid,
       admin: map['admin'],
+      currentPage: map['currentPage'],
     );
   }
 
@@ -49,6 +52,7 @@ class UserState {
       'avatar': avatar,
       'name': name,
       'admin': admin,
+      'currentPage': currentPage,
     };
   }
 
@@ -59,6 +63,7 @@ class UserState {
     String? name,
     String? uid,
     bool? admin,
+    int? currentPage,
   }) {
     return UserState(
       role: role ?? this.role,
@@ -67,6 +72,7 @@ class UserState {
       name: name ?? this.name,
       uid: uid ?? this.uid,
       admin: admin ?? this.admin,
+      currentPage: currentPage ?? this.currentPage,
     );
   }
 }

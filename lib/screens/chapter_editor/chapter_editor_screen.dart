@@ -3,10 +3,8 @@ import 'dart:async';
 import 'package:flutter/material.dart' hide Page;
 import 'package:gap/gap.dart';
 import 'package:get/get.dart';
-import 'package:sorted_list/sorted_list.dart';
 import 'package:teia/models/chapter.dart';
 import 'package:teia/models/group.dart';
-import 'package:teia/models/letter.dart';
 import 'package:teia/models/page.dart';
 import 'package:teia/models/user_state.dart';
 import 'package:teia/screens/chapter_editor/chapter_graph_view.dart';
@@ -54,6 +52,7 @@ class _ChapterEditorScreenState extends State<ChapterEditorScreen> {
   late Color buttonColor;
   final String landscape = ArtService.value.landscape();
   RxBool loading = false.obs;
+  late final TextEditingController titleController = TextEditingController();
 
   Set<int> missingLinks = {};
 
@@ -67,6 +66,7 @@ class _ChapterEditorScreenState extends State<ChapterEditorScreen> {
         .listen(
       (chapter) {
         setState(() => _chapter = chapter);
+        titleController.text = chapter.title;
       },
     );
     _groupSubscription =
@@ -145,6 +145,14 @@ class _ChapterEditorScreenState extends State<ChapterEditorScreen> {
         widget.storyId,
       ),
       _chapter!.graph,
+    );
+  }
+
+  Future<void> updateTitle(String title) async {
+    await ChapterManagementService.value.chapterSetTitle(
+      widget.storyId,
+      widget.chapterId,
+      titleController.text,
     );
   }
 
@@ -359,10 +367,35 @@ class _ChapterEditorScreenState extends State<ChapterEditorScreen> {
                                     fontSize: 28,
                                   ),
                                 ),
-                                Text(
-                                  _chapter?.title ?? '...',
-                                  style: const TextStyle(
-                                    fontSize: 14,
+                                TextField(
+                                  controller: titleController,
+                                  style: const TextStyle(fontSize: 15),
+                                  onSubmitted: (value) async =>
+                                      await updateTitle(value),
+                                  decoration: InputDecoration(
+                                    isDense: true,
+                                    fillColor: Colors.transparent,
+                                    filled: true,
+                                    prefixIcon: Padding(
+                                      padding:
+                                          const EdgeInsets.only(right: 8.0),
+                                      child: IconButton(
+                                        onPressed: () async {
+                                          await updateTitle(
+                                            titleController.text,
+                                          );
+                                        },
+                                        icon: const Icon(Icons.save),
+                                      ),
+                                    ),
+                                    border: OutlineInputBorder(
+                                      borderRadius:
+                                          BorderRadius.circular(100.0),
+                                      borderSide: const BorderSide(
+                                        width: 0.0,
+                                        style: BorderStyle.none,
+                                      ),
+                                    ),
                                   ),
                                 ),
                               ],

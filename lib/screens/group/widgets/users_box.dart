@@ -50,82 +50,86 @@ class UsersBox extends StatelessWidget {
               child: Column(
                 children: [
                   for (final UserInfo userInfo in info)
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Stack(
-                            children: [
-                              Material(
-                                color: Colors.white,
-                                elevation: 2,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8),
-                                  side: BorderSide(
-                                    color: userInfo.color,
-                                  ),
-                                ),
-                                child: Padding(
-                                  padding: const EdgeInsets.all(8),
-                                  child: Row(
-                                    children: [
-                                      ClipRRect(
-                                        borderRadius: BorderRadius.circular(8),
-                                        child: Image.asset(
-                                          ArtService.value.assetPath(
-                                            userInfo.state.avatar,
-                                          ),
-                                          height: 48,
-                                        ),
-                                      ),
-                                      const Gap(12),
-                                      Expanded(
-                                        child: Text(
-                                          userInfo.state.name,
-                                          textAlign: TextAlign.left,
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                      ),
-                                      const Spacer(),
-                                      Expanded(
-                                        child: Text(
-                                          userInfo.state.role
-                                              .toString()
-                                              .toUpperCase(),
-                                          textAlign: TextAlign.right,
-                                          overflow: TextOverflow.ellipsis,
-                                          style: TextStyle(
-                                            color: userInfo.color,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                      ),
-                                      const Gap(12),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                              Positioned.fill(
-                                child: Material(
-                                  color: Colors.transparent,
-                                  child: InkWell(
-                                    onTap: userInfo.state.uid ==
-                                            AuthenticationService.value.uid
-                                        ? onTapEditUser
-                                        : null,
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 12),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Stack(
+                              children: [
+                                Material(
+                                  color: Colors.white,
+                                  elevation: 2,
+                                  shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(8),
-                                    child: const SizedBox.expand(),
+                                    side: BorderSide(
+                                      color: userInfo.color,
+                                    ),
+                                  ),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(8),
+                                    child: Row(
+                                      children: [
+                                        ClipRRect(
+                                          borderRadius:
+                                              BorderRadius.circular(8),
+                                          child: Image.asset(
+                                            ArtService.value.assetPath(
+                                              userInfo.state.avatar,
+                                            ),
+                                            height: 48,
+                                          ),
+                                        ),
+                                        const Gap(12),
+                                        Expanded(
+                                          child: Text(
+                                            userInfo.state.name,
+                                            textAlign: TextAlign.left,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        ),
+                                        const Spacer(),
+                                        Expanded(
+                                          child: Text(
+                                            userInfo.state.role
+                                                .toString()
+                                                .toUpperCase(),
+                                            textAlign: TextAlign.right,
+                                            overflow: TextOverflow.ellipsis,
+                                            style: TextStyle(
+                                              color: userInfo.color,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                        ),
+                                        const Gap(12),
+                                      ],
+                                    ),
                                   ),
                                 ),
-                              )
-                            ],
+                                Positioned.fill(
+                                  child: Material(
+                                    color: Colors.transparent,
+                                    child: InkWell(
+                                      onTap: userInfo.state.uid ==
+                                              AuthenticationService.value.uid
+                                          ? onTapEditUser
+                                          : null,
+                                      borderRadius: BorderRadius.circular(8),
+                                      child: const SizedBox.expand(),
+                                    ),
+                                  ),
+                                )
+                              ],
+                            ),
                           ),
-                        ),
-                        const Gap(12),
-                        StatusIcon(
-                          userState: userInfo.state,
-                          group: group!,
-                        ),
-                      ],
+                          const Gap(12),
+                          StatusIcon(
+                            userState: userInfo.state,
+                            group: group!,
+                          ),
+                        ],
+                      ),
                     ),
                 ],
               ),

@@ -39,7 +39,7 @@ class _ReadChapterScreenState extends State<ReadChapterScreen> {
   final RxBool allowed = false.obs;
   RxBool loading = false.obs;
   RxBool loadingPage = false.obs;
-  RxInt counter = 1.obs;
+  RxInt currentPage = 1.obs;
 
   late StreamSubscription _groupSubscription;
   final String landscape = ArtService.value.landscape();
@@ -60,6 +60,18 @@ class _ReadChapterScreenState extends State<ReadChapterScreen> {
           if (group.state != (_group.value?.state ?? group.state)) {
             Get.back();
           }
+          currentPage.value =
+              group.userState[AuthenticationService.value.uid]!.currentPage;
+          ChapterManagementService.value
+              .pageGet(
+            widget.storyId,
+            widget.chapterId,
+            group.userState[AuthenticationService.value.uid]!.currentPage
+                .toString(),
+          )
+              .then((page) {
+            _page.value = page;
+          });
           setState(() => _group.value = group);
         }
         loading.value = false;
@@ -68,13 +80,7 @@ class _ReadChapterScreenState extends State<ReadChapterScreen> {
     ChapterManagementService.value
         .chapterGet(widget.storyId, widget.chapterId)
         .then((chapter) => _chapter.value = chapter);
-    ChapterManagementService.value
-        .pageGet(
-          widget.storyId,
-          widget.chapterId,
-          "1",
-        )
-        .then((page) => _page.value = page);
+
     super.initState();
   }
 
@@ -87,12 +93,16 @@ class _ReadChapterScreenState extends State<ReadChapterScreen> {
   /// Callback to when a choice is clicked.
   Future<void> onChoice(int choice) async {
     loadingPage.value = true;
+    GroupManagementService.value.setReaderCurrentPage(
+      _group.value!,
+      choice,
+    );
     _page.value = await ChapterManagementService.value.pageGet(
       widget.storyId,
       widget.chapterId,
       choice.toString(),
     );
-    counter.value++;
+    currentPage.value == choice;
     await Future.delayed(500.milliseconds);
     loadingPage.value = false;
   }
@@ -162,7 +172,7 @@ class _ReadChapterScreenState extends State<ReadChapterScreen> {
                         color: Utils.pageEditorBackgroundColor,
                         elevation: 4,
                         child: SizedBox(
-                          width: 600,
+                          width: 800,
                           child: CustomScrollView(
                             slivers: [
                               SliverFillRemaining(
@@ -201,13 +211,13 @@ class _ReadChapterScreenState extends State<ReadChapterScreen> {
                                               ),
                                             ),
                                             Material(
-                                              shape: const CircleBorder(),
+                                              shape: const StadiumBorder(),
                                               color: color,
                                               child: Padding(
                                                 padding:
                                                     const EdgeInsets.all(8),
                                                 child: Text(
-                                                  counter.value.toString(),
+                                                  'Page ${currentPage.value}',
                                                   style: const TextStyle(
                                                     fontSize: 11.0,
                                                     color: Colors.white,

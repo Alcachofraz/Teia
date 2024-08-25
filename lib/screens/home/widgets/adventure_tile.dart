@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:teia/models/group.dart';
@@ -11,8 +10,10 @@ class AdventureTile extends StatefulWidget {
     super.key,
     this.onTap,
     this.adventure,
+    this.text,
   });
 
+  final String? text;
   final Group? adventure;
   final void Function()? onTap;
 
@@ -165,19 +166,19 @@ class _AdventureTileState extends State<AdventureTile> {
                     ],
                   ),
                 )
-              : const Center(
+              : Center(
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(
+                      const Icon(
                         Icons.add,
                         color: Colors.white,
                         size: 56,
                       ),
-                      Gap(8),
+                      const Gap(8),
                       Text(
-                        'Create a new adventure',
-                        style: TextStyle(
+                        widget.text ?? 'Unnamed',
+                        style: const TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.w500,
                           fontSize: 16,

@@ -30,7 +30,9 @@ class StoryManagementService extends GetxService {
     try {
       DocumentReference storyRef =
           FirebaseUtils.firestore.collection('stories').doc();
-      storyRef.set(Story.init(storyRef.id, storyName).toMap());
+      await storyRef.set(Story.init(storyRef.id, storyName).toMap());
+      // Create first chapter:
+      await ChapterManagementService.value.chapterCreate(storyRef.id, 1);
       return storyRef.id;
     } catch (e) {
       print(e);

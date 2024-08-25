@@ -84,7 +84,8 @@ class GroupManagementService extends GetxService {
       throw Exception('Invalid password');
     }
     final group = query.docs.first;
-    final users = group.data()['users'] as List<String>;
+    final users = group.data()['users'];
+
     final userState = group.data()['userState'] as Map<String, dynamic>;
     if (users.contains(AuthenticationService.value.uid)) {
       throw Exception('You are already in this group');
@@ -97,6 +98,7 @@ class GroupManagementService extends GetxService {
       name: Utils.getUsernameFromEmail(AuthenticationService.value.user.email!),
       uid: AuthenticationService.value.uid!,
       admin: false,
+      currentPage: 1,
     ).toMap();
     await group.reference.update(
       {
@@ -173,6 +175,21 @@ class GroupManagementService extends GetxService {
     );
   }
 
+  // Set reader current page
+  Future<void> setReaderCurrentPage(Group group, int currentPage) async {
+    await FirebaseUtils.firestore.collection('groups').doc(group.name).set(
+      {
+        'userState': group.userState.map(
+          (key, value) => MapEntry(
+            key,
+            value.copyWith(currentPage: currentPage).toMap(),
+          ),
+        ),
+      },
+      SetOptions(merge: true),
+    );
+  }
+
   // Set reader ready
   Future<void> setReaderReady(Group group) async {
     GroupState state = GroupState.reading;
@@ -182,19 +199,37 @@ class GroupManagementService extends GetxService {
             element.role == Role.reader &&
             element.uid != AuthenticationService.value.uid)
         .every((element) => element.ready)) {
+      // If so, check if story is finished, to set the proper group state
       state = group.story!.finished
           ? GroupState.reading
           : (group.finalChapter ? GroupState.idle : GroupState.writing);
+      // Then, set all readers to not ready, and updated group state
+      await FirebaseUtils.firestore.collection('groups').doc(group.name).set(
+        {
+          'userState': group.userState.map(
+            (key, value) => MapEntry(
+                key, value.copyWith(ready: false, currentPage: 1).toMap()),
+          ),
+          'state': state.index,
+        },
+        SetOptions(merge: true),
+      );
+    } else {
+      // If not all readers are ready, set only the current user to ready
+      await FirebaseUtils.firestore.collection('groups').doc(group.name).set(
+        {
+          'userState': group.userState.map(
+            (key, value) => MapEntry(
+              key,
+              key == AuthenticationService.value.uid
+                  ? value.copyWith(ready: true, currentPage: 1).toMap()
+                  : value,
+            ),
+          ),
+        },
+        SetOptions(merge: true),
+      );
     }
-    await FirebaseUtils.firestore.collection('groups').doc(group.name).set(
-      {
-        'userState': group.userState.map(
-          (key, value) => MapEntry(key, value.copyWith(ready: false).toMap()),
-        ),
-        'state': state.index,
-      },
-      SetOptions(merge: true),
-    );
   }
 
   // Set writer ready

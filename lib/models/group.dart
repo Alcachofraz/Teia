@@ -48,6 +48,7 @@ class Group {
             ),
             uid: uid,
             admin: true,
+            currentPage: 1,
           ),
       },
       users: uid == null ? [] : [uid],

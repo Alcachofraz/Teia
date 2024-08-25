@@ -2,11 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:teia/models/group.dart';
+import 'package:teia/models/user_state.dart';
 import 'package:teia/screens/group/controllers/group_controller.dart';
 import 'package:teia/screens/group/widgets/group_status_box.dart';
 import 'package:teia/screens/group/widgets/story_box.dart';
 import 'package:teia/screens/group/widgets/users_box.dart';
 import 'package:teia/services/art_service.dart';
+import 'package:teia/services/group_management_service.dart';
 import 'package:teia/views/teia_button.dart';
 
 class WriterGroupScreen extends StatelessWidget {
@@ -67,6 +70,7 @@ class WriterGroupScreen extends StatelessWidget {
                     child: Padding(
                       padding: const EdgeInsets.fromLTRB(0, 24, 24, 24),
                       child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           StoryBox(
                             story: controller.group.value!.story,
@@ -92,6 +96,41 @@ class WriterGroupScreen extends StatelessWidget {
                             group: controller.group.value!,
                             color: color,
                           ),
+                          if (controller.group.value!.state ==
+                              GroupState.writing)
+                            Column(
+                              children: [
+                                const Gap(24),
+                                const Divider(),
+                                const Gap(4),
+                                Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Checkbox(
+                                      value:
+                                          controller.group.value!.finalChapter,
+                                      onChanged: (bool? value) =>
+                                          GroupManagementService.value
+                                              .setFinalChapter(
+                                                  controller.group.value!.name,
+                                                  value ?? false),
+                                    ),
+                                    const Text('Final Chapter'),
+                                  ],
+                                ),
+                                const Gap(8),
+                                TeiaButton(
+                                  color: color,
+                                  onTap: () {
+                                    GroupManagementService.value.setWriterReady(
+                                        controller.group.value!);
+                                  },
+                                  text:
+                                      '(${controller.group.value!.userState.entries.where((e) => e.value.role == Role.writer && e.value.ready).length} / ${controller.group.value!.userState.entries.where((e) => e.value.role == Role.writer).length})  Finish',
+                                  expand: false,
+                                ),
+                              ],
+                            ),
                         ],
                       ),
                     ),
@@ -99,42 +138,6 @@ class WriterGroupScreen extends StatelessWidget {
                 ],
               ),
             ),
-            const Gap(40),
-
-            /*Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  'Chapter ${_chapter?.id ?? '...'}',
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 24,
-                  ),
-                ),
-                const Gap(4),
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Checkbox(
-                      value: _group!.finalChapter,
-                      onChanged: (bool? value) => GroupManagementService.value
-                          .setFinalChapter(_group!.name, value ?? false),
-                    ),
-                    const Text('Final Chapter'),
-                  ],
-                ),
-                const Gap(8),
-                TeiaButton(
-                  color: buttonColor,
-                  onTap: () {
-                    GroupManagementService.value.setWriterReady(_group!);
-                  },
-                  text:
-                      '(${_group!.userState.entries.where((e) => e.value.role == Role.writer && e.value.ready).length} / ${_group!.userState.entries.where((e) => e.value.role == Role.writer).length})  Finish',
-                  expand: false,
-                ),
-              ],
-            ),*/
           ],
         ),
       ),

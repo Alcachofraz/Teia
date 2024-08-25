@@ -61,32 +61,36 @@ class IdleGroupScreen extends StatelessWidget {
                     ),
                   ),
                   Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.fromLTRB(0, 24, 24, 24),
-                      child: Column(
-                        children: [
-                          StoryBox(
-                            story: controller.group.value!.story,
-                          ),
-                          const Gap(12),
-                          StoryCreateBox(
-                            story: controller.group.value!.story,
-                            color: controller.storyBoxColor,
-                            onCreate: controller.createStory,
-                          ),
-                        ],
+                    child: Obx(
+                      () => Padding(
+                        padding: const EdgeInsets.fromLTRB(0, 24, 24, 24),
+                        child: Column(
+                          children: [
+                            StoryBox(
+                              story: controller.group.value!.story,
+                            ),
+                            const Gap(12),
+                            StoryCreateBox(
+                              story: controller.group.value!.story,
+                              color: controller.storyBoxColor,
+                              onCreate: controller.createStory,
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),
                 ],
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24),
-              child: TeiaButton(
-                locked: controller.group.value!.story == null,
-                text: 'Start Story',
-                onTap: controller.startStory,
+            Obx(
+              () => Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: TeiaButton(
+                  locked: controller.group.value!.story == null,
+                  text: 'Start Story',
+                  onTap: controller.startStory,
+                ),
               ),
             ),
             const Gap(40),

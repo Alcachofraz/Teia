@@ -16,7 +16,7 @@ class ChapterGraph {
   /// Map Page constructor. Instantiate a page from a
   /// Map<String, dynamic> object.
   factory ChapterGraph.empty() {
-    return ChapterGraph({});
+    return ChapterGraph({1: []});
   }
 
   /// Execute [action] for each connection of the graph.

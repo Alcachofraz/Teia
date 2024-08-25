@@ -3,6 +3,7 @@ import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:teia/screens/auth/controller/auth_controller.dart';
 import 'package:teia/screens/home/controllers/home_controller.dart';
+import 'package:teia/screens/home/popups/create_adventure/create_adventure.dart';
 import 'package:teia/screens/home/popups/join_adventure/join_adventure.dart';
 import 'package:teia/screens/home/widgets/adventure_tile.dart';
 import 'package:teia/views/misc/screen_wrapper.dart';
@@ -78,6 +79,15 @@ class HomeScreen extends GetView<HomeController> {
                     runSpacing: 20,
                     children: [
                       AdventureTile(
+                        text: 'Create a new adventure',
+                        onTap: () {
+                          launchCreateAdventurePopup(context).then((_) {
+                            controller.refreshJoinedGroups();
+                          });
+                        },
+                      ),
+                      AdventureTile(
+                        text: 'Join',
                         onTap: () {
                           launchJoinAdventurePopup(context).then((_) {
                             controller.refreshJoinedGroups();
@@ -101,9 +111,8 @@ class HomeScreen extends GetView<HomeController> {
                   text: 'Logout',
                   expand: false,
                   color: const Color(0xFFC14545),
-                  onTap: () {
-                    AuthController().logout();
-                  },
+                  borderRadius: 8,
+                  onTap: controller.logout,
                 ),
               ],
             ),

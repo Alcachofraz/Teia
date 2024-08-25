@@ -105,8 +105,31 @@ class ChapterManagementService extends GetxService {
           .collection('chapters')
           .doc(chapterId.toString())
           .set(Chapter.create(chapterId, storyId, 'New chapter').toMap());
+      await pageCreate(
+        tPage.empty(
+          1,
+          chapterId,
+          storyId,
+        ),
+        ChapterGraph.empty(),
+      );
     } catch (e) {
       Logs.d('Creating chapter $chapterId\n$e');
+    }
+  }
+
+  // Add chapter
+  Future<void> chapterSetTitle(
+      String storyId, String chapterId, String title) async {
+    try {
+      await FirebaseUtils.firestore
+          .collection('stories')
+          .doc(storyId)
+          .collection('chapters')
+          .doc(chapterId)
+          .update({'title': title});
+    } catch (e) {
+      Logs.d('Updating chapter title $chapterId\n$e');
     }
   }
 

@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:teia/models/group.dart';
 import 'package:teia/screens/group/controllers/group_controller.dart';
 import 'package:teia/screens/group/widgets/group_status_box.dart';
 import 'package:teia/screens/group/widgets/story_box.dart';
 import 'package:teia/screens/group/widgets/users_box.dart';
 import 'package:teia/services/art_service.dart';
+import 'package:teia/services/authentication_service.dart';
 import 'package:teia/views/teia_button.dart';
 
 class ReaderGroupScreen extends StatelessWidget {
@@ -72,20 +74,39 @@ class ReaderGroupScreen extends StatelessWidget {
                             story: controller.group.value!.story,
                           ),
                           const Gap(12),
-                          TeiaButton(
-                            text: 'Reader chapter',
-                            color: color,
-                            widget: const Icon(
-                              Icons.schema_outlined,
-                              color: Colors.white,
-                            ),
-                            onTap: () {
-                              Get.toNamed('/read_chapter', parameters: {
-                                'storyId': controller.group.value!.story!.id,
-                                'chapterId': '1',
-                                'group': controller.group.value!.name,
-                              });
-                            },
+                          Obx(
+                            () => controller.group.value!.state ==
+                                    GroupState.reading
+                                ? TeiaButton(
+                                    text: controller
+                                            .group
+                                            .value!
+                                            .userState[AuthenticationService
+                                                .value.uid]!
+                                            .ready
+                                        ? 'You are done with this chapter'
+                                        : 'Read chapter',
+                                    color: color,
+                                    widget: const Icon(
+                                      Icons.schema_outlined,
+                                      color: Colors.white,
+                                    ),
+                                    locked: controller
+                                        .group
+                                        .value!
+                                        .userState[
+                                            AuthenticationService.value.uid]!
+                                        .ready,
+                                    onTap: () {
+                                      Get.toNamed('/read_chapter', parameters: {
+                                        'storyId':
+                                            controller.group.value!.story!.id,
+                                        'chapterId': '1',
+                                        'group': controller.group.value!.name,
+                                      });
+                                    },
+                                  )
+                                : Container(),
                           ),
                           const Gap(16),
                           GroupStatusBox(

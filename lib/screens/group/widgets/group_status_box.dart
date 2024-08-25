@@ -17,7 +17,9 @@ class GroupStatusBox extends StatelessWidget {
   final Color? color;
 
   Widget getGroupStatusText() {
-    int currentChapter = group.currentChapter;
+    int currentChapter = group.state == GroupState.reading
+        ? group.currentChapter - 1
+        : group.currentChapter;
 
     if (group.state == GroupState.reading) {
       return group.userState[AuthenticationService.value.uid!]!.role ==
@@ -111,7 +113,7 @@ class GroupStatusBox extends StatelessWidget {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  const TextSpan(text: "is in the works! Sit tight."),
+                  const TextSpan(text: " is in the works! Sit tight."),
                 ],
               ),
             )

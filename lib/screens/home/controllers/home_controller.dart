@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:get/get.dart';
 import 'package:teia/models/group.dart';
+import 'package:teia/screens/auth/controller/auth_controller.dart';
 import 'package:teia/services/art_service.dart';
 import 'package:teia/services/group_management_service.dart';
 
@@ -28,5 +29,10 @@ class HomeController extends GetxController {
 
   Future<void> refreshJoinedGroups() async {
     joinedGroups.value = await groupManagementService.getJoinedGroups();
+  }
+
+  Future<void> logout() async {
+    await refreshJoinedGroups();
+    AuthController().logout();
   }
 }

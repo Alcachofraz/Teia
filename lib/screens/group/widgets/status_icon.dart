@@ -46,7 +46,7 @@ class StatusIcon extends StatelessWidget {
                   : 'Still reading...',
             );
           case GroupState.writing:
-            return const StatusInfo('✅', 'Waiting for the next chapter!');
+            return const StatusInfo('💤', 'Waiting for the next chapter!');
         }
       case Role.writer:
         switch (group.state) {
@@ -68,7 +68,7 @@ class StatusIcon extends StatelessWidget {
             );
           case GroupState.writing:
             return StatusInfo(
-              userState.ready ? '✅' : '⌛',
+              userState.ready ? '💤' : '⌛',
               userState.ready
                   ? "Finished writing!"
                   : 'Still working on the next chapter...',
