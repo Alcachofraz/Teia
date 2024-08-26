@@ -40,13 +40,13 @@ class StatusIcon extends StatelessWidget {
             }
           case GroupState.reading:
             return StatusInfo(
-              userState.ready ? '✅' : '⌛',
+              userState.ready ? '✅' : '📖',
               userState.ready
                   ? 'Already read the current chapter!'
                   : 'Still reading...',
             );
           case GroupState.writing:
-            return const StatusInfo('💤', 'Waiting for the next chapter!');
+            return const StatusInfo('⌛', 'Waiting for the next chapter!');
         }
       case Role.writer:
         switch (group.state) {
@@ -63,12 +63,12 @@ class StatusIcon extends StatelessWidget {
             }
           case GroupState.reading:
             return const StatusInfo(
-              '✅',
+              '✍🏼',
               'Already working on the next chapter!',
             );
           case GroupState.writing:
             return StatusInfo(
-              userState.ready ? '💤' : '⌛',
+              userState.ready ? '⌛' : '✍🏼',
               userState.ready
                   ? "Finished writing!"
                   : 'Still working on the next chapter...',
@@ -89,6 +89,7 @@ class StatusIcon extends StatelessWidget {
         padding: const EdgeInsets.all(4),
         child: Text(
           info.icon,
+          style: const TextStyle(fontSize: 20),
         ),
       ),
     );

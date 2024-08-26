@@ -86,7 +86,9 @@ class WriterGroupScreen extends StatelessWidget {
                             onTap: () {
                               Get.toNamed('/chapter_editor', parameters: {
                                 'storyId': controller.group.value!.story!.id,
-                                'chapterId': '1',
+                                'chapterId':
+                                    (controller.group.value!.currentChapter)
+                                        .toString(),
                                 'group': controller.group.value!.name,
                               });
                             },
@@ -99,6 +101,7 @@ class WriterGroupScreen extends StatelessWidget {
                           if (controller.group.value!.state ==
                               GroupState.writing)
                             Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 const Gap(24),
                                 const Divider(),

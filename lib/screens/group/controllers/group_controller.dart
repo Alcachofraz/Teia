@@ -56,7 +56,13 @@ class GroupController extends GetxController {
             );
             if (allowed.value) {
               if (newGroup.state != group.value?.state) {
-                updateGroupScreen?.call(() {});
+                if (newGroup.userState[AuthenticationService.value.uid]!.role ==
+                        Role.writer &&
+                    newGroup.state == GroupState.writing) {
+                  // Do nothing, because the writer is already in the writing screen
+                } else {
+                  updateGroupScreen?.call(() {});
+                }
               }
               group.value = newGroup;
               userInfo.clear();

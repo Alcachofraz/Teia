@@ -101,7 +101,10 @@ class ReaderGroupScreen extends StatelessWidget {
                                       Get.toNamed('/read_chapter', parameters: {
                                         'storyId':
                                             controller.group.value!.story!.id,
-                                        'chapterId': '1',
+                                        'chapterId': (controller.group.value!
+                                                    .currentChapter -
+                                                1)
+                                            .toString(),
                                         'group': controller.group.value!.name,
                                       });
                                     },

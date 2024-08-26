@@ -2,8 +2,8 @@ import 'package:get/get.dart';
 import 'package:teia/services/chatgpt/chatgpt_service.dart';
 
 class ChatGPTController extends GetxController {
-  final String Function() getPageContent;
-  ChatGPTController({required this.getPageContent});
+  final Future<List<String>> Function() getChapterContent;
+  ChatGPTController({required this.getChapterContent});
   RxString idea = ''.obs;
   RxBool loading = false.obs;
 
@@ -11,7 +11,7 @@ class ChatGPTController extends GetxController {
 
   Future<void> getIdea() async {
     loading.value = true;
-    idea.value = await chatGPTService.getDraft(getPageContent());
+    idea.value = await chatGPTService.getDraft(await getChapterContent());
     loading.value = false;
   }
 }

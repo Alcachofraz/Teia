@@ -7,13 +7,13 @@ import 'package:teia/views/teia_button.dart';
 
 class ChatGPTView extends GetView<ChatGPTController> {
   const ChatGPTView(
-      {super.key, required this.getPageContent, this.accentColor});
-  final String Function() getPageContent;
+      {super.key, required this.getChapterContent, this.accentColor});
+  final Future<List<String>> Function() getChapterContent;
   final Color? accentColor;
 
   @override
   Widget build(BuildContext context) {
-    Get.put(ChatGPTController(getPageContent: getPageContent));
+    Get.put(ChatGPTController(getChapterContent: getChapterContent));
     return Tile(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 16),

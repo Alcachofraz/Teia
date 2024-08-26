@@ -1,14 +1,14 @@
 class ChapterGraph {
-  final Map<int, List<int>> _nodes;
+  final Map<int, Set<int>> _nodes;
 
   ChapterGraph(this._nodes);
 
   /// Nodes getter
-  Map<int, List<int>> get nodes => _nodes;
+  Map<int, Set<int>> get nodes => _nodes;
 
   /// Map Page constructor. Instantiate a page from a
   /// Map<String, dynamic> object.
-  factory ChapterGraph.fromMap(Map<int, List<int>>? map) {
+  factory ChapterGraph.fromMap(Map<int, Set<int>>? map) {
     if (map == null) return ChapterGraph({});
     return ChapterGraph(map);
   }
@@ -16,7 +16,7 @@ class ChapterGraph {
   /// Map Page constructor. Instantiate a page from a
   /// Map<String, dynamic> object.
   factory ChapterGraph.empty() {
-    return ChapterGraph({1: []});
+    return ChapterGraph({1: {}});
   }
 
   /// Execute [action] for each connection of the graph.
@@ -37,7 +37,7 @@ class ChapterGraph {
     //log('$start to $end');
     if (_nodes.containsKey(start)) {
       _nodes[start]!.add(end);
-      _nodes[end] = [];
+      _nodes[end] = {};
       return true;
     } else {
       return false;
@@ -91,7 +91,7 @@ class ChapterGraph {
   }
 
   // To map.
-  Map<String, List<int>> toMap() =>
+  Map<String, Set<int>> toMap() =>
       _nodes.map((key, value) => MapEntry(key.toString(), value));
 
   @override

@@ -52,6 +52,7 @@ class _ChapterEditorScreenState extends State<ChapterEditorScreen> {
   late Color buttonColor;
   final String landscape = ArtService.value.landscape();
   RxBool loading = false.obs;
+  RxBool titleSaved = true.obs;
   late final TextEditingController titleController = TextEditingController();
 
   Set<int> missingLinks = {};
@@ -154,6 +155,7 @@ class _ChapterEditorScreenState extends State<ChapterEditorScreen> {
       widget.chapterId,
       titleController.text,
     );
+    titleSaved.value = true;
   }
 
   Widget _dividerBuilder(bool vertical, axis, index, resizable, dragging,
@@ -323,6 +325,7 @@ class _ChapterEditorScreenState extends State<ChapterEditorScreen> {
           if (_chapter!.links.nodes[id] == null ||
               !_chapter!.links.nodes[id]!.contains(link)) {
             missingLinks.add(id);
+            break;
           }
         }
       }
@@ -367,33 +370,54 @@ class _ChapterEditorScreenState extends State<ChapterEditorScreen> {
                                     fontSize: 28,
                                   ),
                                 ),
-                                TextField(
-                                  controller: titleController,
-                                  style: const TextStyle(fontSize: 15),
-                                  onSubmitted: (value) async =>
-                                      await updateTitle(value),
-                                  decoration: InputDecoration(
-                                    isDense: true,
-                                    fillColor: Colors.transparent,
-                                    filled: true,
-                                    prefixIcon: Padding(
-                                      padding:
-                                          const EdgeInsets.only(right: 8.0),
-                                      child: IconButton(
-                                        onPressed: () async {
-                                          await updateTitle(
-                                            titleController.text,
-                                          );
-                                        },
-                                        icon: const Icon(Icons.save),
+                                Obx(
+                                  () => TextField(
+                                    controller: titleController,
+                                    style: const TextStyle(fontSize: 15),
+                                    onSubmitted: (value) async =>
+                                        await updateTitle(value),
+                                    onChanged: (value) {
+                                      titleSaved.value = false;
+                                    },
+                                    decoration: InputDecoration(
+                                      isDense: true,
+                                      fillColor: Colors.transparent,
+                                      filled: true,
+                                      prefixIcon: Padding(
+                                        padding:
+                                            const EdgeInsets.only(right: 8.0),
+                                        child: IconButton(
+                                          onPressed: () async {
+                                            await updateTitle(
+                                              titleController.text,
+                                            );
+                                          },
+                                          icon: Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              Icon(
+                                                titleSaved.value
+                                                    ? Icons.check
+                                                    : Icons.error_outline,
+                                                color: titleSaved.value
+                                                    ? Colors.green[700]
+                                                    : Colors.red[700],
+                                                size: 14,
+                                              ),
+                                              const Icon(
+                                                Icons.save,
+                                              ),
+                                            ],
+                                          ),
+                                        ),
                                       ),
-                                    ),
-                                    border: OutlineInputBorder(
-                                      borderRadius:
-                                          BorderRadius.circular(100.0),
-                                      borderSide: const BorderSide(
-                                        width: 0.0,
-                                        style: BorderStyle.none,
+                                      border: OutlineInputBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(100.0),
+                                        borderSide: const BorderSide(
+                                          width: 0.0,
+                                          style: BorderStyle.none,
+                                        ),
                                       ),
                                     ),
                                   ),

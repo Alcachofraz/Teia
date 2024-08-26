@@ -24,8 +24,8 @@ class Chapter {
       id,
       storyId,
       title,
-      ChapterGraph({1: []}),
-      ChapterGraph({1: []}),
+      ChapterGraph({1: {}}),
+      ChapterGraph({1: {}}),
     );
   }
 
@@ -34,8 +34,8 @@ class Chapter {
       -1,
       'Story ID',
       'Title',
-      ChapterGraph({1: []}),
-      ChapterGraph({1: []}),
+      ChapterGraph({1: {}}),
+      ChapterGraph({1: {}}),
     );
   }
 
@@ -55,10 +55,10 @@ class Chapter {
       map['id'] as int,
       map['storyId'] as String,
       map['title'] as String,
-      ChapterGraph.fromMap(Map<String, dynamic>.from(map['graph']).map(
-          (key, value) => MapEntry(int.parse(key), List<int>.from(value)))),
-      ChapterGraph.fromMap(Map<String, dynamic>.from(map['links']).map(
-          (key, value) => MapEntry(int.parse(key), List<int>.from(value)))),
+      ChapterGraph.fromMap(Map<String, dynamic>.from(map['graph'])
+          .map((key, value) => MapEntry(int.parse(key), Set<int>.from(value)))),
+      ChapterGraph.fromMap(Map<String, dynamic>.from(map['links'])
+          .map((key, value) => MapEntry(int.parse(key), Set<int>.from(value)))),
     );
   }
 

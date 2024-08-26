@@ -15,22 +15,29 @@ class ChatGPTService extends GetxService {
 
   static final dio = Dio();
 
-  Future<String> getDraft(String context) async {
+  Future<String> getDraft(List<String> context) async {
+    final List<dynamic> content = [
+      {
+        "role": "user",
+        "content":
+            "I will provide you with context for the previous pages of my Choose Your Own Adventure book, and you'll keep the story going. You must only generate the story content, and you must not answer like a chat-bot. The content you generate should be written in the same language as the context. You must write in second-person. The options you might provide are only narrative, there's no need to bullet point them.",
+      },
+      if (context.isNotEmpty) ...[
+        for (String page in context)
+          {
+            "role": "user",
+            "content": page,
+          },
+      ] else ...[
+        {
+          "role": "user",
+          "content":
+              "For now, there is no context, so you can start the story with total freedom.",
+        },
+      ],
+    ];
     try {
-      final body = {
-        "model": model,
-        "messages": [
-          {
-            "role": "user",
-            "content":
-                "You are a narrative idea tool. I will provide you with context for the previous pages of my Choose Your Own Adventure book, and you'll give me an idea on how the current page should end. You are not a chat bot, so don't answer like one. Just give me the idea. The idea you give should be written in the same language as the context.",
-          },
-          {
-            "role": "user",
-            "content": context,
-          },
-        ]
-      };
+      final body = {"model": model, "messages": content};
       final headers = {
         "Authorization": "Bearer $apiKey",
         "Accept": "application/json",

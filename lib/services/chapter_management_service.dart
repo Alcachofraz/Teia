@@ -1,5 +1,6 @@
-import 'dart:convert';
-
+import 'package:firebase_database/firebase_database.dart';
+import 'package:flutter/material.dart' hide Page;
+import 'package:flutter_quill/flutter_quill.dart';
 import 'package:get/get.dart';
 import 'package:teia/models/change.dart';
 import 'package:teia/models/chapter.dart';
@@ -280,13 +281,30 @@ class ChapterManagementService extends GetxService {
     }*/
   }
 
-  Future<List<Change>> getPageChanges(String storyId, String chapterId) async {
-    return ((await FirebaseUtils.realtime
-                .ref('stories/$storyId/chapters/$chapterId/pages')
-                .once())
-            .snapshot
-            .value as List<Map<String, dynamic>>)
-        .map((e) => Change.fromMap(e))
-        .toList();
+  Future<List<Change>> getPageChanges(
+      String storyId, String chapterId, String pageId) async {
+    final DatabaseReference ref = FirebaseUtils.realtime
+        .ref('stories/$storyId/chapters/$chapterId/pages/$pageId/changes');
+    final data = await ref.get();
+    return data.exists
+        ? (data.value as List<Map<String, dynamic>>)
+            .map((e) => Change.fromMap(e))
+            .toList()
+        : [];
+  }
+
+  Future<String> getPageContent(
+      String storyId, String chapterId, String pageId) async {
+    List<Change> changes = await getPageChanges(storyId, chapterId, pageId);
+    QuillController controller = QuillController.basic();
+    tPage page = tPage.empty(0, 0, '');
+    for (Change change in changes) {
+      controller.compose(
+        page.compose(change),
+        const TextSelection(baseOffset: 0, extentOffset: 0),
+        ChangeSource.remote,
+      );
+    }
+    return controller.getPlainText();
   }
 }

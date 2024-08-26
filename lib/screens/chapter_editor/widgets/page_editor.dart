@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart' hide Page;
+import 'package:flutter/services.dart';
 import 'package:flutter_quill/flutter_quill.dart';
 import 'package:flutter_quill/quill_delta.dart';
 import 'package:get/get.dart';
@@ -23,6 +24,7 @@ import 'package:teia/utils/utils.dart';
 import 'package:teia/views/misc/tap_icon.dart';
 import 'package:teia/views/misc/tile.dart';
 import 'package:universal_html/html.dart';
+import 'package:file_picker/file_picker.dart';
 
 class PageEditor extends StatefulWidget {
   final int pageId;
@@ -77,6 +79,8 @@ class _PageEditorState extends State<PageEditor> {
   Color accentColor = ArtService.value.pastel();
 
   final StorageService storageService = Get.put(StorageService());
+
+  bool pasting = false;
 
   @override
   void initState() {
@@ -266,6 +270,11 @@ class _PageEditorState extends State<PageEditor> {
   /// On document insert.
   void _onLocalInsert(LetterId? id, String text) {
     //print('INSERT [$id, $text]');
+    if (text.length > 1) {
+      setState(() {
+        pasting = true;
+      });
+    }
     page.insert(id, text);
     _pushPageChange(
       Change(
@@ -276,6 +285,11 @@ class _PageEditorState extends State<PageEditor> {
         letter: text,
       ),
     );
+    if (text.length > 1) {
+      setState(() {
+        pasting = false;
+      });
+    }
   }
 
   /// On document delete.
@@ -314,20 +328,16 @@ class _PageEditorState extends State<PageEditor> {
   Future<void> _checkLinksOnDelete() async {
     Set<int> links = {};
     links.addAll(widget.chapter.links.nodes[widget.pageId] ?? []);
+    Set<int> actualLinks = {};
     if (links.isEmpty) return;
     for (Letter letter in page.letters) {
-      for (int id in (widget.chapter.links.nodes[widget.pageId] ?? [])) {
-        if (letter.snippet != null &&
-            letter.snippet!.type == SnippetType.choice &&
-            letter.snippet!.attributes['choice'] == id) {
-          links.remove(id);
-          if (links.isEmpty) {
-            return;
-          }
-        }
+      if (letter.snippet != null &&
+          letter.snippet!.type == SnippetType.choice) {
+        actualLinks.add(letter.snippet!.attributes['choice']);
       }
     }
-    for (int id in links) {
+    Set<int> diff = links.difference(actualLinks);
+    for (int id in diff) {
       widget.chapter.removeLink(widget.pageId, id);
     }
     _pushChapterToRemote(widget.chapter);
@@ -358,8 +368,8 @@ class _PageEditorState extends State<PageEditor> {
   /// Create a snippet from the selected text [_selection]
   void _createSnippet(Snippet snippet) {
     // 1. and 3.
-    _onLocalFormat(page.letters[_selection!.baseOffset].id,
-        _selection!.extentOffset - _selection!.baseOffset, snippet);
+    _onLocalFormat(page.letters[_selection!.start].id,
+        (_selection!.end - _selection!.start).abs(), snippet);
     // 2.
     _controller.formatSelection(
       ColorAttribute(
@@ -411,6 +421,33 @@ class _PageEditorState extends State<PageEditor> {
     ));
   }
 
+  // Get String content from each of the pages before
+  // the current page in this chapter
+  Future<List<String>> getChapterContent() async {
+    List<String> pages = [];
+    int i = page.id;
+    String content =
+        _controller.document.getPlainText(0, _controller.document.length);
+    if (content.isNotEmpty && content != '\n') {
+      pages.add(content);
+    }
+    while (i > 1) {
+      i = widget.chapter.graph.nodes.entries
+          .firstWhere(
+              (MapEntry<int, Set<int>> entry) => entry.value.contains(i))
+          .key;
+      String content = await ChapterManagementService.value.getPageContent(
+        widget.chapter.storyId,
+        widget.chapter.id.toString(),
+        i.toString(),
+      );
+      if (content.isNotEmpty && content != '\n') {
+        pages.add(content);
+      }
+    }
+    return pages.reversed.toList();
+  }
+
   Widget _snippetCard(Snippet snippet) {
     switch (snippet.type) {
       case SnippetType.choice:
@@ -436,7 +473,7 @@ class _PageEditorState extends State<PageEditor> {
           Padding(
             padding: const EdgeInsets.fromLTRB(0, 0, 0, 16),
             child: ChatGPTView(
-              getPageContent: () => _controller.document.toPlainText(),
+              getChapterContent: getChapterContent,
               accentColor: accentColor,
             ),
           ),
@@ -445,6 +482,30 @@ class _PageEditorState extends State<PageEditor> {
         ],
       ),
     );
+  }
+
+  Widget _pasting() {
+    return pasting
+        ? const Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            child: Tile(
+              padding: EdgeInsets.zero,
+              radiusAll: 64,
+              elevation: 8,
+              width: Utils.textOptionsWidth,
+              color: Colors.white,
+              child: Row(
+                children: [
+                  Text('Pasting... '),
+                  CircularProgressIndicator(),
+                ],
+              ),
+            ),
+          )
+        : const SizedBox.shrink();
   }
 
   Widget _textOptions() {
@@ -604,11 +665,16 @@ class _PageEditorState extends State<PageEditor> {
                                     icon: const Icon(
                                       Icons.upload_rounded,
                                     ),
-                                    onTap: () {
+                                    onTap: () async {
+                                      FilePickerResult? result =
+                                          await FilePicker.platform
+                                              .pickFiles(type: FileType.image);
+                                      if (result != null) {
+                                        _onAddImage(result.files.single.bytes!);
+                                      }
                                       setState(() {
                                         showingImageOption = false;
                                       });
-
                                       // Load image from device
                                     },
                                   ),
@@ -684,8 +750,8 @@ class _PageEditorState extends State<PageEditor> {
                         padding:
                             const EdgeInsets.fromLTRB(24.0, 24.0, 24.0, 24.0),
                         child: QuillEditor(
+                          controller: _controller,
                           configurations: QuillEditorConfigurations(
-                            controller: _controller,
                             expands: true,
                             paintCursorAboveText: true,
                             placeholder: 'Once upon a time...',
@@ -718,6 +784,7 @@ class _PageEditorState extends State<PageEditor> {
           ],
         ),
         _textOptions(),
+        _pasting(),
       ],
     );
   }
