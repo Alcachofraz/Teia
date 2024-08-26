@@ -80,7 +80,11 @@ class _ChapterEditorScreenState extends State<ChapterEditorScreen> {
                 Role.writer;
         if (allowed.value) {
           if (group.state != (_group?.state ?? group.state)) {
-            Get.back();
+            if (group.state == GroupState.writing) {
+              // Do nothing, because the writer is already in the writing screen
+            } else {
+              Get.back();
+            }
           }
           setState(() => _group = group);
         }

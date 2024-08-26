@@ -118,7 +118,6 @@ class _ReadChapterScreenState extends State<ReadChapterScreen> {
       GroupManagementService.value.setReaderReady(
         _group.value!,
       );
-      Get.back();
     }
   }
 

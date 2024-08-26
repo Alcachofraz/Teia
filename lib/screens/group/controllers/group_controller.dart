@@ -56,13 +56,7 @@ class GroupController extends GetxController {
             );
             if (allowed.value) {
               if (newGroup.state != group.value?.state) {
-                if (newGroup.userState[AuthenticationService.value.uid]!.role ==
-                        Role.writer &&
-                    newGroup.state == GroupState.writing) {
-                  // Do nothing, because the writer is already in the writing screen
-                } else {
-                  updateGroupScreen?.call(() {});
-                }
+                updateGroupScreen?.call(() {});
               }
               group.value = newGroup;
               userInfo.clear();
@@ -73,6 +67,7 @@ class GroupController extends GetxController {
                   state: value,
                 ));
               });
+              userInfo.sort();
             }
           }
           loading.value = false;

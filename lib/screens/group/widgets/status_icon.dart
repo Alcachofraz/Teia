@@ -29,7 +29,7 @@ class StatusIcon extends StatelessWidget {
         switch (group.state) {
           case GroupState.idle:
             if (group.finalChapter) {
-              return const StatusInfo('🏁', 'Adventure done!');
+              return const StatusInfo('🏁', 'Adventure finished!');
             } else {
               return StatusInfo(
                 userState.ready ? '✅' : '⌛',
@@ -39,12 +39,19 @@ class StatusIcon extends StatelessWidget {
               );
             }
           case GroupState.reading:
-            return StatusInfo(
-              userState.ready ? '✅' : '📖',
-              userState.ready
-                  ? 'Already read the current chapter!'
-                  : 'Still reading...',
-            );
+            if (userState.ready) {
+              return StatusInfo(
+                group.finalChapter ? '🏁' : '✅',
+                userState.ready
+                    ? 'Adventure finished!'
+                    : 'Already read the current chapter!',
+              );
+            } else {
+              return const StatusInfo(
+                '📖',
+                'Still reading...',
+              );
+            }
           case GroupState.writing:
             return const StatusInfo('⌛', 'Waiting for the next chapter!');
         }
@@ -52,7 +59,7 @@ class StatusIcon extends StatelessWidget {
         switch (group.state) {
           case GroupState.idle:
             if (group.finalChapter) {
-              return const StatusInfo('🏁', 'Adventure done!');
+              return const StatusInfo('🏁', 'Adventure finished!');
             } else {
               return StatusInfo(
                 userState.ready ? '✅' : '⌛',
@@ -62,10 +69,14 @@ class StatusIcon extends StatelessWidget {
               );
             }
           case GroupState.reading:
-            return const StatusInfo(
-              '✍🏼',
-              'Already working on the next chapter!',
-            );
+            if (group.finalChapter) {
+              return const StatusInfo('🏁', 'Story complete!');
+            } else {
+              return const StatusInfo(
+                '✍🏼',
+                'Already working on the next chapter!',
+              );
+            }
           case GroupState.writing:
             return StatusInfo(
               userState.ready ? '⌛' : '✍🏼',

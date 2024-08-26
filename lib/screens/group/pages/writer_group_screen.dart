@@ -109,14 +109,17 @@ class WriterGroupScreen extends StatelessWidget {
                                 Row(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
-                                    Checkbox(
-                                      value:
-                                          controller.group.value!.finalChapter,
-                                      onChanged: (bool? value) =>
-                                          GroupManagementService.value
-                                              .setFinalChapter(
-                                                  controller.group.value!.name,
-                                                  value ?? false),
+                                    Obx(
+                                      () => Checkbox(
+                                        value: controller
+                                            .group.value!.finalChapter,
+                                        onChanged: (bool? value) =>
+                                            GroupManagementService.value
+                                                .setFinalChapter(
+                                                    controller
+                                                        .group.value!.name,
+                                                    value ?? false),
+                                      ),
                                     ),
                                     const Text('Final Chapter'),
                                   ],

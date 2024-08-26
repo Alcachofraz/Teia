@@ -251,8 +251,8 @@ class GroupManagementService extends GetxService {
       // If not final chapter, add another after
       if (!group.finalChapter) {
         await StoryManagementService.value.storyAddChapter(group.story!);
-        currentChapter++;
       }
+      currentChapter++;
     }
     await FirebaseUtils.firestore.collection('groups').doc(group.name).set(
       {

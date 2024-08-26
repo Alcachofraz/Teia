@@ -40,15 +40,18 @@ class GroupStatusBox extends StatelessWidget {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  const TextSpan(text: ". But you can start working on "),
-                  TextSpan(
-                    text: "Chapter ${currentChapter + 1}",
-                    style: TextStyle(
-                      color: color,
-                      fontWeight: FontWeight.bold,
+                  const TextSpan(text: "."),
+                  if (!group.finalChapter)
+                    const TextSpan(text: " But you can start working on "),
+                  if (!group.finalChapter)
+                    TextSpan(
+                      text: "Chapter ${currentChapter + 1}",
+                      style: TextStyle(
+                        color: color,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                  ),
-                  const TextSpan(text: "!"),
+                  if (!group.finalChapter) const TextSpan(text: "!"),
                 ],
               ),
             )
