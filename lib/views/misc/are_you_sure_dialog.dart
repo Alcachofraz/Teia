@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 Future<void> launchAreYouSurePopup(
   BuildContext context, {
@@ -17,9 +18,7 @@ Future<void> launchAreYouSurePopup(
         ),
         actions: [
           TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-            },
+            onPressed: () => Get.close(1),
             child: const Text('Cancel'),
           ),
           TextButton(

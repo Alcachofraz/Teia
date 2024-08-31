@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class AnimatedDialog extends StatefulWidget {
   final String title;
@@ -6,17 +7,18 @@ class AnimatedDialog extends StatefulWidget {
   final Duration duration;
 
   const AnimatedDialog({
-    Key? key,
+    super.key,
     required this.title,
     required this.child,
     this.duration = const Duration(milliseconds: 500),
-  }) : super(key: key);
+  });
 
   @override
   State<AnimatedDialog> createState() => _AnimatedDialogState();
 }
 
-class _AnimatedDialogState extends State<AnimatedDialog> with SingleTickerProviderStateMixin {
+class _AnimatedDialogState extends State<AnimatedDialog>
+    with SingleTickerProviderStateMixin {
   late AnimationController controller;
   late Animation<double> scaleAnimation;
 
@@ -25,7 +27,8 @@ class _AnimatedDialogState extends State<AnimatedDialog> with SingleTickerProvid
     super.initState();
 
     controller = AnimationController(vsync: this, duration: widget.duration);
-    scaleAnimation = CurvedAnimation(parent: controller, curve: Curves.elasticInOut);
+    scaleAnimation =
+        CurvedAnimation(parent: controller, curve: Curves.elasticInOut);
     controller.addListener(() {
       setState(() {});
     });
@@ -70,12 +73,13 @@ class _AnimatedDialogState extends State<AnimatedDialog> with SingleTickerProvid
                         child: InkWell(
                           customBorder: const CircleBorder(),
                           onTap: () {
-                            Navigator.pop(context);
+                            () => Get.close(1);
                           },
                           splashColor: Colors.grey.withOpacity(0.5),
                           child: const Padding(
                             padding: EdgeInsets.all(8.0),
-                            child: Icon(Icons.close, color: Colors.black, size: 32.0),
+                            child: Icon(Icons.close,
+                                color: Colors.black, size: 32.0),
                           ),
                         ),
                       ),

@@ -1,12 +1,17 @@
+import 'dart:convert';
+
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart' hide Page;
 import 'package:flutter_quill/flutter_quill.dart';
+import 'package:flutter_quill/quill_delta.dart';
 import 'package:get/get.dart';
 import 'package:teia/models/change.dart';
 import 'package:teia/models/chapter.dart';
 import 'package:teia/models/chapter_graph.dart';
+import 'package:teia/models/letter.dart';
 import 'package:teia/models/note/note.dart';
 import 'package:teia/models/page.dart';
+import 'package:teia/models/snippets/snippet.dart';
 import 'package:teia/services/firebase/firestore_utils.dart';
 import 'package:teia/utils/logs.dart';
 
@@ -286,25 +291,50 @@ class ChapterManagementService extends GetxService {
     final DatabaseReference ref = FirebaseUtils.realtime
         .ref('stories/$storyId/chapters/$chapterId/pages/$pageId/changes');
     final data = await ref.get();
-    return data.exists
-        ? (data.value as List<Map<String, dynamic>>)
-            .map((e) => Change.fromMap(e))
-            .toList()
-        : [];
+    if (!data.exists) return [];
+    Map<String, dynamic> map = jsonDecode(jsonEncode(data.value));
+    List<dynamic> values = map.values.toList();
+    return values
+        .map((e) => Change.fromMap(jsonDecode(jsonEncode(e))))
+        .toList();
   }
 
-  Future<String> getPageContent(
-      String storyId, String chapterId, String pageId) async {
+  // Returns a list with two Strings:
+  // 1. The content of the page
+  // 2. The text that leads to page [nextPageId]
+  Future<List<String>> getPageContent(
+      String storyId, String chapterId, String pageId,
+      {String? nextPageId}) async {
     List<Change> changes = await getPageChanges(storyId, chapterId, pageId);
-    QuillController controller = QuillController.basic();
     tPage page = tPage.empty(0, 0, '');
     for (Change change in changes) {
-      controller.compose(
-        page.compose(change),
-        const TextSelection(baseOffset: 0, extentOffset: 0),
-        ChangeSource.remote,
-      );
+      page.compose(change);
     }
-    return controller.getPlainText();
+    if (nextPageId != null) {
+      String text = '';
+      for (Letter letter in page.letters) {
+        if (letter.snippet != null &&
+            letter.snippet!.type == SnippetType.choice &&
+            letter.snippet!.attributes['choice'] == int.parse(nextPageId)) {
+          text += letter.letter;
+        }
+      }
+      return [text, page.getRawText()];
+    }
+    return ['', page.getRawText()];
+  }
+
+  /// Simplify changes queue:
+  Future<void> simplifyChangesQueue(tPage page) async {
+    final postRef = FirebaseUtils.realtime.ref(
+        'stories/${page.storyId}/chapters/${page.chapterId.toString()}/pages/${page.id}/changes');
+    await postRef.runTransaction((post) {
+      final Map<String, dynamic> newPost = {};
+      int i = 0;
+      for (Change change in page.toChanges()) {
+        newPost[(i++).toString()] = change.toMap();
+      }
+      return Transaction.success(newPost);
+    });
   }
 }

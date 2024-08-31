@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class UpwardOverlay extends StatefulWidget {
   final String title;
@@ -7,18 +8,19 @@ class UpwardOverlay extends StatefulWidget {
   final double? height;
 
   const UpwardOverlay({
-    Key? key,
+    super.key,
     required this.title,
     required this.child,
     this.duration = const Duration(milliseconds: 500),
     this.height,
-  }) : super(key: key);
+  });
 
   @override
   State<UpwardOverlay> createState() => _UpwardOverlayState();
 }
 
-class _UpwardOverlayState extends State<UpwardOverlay> with SingleTickerProviderStateMixin {
+class _UpwardOverlayState extends State<UpwardOverlay>
+    with SingleTickerProviderStateMixin {
   late AnimationController controller;
   late Animation<Offset> slideAnimation;
   late final double height;
@@ -78,9 +80,9 @@ class _UpwardOverlayState extends State<UpwardOverlay> with SingleTickerProvider
 class UpwardOverlayHeader extends StatelessWidget {
   final String title;
   const UpwardOverlayHeader({
-    Key? key,
+    super.key,
     required this.title,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -90,9 +92,7 @@ class UpwardOverlayHeader extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           IconButton(
-            onPressed: () {
-              Navigator.pop(context);
-            },
+            onPressed: () => Get.close(1),
             icon: Icon(
               Icons.west,
               size: 28.0,

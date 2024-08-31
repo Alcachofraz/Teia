@@ -38,9 +38,7 @@ launchCreateAdventurePopup(BuildContext context) {
         ),
         actions: [
           TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-            },
+            onPressed: () => Get.close(1),
             child: const Text('Cancel'),
           ),
           TextButton(
@@ -50,7 +48,9 @@ launchCreateAdventurePopup(BuildContext context) {
                     adventureNameController.text,
                     adventurePasswordController.text,
                   )
-                  .then((_) => Navigator.pop(context));
+                  .then(
+                    (_) => Get.close(1),
+                  );
             },
             child: const Text('Join'),
           ),

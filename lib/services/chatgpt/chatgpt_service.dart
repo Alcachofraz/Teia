@@ -20,7 +20,7 @@ class ChatGPTService extends GetxService {
       {
         "role": "user",
         "content":
-            "I will provide you with context for the previous pages of my Choose Your Own Adventure book, and you'll keep the story going. You must only generate the story content, and you must not answer like a chat-bot. The content you generate should be written in the same language as the context. You must write in second-person. The options you might provide are only narrative, there's no need to bullet point them.",
+            "I will provide you with context for the previous pages of my Choose Your Own Adventure book, and you'll keep the story going. You must only generate the story content, and you must not answer like a chat-bot. The content you generate should be written in the same language as the context. You must write in second-person.",
       },
       if (context.isNotEmpty) ...[
         for (String page in context)

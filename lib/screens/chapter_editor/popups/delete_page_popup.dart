@@ -19,7 +19,7 @@ openDeletePopupError(BuildContext context, int pageId) {
             ),
             const SizedBox(height: 10),
             TeiaButton(
-              onTap: Get.back,
+              onTap: () => Get.close(1),
               text: 'Close',
             ),
           ],

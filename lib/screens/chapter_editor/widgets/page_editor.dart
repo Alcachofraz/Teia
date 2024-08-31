@@ -132,6 +132,7 @@ class _PageEditorState extends State<PageEditor> {
     _controller.dispose();
     _onContextMenu.cancel();
     _scrollController.dispose();
+    ChapterManagementService.value.simplifyChangesQueue(page);
     super.dispose();
   }
 
@@ -431,18 +432,26 @@ class _PageEditorState extends State<PageEditor> {
     if (content.isNotEmpty && content != '\n') {
       pages.add(content);
     }
+    bool secondToLastPage = true;
     while (i > 1) {
       i = widget.chapter.graph.nodes.entries
           .firstWhere(
               (MapEntry<int, Set<int>> entry) => entry.value.contains(i))
           .key;
-      String content = await ChapterManagementService.value.getPageContent(
+
+      List<String> content =
+          await ChapterManagementService.value.getPageContent(
         widget.chapter.storyId,
         widget.chapter.id.toString(),
         i.toString(),
+        nextPageId: secondToLastPage ? widget.pageId.toString() : null,
       );
-      if (content.isNotEmpty && content != '\n') {
-        pages.add(content);
+      if (secondToLastPage && content[0].isNotEmpty && content[0] != '\n') {
+        pages.add(content[0]);
+        secondToLastPage = false;
+      }
+      if (content[1].isNotEmpty && content[1] != '\n') {
+        pages.add(content[1]);
       }
     }
     return pages.reversed.toList();
@@ -758,7 +767,11 @@ class _PageEditorState extends State<PageEditor> {
                             scrollable: true,
                             autoFocus: true,
                             padding: const EdgeInsets.fromLTRB(
-                                24.0, 20.0, 24.0, 24.0),
+                              24.0,
+                              20.0,
+                              24.0,
+                              24.0,
+                            ),
                             onImagePaste: (bytes) => Future.value(null),
                             onLaunchUrl: null,
                             embedBuilders: [CursorEmbedBuilder()],

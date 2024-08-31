@@ -37,19 +37,19 @@ Future<void> launchJoinAdventurePopup(BuildContext context) {
         ),
         actions: [
           TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-            },
+            onPressed: () => Get.close(1),
             child: const Text('Cancel'),
           ),
           TextButton(
             onPressed: () {
               groupManagementService
                   .groupJoin(
-                    adventureNameController.text,
-                    adventurePasswordController.text,
-                  )
-                  .then((_) => Navigator.pop(context));
+                adventureNameController.text,
+                adventurePasswordController.text,
+              )
+                  .then((bool result) {
+                if (result) Get.close(1);
+              });
             },
             child: const Text('Join'),
           ),

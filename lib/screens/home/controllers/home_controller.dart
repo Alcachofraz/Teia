@@ -16,7 +16,9 @@ class HomeController extends GetxController {
 
   @override
   void onInit() {
-    refreshJoinedGroups();
+    groupManagementService.joinedGroupsStream().listen((List<Group> groups) {
+      joinedGroups.value = groups;
+    });
     backgroundLeft =
         ArtService.value.randomBackgroundPath(BackroundOrientation.left);
     backgroundRight =
@@ -27,12 +29,8 @@ class HomeController extends GetxController {
     super.onInit();
   }
 
-  Future<void> refreshJoinedGroups() async {
-    joinedGroups.value = await groupManagementService.getJoinedGroups();
-  }
-
   Future<void> logout() async {
-    await refreshJoinedGroups();
+    Get.delete<HomeController>();
     AuthController().logout();
   }
 }

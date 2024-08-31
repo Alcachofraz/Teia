@@ -69,6 +69,6 @@ class Change extends Comparable<Change> {
 
   @override
   String toString() {
-    return '{${letter == null ? 'delete: $length' : 'insert: $letter'}, offset: $id}';
+    return toMap().toString();
   }
 }

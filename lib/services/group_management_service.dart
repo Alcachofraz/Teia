@@ -44,6 +44,25 @@ class GroupManagementService extends GetxService {
     return groups;
   }
 
+  // stream to listen for joined groups
+  Stream<List<Group>> joinedGroupsStream() {
+    return FirebaseUtils.firestore
+        .collection('groups')
+        .where('users', arrayContains: AuthenticationService.value.uid)
+        .snapshots()
+        .asyncMap(
+          (event) async => (await Future.wait(event.docs.map(
+            (e) async => Group.fromMap(
+              e.data(),
+              await Get.put(StoryManagementService()).storyGet(
+                e.data()['story'],
+              ),
+            ),
+          )))
+              .toList(),
+        );
+  }
+
   // Create new group
   Future<void> groupCreate(String name, String password) async {
     await FirebaseUtils.firestore.collection('groups').doc(name).set(
@@ -110,11 +129,13 @@ class GroupManagementService extends GetxService {
 
   // If the group exists, the password is correct and the user is not already in the group, the user is added to the group.
   // If the group does not exist, the group is created and he user joins.
-  Future<void> groupJoin(String name, String password) async {
+  Future<bool> groupJoin(String name, String password) async {
     if (await groupExists(name)) {
       await groupJoinExisting(name, password);
+      return true;
     } else {
-      await groupCreate(name, password);
+      //await groupCreate(name, password);
+      return false;
     }
   }
 

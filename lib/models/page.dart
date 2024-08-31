@@ -5,6 +5,7 @@ import 'package:sorted_list/sorted_list.dart';
 import 'package:teia/models/change.dart';
 import 'package:teia/models/letter.dart';
 import 'package:teia/models/snippets/snippet.dart';
+import 'package:teia/services/authentication_service.dart';
 
 class tPage {
   final int id;
@@ -16,7 +17,7 @@ class tPage {
 
   SortedList<Letter> letters;
 
-  static const int intMaxValue = 2147483647;
+  static const int kIntMaxValue = 50; // 0x20000000000000;
   static const int boundary = 10;
 
   tPage(
@@ -135,8 +136,8 @@ class tPage {
       for (int i = ret.depths - 1; i < (q?.depths ?? 0); i++) {
         ret.add(0);
       }
-      if (ret.last + boundary > intMaxValue) {
-        ret.removeLast();
+      if (ret.last >= kIntMaxValue - boundary) {
+        if (q != null) ret.removeLast();
         ret.last += boundary;
       } else {
         ret.last += boundary;
@@ -246,7 +247,7 @@ class tPage {
     //int index = letters.indexWhere((l) => l.id == id);
     int index = indexLetter(id, insert: false);
     if (index < 0) return -1;
-    if (index + length < letters.length) {
+    if (index + length <= letters.length) {
       letters.removeRange(index, index + length);
     }
     return index;
@@ -271,4 +272,64 @@ class tPage {
       return !letters.any((l) => l.snippet?.type == SnippetType.choice);
     }
   }
+
+  /// Convert this page to a list of Changes.
+  /// This is used to send the full list of simplified changes to the server.
+  List<Change> toChanges() {
+    List<Change> ret = [
+      Change(
+        null,
+        ChangeType.insert,
+        AuthenticationService.value.uid!,
+        DateTime.now().millisecondsSinceEpoch,
+        letter: getRawText(),
+      ),
+    ];
+    WorkingSnippet? workingSnippet;
+    LetterId letterId = LetterId([10]);
+    for (int i = 1; i <= letters.length; i++) {
+      Letter letter = letters[i - 1];
+      if (letter.snippet == null) {
+        if (workingSnippet != null) {
+          ret.add(Change(
+            workingSnippet.startId,
+            ChangeType.format,
+            AuthenticationService.value.uid!,
+            DateTime.now().millisecondsSinceEpoch,
+            length: workingSnippet.length,
+            snippet: workingSnippet.snippet,
+          ));
+          workingSnippet = null;
+        }
+      } else {
+        if (workingSnippet != null) {
+          if (letter.snippet == workingSnippet.snippet) {
+            workingSnippet.length++;
+          } else {
+            ret.add(Change(
+              workingSnippet.startId,
+              ChangeType.format,
+              AuthenticationService.value.uid!,
+              DateTime.now().millisecondsSinceEpoch,
+              length: workingSnippet.length,
+              snippet: workingSnippet.snippet,
+            ));
+            workingSnippet = WorkingSnippet(letter.snippet!, letterId, 1);
+          }
+        } else {
+          workingSnippet = WorkingSnippet(letter.snippet!, letterId, 1);
+        }
+      }
+      letterId = generateId(letterId, null);
+    }
+    return ret;
+  }
+}
+
+class WorkingSnippet {
+  final Snippet snippet;
+  final LetterId startId;
+  int length;
+
+  WorkingSnippet(this.snippet, this.startId, this.length);
 }

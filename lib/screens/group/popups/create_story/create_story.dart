@@ -36,9 +36,7 @@ Future<void> launchCreateStoryPopup(BuildContext context, String groupName) {
         ),
         actions: [
           TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-            },
+            onPressed: () => Get.close(1),
             child: const Text('Cancel'),
           ),
           Obx(

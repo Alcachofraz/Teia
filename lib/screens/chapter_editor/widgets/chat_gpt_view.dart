@@ -13,6 +13,7 @@ class ChatGPTView extends GetView<ChatGPTController> {
 
   @override
   Widget build(BuildContext context) {
+    Get.delete<ChatGPTController>();
     Get.put(ChatGPTController(getChapterContent: getChapterContent));
     return Tile(
       width: double.infinity,
