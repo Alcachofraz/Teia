@@ -33,7 +33,7 @@ class Teia extends StatelessWidget {
     return GetMaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Teia',
-      initialRoute: '/auth',
+      initialRoute: '/',
       getPages: [
         GetPage(
           name: '/home',
@@ -44,7 +44,7 @@ class Teia extends StatelessWidget {
           page: () => const GroupScreen(),
         ),
         GetPage(
-          name: '/auth',
+          name: '/',
           page: () => const LandingScreen(),
         ),
         GetPage(
