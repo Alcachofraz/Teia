@@ -322,6 +322,18 @@ class tPage {
       }
       letterId = generateId(letterId, null);
     }
+    if (workingSnippet != null) {
+      ret.add(
+        Change(
+          workingSnippet.startId,
+          ChangeType.format,
+          AuthenticationService.value.uid!,
+          DateTime.now().millisecondsSinceEpoch,
+          length: workingSnippet.length,
+          snippet: workingSnippet.snippet,
+        ),
+      );
+    }
     return ret;
   }
 }

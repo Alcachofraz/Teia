@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
+import 'package:get/get.dart';
 import 'package:teia/models/story.dart';
 import 'package:teia/views/teia_button.dart';
 
@@ -41,6 +42,13 @@ class StoryCreateBox extends StatelessWidget {
                 ),
                 const Gap(6),
                 TeiaButton(
+                  onTap: () {
+                    Get.snackbar(
+                      "Coming soon",
+                      "This feature is not available yet",
+                      snackPosition: SnackPosition.BOTTOM,
+                    );
+                  },
                   widget: const Icon(
                     Icons.search,
                     color: Colors.white,

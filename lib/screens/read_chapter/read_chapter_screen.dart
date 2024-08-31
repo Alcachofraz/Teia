@@ -17,6 +17,7 @@ import 'package:teia/utils/utils.dart';
 import 'package:teia/views/misc/screen_wrapper.dart';
 import 'package:teia/views/misc/tile.dart';
 import 'package:teia/views/teia_button.dart';
+import 'package:photo_view/photo_view.dart';
 
 class ReadChapterScreen extends StatefulWidget {
   final String chapterId = Get.parameters['chapterId']!;
@@ -109,7 +110,27 @@ class _ReadChapterScreenState extends State<ReadChapterScreen> {
 
   /// Callback to when an image is clicked.
   void onImage(String url) {
-    print('On URL $url');
+    Get.dialog(
+      Padding(
+        padding: const EdgeInsets.all(64),
+        child: Stack(
+          children: [
+            PhotoView(
+              imageProvider: NetworkImage(url),
+            ),
+            Positioned.fill(
+              child: Align(
+                alignment: Alignment.topRight,
+                child: IconButton(
+                  icon: const Icon(Icons.close),
+                  onPressed: Get.back,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   /// Callback to when the chapter is finished.
