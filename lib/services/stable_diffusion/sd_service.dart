@@ -4,32 +4,27 @@ import 'dart:typed_data';
 import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:image/image.dart' as img;
-import 'package:teia/models/stable_diffusion/prompt.dart';
 
 class StableDiffusionService {
   static const String engineId = 'stable-diffusion-v1-6';
   static const String maskingEngineId = 'stable-diffusion-v1-6';
 
-  static const String promptStyler = '''detailed, cinematic, high quality''';
-
-  static const String negativePromptStyler =
-      '''bad, ugly, overexposed, low contrast, 
-  cut off, tiling, watermark, blurry, deformed, weird colors, mutated color, muted color, 
-  photo realistic, fused, less detail, lowres, out of frame, worst quality, low quality, 
-  normal quality, displaced object''';
+  static const String promptStylerAppend = ', cinematic illustration';
 
   /// ERROR
-  static List<dynamic> ERRORS = [];
+  static List<dynamic> errors = [];
 
-  static Uri apiHost = Uri.https('api.stability.ai', 'v1/generation/$engineId');
+  //static Uri apiHost = Uri.https('api.stability.ai', 'v1/generation/$engineId');
+  static Uri apiHost =
+      Uri.https('api.stability.ai', 'v2beta/stable-image/generate/core');
   //static Uri apiHost = Uri.https('lovely-clowns-carry-34-87-173-242.loca.lt', 'inator');
 
   static const String apiKey =
       'sk-DY0hd8PcPKrQCRtiGL6bzRObUbOmBjgGHuQJudHTGHdjcCZa';
 
-  static const int SAMPLES = 1;
+  static const int samples = 1;
 
-  static final dio = Dio();
+  static final Dio dio = Dio();
 
   /// Replaces transparent pixels with white pixels and resizes the frame to 512x512.
   static Uint8List? normalizeMask(Uint8List? toBeMask,
@@ -64,18 +59,22 @@ class StableDiffusionService {
     var headers = {
       "Authorization": "Bearer $apiKey",
       "Accept": "application/json",
-      "Content-Type": "application/json",
+      "Content-Type": "multipart/form-data",
     };
+    FormData formData = FormData.fromMap(body);
     try {
       return await dio.post(
-        'https://api.stability.ai/v1/generation/$engineId/text-to-image',
-        data: body,
+        apiHost.toString(),
         options: Options(
           headers: headers,
         ),
+        data: formData,
       );
     } on DioException catch (e) {
-      print(e);
+      log(e.toString() +
+          e.error.toString() +
+          e.message.toString() +
+          e.response.toString());
       return null;
     }
   }
@@ -101,43 +100,29 @@ class StableDiffusionService {
 
     try {
       return await dio.post(
-        'https://api.stability.ai/v1/generation/$maskingEngineId/image-to-image/masking',
+        '$apiHost/$maskingEngineId/image-to-image/masking',
         data: formData,
         options: Options(
           headers: headers,
         ),
       );
-    } on DioException catch (e) {
-      print(e);
+    } catch (e) {
+      log(e.toString());
       return null;
     }
   }
 
-  static Future<Uint8List?> generate(double cfgScale, String clipGuidancePreset,
-      int width, int height, int steps, List<Prompt> prompts, int samples,
+  static Future<Uint8List?> generate(
+      String prompt, String storyId, String chapterId,
       {Uint8List? initImage, Uint8List? maskImage}) async {
-    List<Map<String, dynamic>> textPrompts = [];
-    for (Prompt prompt in prompts) {
-      textPrompts.add({
-        'text': '${prompt.text}, $promptStyler',
-        'weight': prompt.weight,
-      });
-    }
-    textPrompts.add({
-      'text': negativePromptStyler,
-      'weight': -1,
-    });
     try {
       Response<dynamic>? response;
       if (initImage != null && maskImage != null) {
         response = await inpaint(
           {
             'mask_source': 'MASK_IMAGE_WHITE',
-            'cfg_scale': cfgScale,
-            'clip_guidance_preset': clipGuidancePreset,
             'samples': samples,
-            'steps': steps,
-            'text_prompts': textPrompts,
+            'prompt': prompt + promptStylerAppend,
           },
           initImage,
           maskImage,
@@ -145,13 +130,8 @@ class StableDiffusionService {
       } else {
         response = await txt2img(
           {
-            'cfg_scale': cfgScale,
-            'clip_guidance_preset': clipGuidancePreset,
-            'height': height,
-            'width': width,
+            'prompt': prompt + promptStylerAppend,
             'samples': samples,
-            'steps': steps,
-            'text_prompts': textPrompts,
           },
         );
       }
@@ -167,15 +147,13 @@ class StableDiffusionService {
       }
       try {
         // Try to parse errors
-        ERRORS = data['errors'];
-        log(ERRORS.toString());
+        errors = data['errors'];
+        log(errors.toString());
         return null;
       } catch (e) {
         log('Can\'t parse errors from request.');
       }
-      Map<String, dynamic> firstImage = data['artifacts'][0];
-      var imageBytes = base64Decode(firstImage['base64'] as String);
-      return imageBytes;
+      return base64Decode(data['image'] as String);
     } catch (e) {
       log(e.toString());
       return null;

@@ -1,17 +1,17 @@
 import 'dart:convert';
 
-import 'package:firebase_database/firebase_database.dart';
-import 'package:flutter/material.dart' hide Page;
-import 'package:flutter_quill/flutter_quill.dart';
-import 'package:flutter_quill/quill_delta.dart';
+import 'package:cloud_firestore/cloud_firestore.dart' as fs;
+import 'package:firebase_database/firebase_database.dart' as rt;
 import 'package:get/get.dart';
 import 'package:teia/models/change.dart';
 import 'package:teia/models/chapter.dart';
 import 'package:teia/models/chapter_graph.dart';
+import 'package:teia/models/comment.dart';
 import 'package:teia/models/letter.dart';
 import 'package:teia/models/note/note.dart';
 import 'package:teia/models/page.dart';
 import 'package:teia/models/snippets/snippet.dart';
+import 'package:teia/services/authentication_service.dart';
 import 'package:teia/services/firebase/firestore_utils.dart';
 import 'package:teia/utils/logs.dart';
 
@@ -288,13 +288,11 @@ class ChapterManagementService extends GetxService {
 
   Future<List<Change>> getPageChanges(
       String storyId, String chapterId, String pageId) async {
-    final DatabaseReference ref = FirebaseUtils.realtime
+    final rt.DatabaseReference ref = FirebaseUtils.realtime
         .ref('stories/$storyId/chapters/$chapterId/pages/$pageId/changes');
     final data = await ref.get();
     if (!data.exists) return [];
-    Map<String, dynamic> map = jsonDecode(jsonEncode(data.value));
-    List<dynamic> values = map.values.toList();
-    return values
+    return (data.value as List<dynamic>)
         .map((e) => Change.fromMap(jsonDecode(jsonEncode(e))))
         .toList();
   }
@@ -334,7 +332,86 @@ class ChapterManagementService extends GetxService {
       for (Change change in page.toChanges()) {
         newPost[(i++).toString()] = change.toMap();
       }
-      return Transaction.success(newPost);
+      return rt.Transaction.success(newPost);
+    });
+  }
+
+  // Push new comment and return ID
+  Future<String> createComment(Comment comment) async {
+    return (await FirebaseUtils.firestore
+            .collection('stories')
+            .doc(comment.storyId)
+            .collection('chapters')
+            .doc(comment.chapterId)
+            .collection('pages')
+            .doc(comment.pageId)
+            .collection('comments')
+            .add(comment.toJson()))
+        .id;
+  }
+
+  // Push new message to comment [comment]
+  Future<void> addCommentMessage(
+    Comment comment,
+    String message,
+    int avatar,
+    String username,
+    String uid,
+  ) async {
+    return FirebaseUtils.firestore
+        .collection('stories')
+        .doc(comment.storyId)
+        .collection('chapters')
+        .doc(comment.chapterId)
+        .collection('pages')
+        .doc(comment.pageId)
+        .collection('comments')
+        .doc(comment.id)
+        .update(
+      {
+        'messages': fs.FieldValue.arrayUnion([
+          {
+            'message': message,
+            'avatar': avatar,
+            'username': username,
+            'uid': uid,
+          }
+        ]),
+      },
+    );
+  }
+
+  // Remove comment:
+  Future<void> removeComment(Comment comment) async {
+    return FirebaseUtils.firestore
+        .collection('stories')
+        .doc(comment.storyId)
+        .collection('chapters')
+        .doc(comment.chapterId)
+        .collection('pages')
+        .doc(comment.pageId)
+        .collection('comments')
+        .doc(comment.id)
+        .delete();
+  }
+
+  // Stream changes to comments
+  Stream<List<Comment>> streamCommentsChanges(
+    String storyId,
+    String chapterId,
+    String pageId,
+  ) {
+    return FirebaseUtils.firestore
+        .collection(
+            'stories/$storyId/chapters/$chapterId/pages/$pageId/comments')
+        .snapshots()
+        .map((event) {
+      try {
+        return event.docs.map((e) => Comment.fromJson(e.data(), e.id)).toList();
+      } catch (e) {
+        print('Error parsing comments: $e');
+        throw Exception('Error parsing comments: $e');
+      }
     });
   }
 }

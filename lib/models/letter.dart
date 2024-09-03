@@ -6,14 +6,16 @@ class Letter extends Comparable<Letter> {
   final LetterId id;
   final String letter;
   Snippet? snippet;
+  String? commentId;
 
-  Letter(this.id, this.letter, {this.snippet});
+  Letter(this.id, this.letter, {this.snippet, this.commentId});
 
   factory Letter.fromMap(Map<String, dynamic> map) {
     return Letter(
       LetterId.fromMap(map['id']),
       map['letter'] as String,
       snippet: Snippet.fromMap(map['snippet']),
+      commentId: map['commentId'] as String,
     );
   }
 
@@ -33,12 +35,13 @@ class Letter extends Comparable<Letter> {
       'id': id.id,
       'letter': letter,
       'snippet': snippet?.toMap(),
+      'commentId': commentId,
     };
   }
 
   @override
   String toString() {
-    return '{$letter, $id, $snippet}';
+    return '{$letter, $id, $snippet, $commentId}';
   }
 }
 

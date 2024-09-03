@@ -1,18 +1,22 @@
 import 'dart:async';
-import 'dart:typed_data';
 
 import 'package:flutter/material.dart' hide Page;
-import 'package:flutter/services.dart';
 import 'package:flutter_quill/flutter_quill.dart';
 import 'package:flutter_quill/quill_delta.dart';
+import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:just_the_tooltip/just_the_tooltip.dart';
 import 'package:teia/models/change.dart';
 import 'package:teia/models/chapter.dart';
+import 'package:teia/models/comment_message.dart';
+import 'package:teia/models/group.dart';
 import 'package:teia/models/letter.dart';
 import 'package:teia/models/page.dart';
+import 'package:teia/models/comment.dart' as c;
 import 'package:teia/models/snippets/snippet.dart';
 import 'package:teia/screens/chapter_editor/widgets/chat_gpt_view.dart';
+import 'package:teia/screens/chapter_editor/widgets/comments/comment_card.dart';
+import 'package:teia/screens/chapter_editor/widgets/comments/new_comment_card.dart';
 import 'package:teia/screens/chapter_editor/widgets/cursor/cursor_embed_builder.dart';
 import 'package:teia/screens/chapter_editor/widgets/snippets/snippet_choice_card.dart';
 import 'package:teia/screens/chapter_editor/widgets/snippets/snippet_image_card.dart';
@@ -28,6 +32,7 @@ import 'package:file_picker/file_picker.dart';
 
 class PageEditor extends StatefulWidget {
   final int pageId;
+  final Group group;
   final FocusNode? focusNode;
   final Future<void> Function(tPage page)? pushPageToRemote;
   final Future<void> Function(Chapter chapter)? pushChapterToRemote;
@@ -39,6 +44,7 @@ class PageEditor extends StatefulWidget {
   const PageEditor({
     super.key,
     required this.pageId,
+    required this.group,
     this.focusNode,
     this.pushPageToRemote,
     this.pushChapterToRemote,
@@ -57,6 +63,7 @@ class _PageEditorState extends State<PageEditor> {
   late StreamSubscription _localChangesSubscription;
   late StreamSubscription _pageChangesSubscription;
   late StreamSubscription _onContextMenu;
+  late StreamSubscription _commentsChangesSubscription;
   late ScrollController _scrollController;
   FocusNode focus = FocusNode();
 
@@ -74,6 +81,7 @@ class _PageEditorState extends State<PageEditor> {
   bool showingChoiceOption = false;
   bool showingTextOption = false;
   bool showingImageOption = false;
+  bool showingNewComment = false;
   late int _sessionStartTimestamp;
 
   Color accentColor = ArtService.value.pastel();
@@ -81,6 +89,8 @@ class _PageEditorState extends State<PageEditor> {
   final StorageService storageService = Get.put(StorageService());
 
   bool pasting = false;
+
+  List<c.Comment> comments = [];
 
   @override
   void initState() {
@@ -113,6 +123,19 @@ class _PageEditorState extends State<PageEditor> {
         )
         .listen(_onRemoteChange);
 
+    // Stream comments
+    _commentsChangesSubscription = ChapterManagementService.value
+        .streamCommentsChanges(
+      widget.chapter.storyId,
+      widget.chapter.id.toString(),
+      widget.pageId.toString(),
+    )
+        .listen((data) {
+      setState(() {
+        comments = data;
+      });
+    });
+
     /*_pageSubscription = ChapterManagementService.value
         .pageStream(
           widget.chapter.storyId,
@@ -132,6 +155,7 @@ class _PageEditorState extends State<PageEditor> {
     _controller.dispose();
     _onContextMenu.cancel();
     _scrollController.dispose();
+    _commentsChangesSubscription.cancel();
     ChapterManagementService.value.simplifyChangesQueue(page);
     super.dispose();
   }
@@ -325,7 +349,45 @@ class _PageEditorState extends State<PageEditor> {
     );
   }
 
-  /// CHeck if there are any links that need deleting, after local delete.
+  /// On create comment -> add coment to backend
+  Future<void> _onCommentCreate(String text) async {
+    await ChapterManagementService.value.createComment(
+      c.Comment(
+        messages: [
+          CommentMessage(
+            username:
+                widget.group.userState[AuthenticationService.value.uid]!.name,
+            message: text,
+            avatar:
+                widget.group.userState[AuthenticationService.value.uid]!.avatar,
+            uid: widget.group.userState[AuthenticationService.value.uid]!.uid,
+          ),
+        ],
+        id: '-1',
+        storyId: widget.chapter.storyId,
+        chapterId: widget.chapter.id.toString(),
+        pageId: widget.pageId.toString(),
+      ),
+    );
+  }
+
+  /// On respond to comment -> add coment message to backend
+  Future<void> _onCommentRespond(c.Comment comment, String text) async {
+    await ChapterManagementService.value.addCommentMessage(
+      comment,
+      text,
+      widget.group.userState[AuthenticationService.value.uid]!.avatar,
+      widget.group.userState[AuthenticationService.value.uid]!.name,
+      widget.group.userState[AuthenticationService.value.uid]!.uid,
+    );
+  }
+
+  /// On create comment -> remove coment from backend and de-format page
+  Future<void> _onCommentResolve(c.Comment comment) async {
+    await ChapterManagementService.value.removeComment(comment);
+  }
+
+  /// Check if there are any links that need deleting, after local delete.
   Future<void> _checkLinksOnDelete() async {
     Set<int> links = {};
     links.addAll(widget.chapter.links.nodes[widget.pageId] ?? []);
@@ -380,13 +442,12 @@ class _PageEditorState extends State<PageEditor> {
   }
 
   /// Uploads image to Firebase Storage and creates a snippet with the image URL.
-  Future<void> _onAddImage(Uint8List image) async {
+  Future<void> _onAddImage(String image) async {
     _createSnippet(Snippet(
       _selection!.textInside(_controller.document.toPlainText()),
       SnippetType.image,
       {
-        'url': await storageService.uploadImage(
-            widget.chapter.storyId, widget.chapter.id.toString(), image),
+        'url': image,
       },
     ));
   }
@@ -479,6 +540,60 @@ class _PageEditorState extends State<PageEditor> {
               padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
               child: _snippetCard(_atSnippet!),
             ),
+          if (showingNewComment)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+              child: NewCommentCard(
+                onComplete: (String text) {
+                  _onCommentCreate(text);
+                  setState(() {
+                    showingNewComment = false;
+                  });
+                },
+                onDismiss: () {
+                  setState(() {
+                    showingNewComment = false;
+                  });
+                },
+              ),
+            )
+          else
+            Align(
+              alignment: Alignment.topLeft,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                child: Tile(
+                  color: Colors.white,
+                  padding: EdgeInsets.zero,
+                  radiusAll: 4.0,
+                  child: InkWell(
+                    child: const Padding(
+                      padding: EdgeInsets.all(16),
+                      child: Row(
+                        children: [
+                          Icon(Icons.add, size: 20),
+                          Gap(8),
+                          Text('New comment'),
+                        ],
+                      ),
+                    ),
+                    onTap: () {
+                      setState(() {
+                        showingNewComment = true;
+                      });
+                    },
+                  ),
+                ),
+              ),
+            ),
+          for (c.Comment comment in comments)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+              child: CommentCard(
+                comment: comment,
+                onRespond: _onCommentRespond,
+              ),
+            ),
           Padding(
             padding: const EdgeInsets.fromLTRB(0, 0, 0, 16),
             child: ChatGPTView(
@@ -486,8 +601,6 @@ class _PageEditorState extends State<PageEditor> {
               accentColor: accentColor,
             ),
           ),
-
-          // for() comments
         ],
       ),
     );
@@ -661,9 +774,19 @@ class _PageEditorState extends State<PageEditor> {
                                       setState(() {
                                         showingImageOption = false;
                                       });
+
                                       var image = await Get.toNamed(
-                                        '/chapter_editor/generate',
-                                      );
+                                          '/image_generate',
+                                          parameters: {
+                                            'text': _selection?.textInside(
+                                                  _controller.document
+                                                      .toPlainText(),
+                                                ) ??
+                                                '',
+                                            'story_id': widget.chapter.storyId,
+                                            'chapter_id':
+                                                widget.chapter.id.toString(),
+                                          });
                                       if (image != null) {
                                         await _onAddImage(image);
                                       }
@@ -679,7 +802,13 @@ class _PageEditorState extends State<PageEditor> {
                                           await FilePicker.platform
                                               .pickFiles(type: FileType.image);
                                       if (result != null) {
-                                        _onAddImage(result.files.single.bytes!);
+                                        String url =
+                                            await storageService.uploadImage(
+                                          widget.chapter.storyId,
+                                          widget.chapter.id.toString(),
+                                          result.files.single.bytes!,
+                                        );
+                                        _onAddImage(url);
                                       }
                                       setState(() {
                                         showingImageOption = false;
@@ -691,7 +820,7 @@ class _PageEditorState extends State<PageEditor> {
                               ),
                             ),
                     ),
-                    JustTheTooltip(
+                    /*JustTheTooltip(
                       waitDuration: const Duration(milliseconds: 1000),
                       content: const Padding(
                         padding: EdgeInsets.all(8.0),
@@ -707,10 +836,11 @@ class _PageEditorState extends State<PageEditor> {
                           setState(() {
                             showingImageOption = false;
                             showingChoiceOption = false;
+                            showingNewComment = true;
                           });
                         },
                       ),
-                    ),
+                    ),*/
                   ],
                 ),
               )

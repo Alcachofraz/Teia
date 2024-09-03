@@ -57,7 +57,7 @@ dependencies:
   just_the_tooltip: ^0.0.12
   dropdown_button2: ^2.3.9
   #flutter_painter_v2: ^2.0.1
-  image_painter: ^0.7.1
+  painter: ^2.0.0
   #flutter_painter:
     #git:
       #url: https://github.com/Harishwarrior/flutter_painter.git

@@ -8,10 +8,10 @@ class SnippetChoiceCard extends StatelessWidget {
   final Snippet snippet;
   final Function(int page) onPageTap;
   const SnippetChoiceCard({
-    Key? key,
+    super.key,
     required this.snippet,
     required this.onPageTap,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -26,12 +26,15 @@ class SnippetChoiceCard extends StatelessWidget {
           children: [
             const Text(
               "Choice Snippet",
-              style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.w600),
+              style: TextStyle(fontSize: 14.0, fontWeight: FontWeight.w600),
             ),
-            const SizedBox(height: 8.0),
+            const SizedBox(height: 4.0),
             RichText(
               text: TextSpan(
-                style: GoogleFonts.roboto(fontSize: 14.0),
+                style: GoogleFonts.roboto(
+                  fontSize: 11.0,
+                  fontStyle: FontStyle.italic,
+                ),
                 children: [
                   TextSpan(text: '"${snippet.text}"  🠪  '),
                   TextSpan(

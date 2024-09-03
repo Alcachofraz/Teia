@@ -48,9 +48,9 @@ class TeiaButton extends StatelessWidget {
         );
     final EdgeInsets padding_ = padding ??
         const EdgeInsets.fromLTRB(
-          8,
+          12,
           22,
-          8,
+          12,
           22,
         );
     return ElevatedButton(

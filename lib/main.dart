@@ -50,12 +50,10 @@ class Teia extends StatelessWidget {
         GetPage(
           name: '/chapter_editor',
           page: () => ChapterEditorScreen(),
-          children: [
-            GetPage(
-              name: '/generate',
-              page: () => const ImageEditorScreen(),
-            ),
-          ],
+        ),
+        GetPage(
+          name: '/image_generate',
+          page: () => const ImageEditorScreen(),
         ),
         GetPage(
           name: '/read_chapter',

@@ -32,14 +32,17 @@ class SnippetImageCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Text(
-                    "Choice Snippet",
+                    "Image Snippet",
                     style:
-                        TextStyle(fontSize: 18.0, fontWeight: FontWeight.w600),
+                        TextStyle(fontSize: 14.0, fontWeight: FontWeight.w600),
                   ),
-                  const SizedBox(height: 8.0),
+                  const SizedBox(height: 4.0),
                   Text(
-                    '"${snippet.text}"',
-                    style: GoogleFonts.roboto(fontSize: 14.0),
+                    snippet.text,
+                    style: GoogleFonts.roboto(
+                      fontSize: 11.0,
+                      fontStyle: FontStyle.italic,
+                    ),
                   ),
                 ],
               ),
@@ -55,13 +58,16 @@ class SnippetImageCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const Text(
-                "Choice Snippet",
-                style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.w600),
+                "Image Snippet",
+                style: TextStyle(fontSize: 15.0, fontWeight: FontWeight.w600),
               ),
               const SizedBox(height: 8.0),
               Text(
-                '"${snippet.text}"',
-                style: GoogleFonts.roboto(fontSize: 14.0),
+                snippet.text,
+                style: GoogleFonts.roboto(
+                  fontSize: 12.0,
+                  fontStyle: FontStyle.italic,
+                ),
               ),
               const SizedBox(height: 12.0),
               Row(

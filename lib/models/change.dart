@@ -15,6 +15,7 @@ class Change extends Comparable<Change> {
   final String uid;
   final int timestamp;
   final Snippet? snippet;
+  final String? commentId;
 
   Change(
     this.id,
@@ -24,6 +25,7 @@ class Change extends Comparable<Change> {
     this.length,
     this.letter,
     this.snippet,
+    this.commentId,
   });
 
   factory Change.fromMap(Map<String, dynamic> map) {
@@ -41,6 +43,7 @@ class Change extends Comparable<Change> {
                 map['snippet'] as dynamic,
               ),
             ),
+      commentId: map['commentId'],
     );
   }
 
@@ -64,6 +67,7 @@ class Change extends Comparable<Change> {
       'uid': uid,
       'timestamp': timestamp,
       'snippet': snippet?.toMap(),
+      'commentId': commentId,
     };
   }
 
