@@ -275,7 +275,7 @@ class tPage {
 
   /// Convert this page to a list of Changes.
   /// This is used to send the full list of simplified changes to the server.
-  List<Change> toChanges() {
+  List<Change> toChanges({requeue = true}) {
     List<Change> ret = [
       Change(
         null,
@@ -298,6 +298,7 @@ class tPage {
             DateTime.now().millisecondsSinceEpoch,
             length: workingSnippet.length,
             snippet: workingSnippet.snippet,
+            requeue: requeue,
           ));
           workingSnippet = null;
         }
@@ -313,6 +314,7 @@ class tPage {
               DateTime.now().millisecondsSinceEpoch,
               length: workingSnippet.length,
               snippet: workingSnippet.snippet,
+              requeue: requeue,
             ));
             workingSnippet = WorkingSnippet(letter.snippet!, letterId, 1);
           }
@@ -331,6 +333,7 @@ class tPage {
           DateTime.now().millisecondsSinceEpoch,
           length: workingSnippet.length,
           snippet: workingSnippet.snippet,
+          requeue: requeue,
         ),
       );
     }

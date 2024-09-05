@@ -262,7 +262,8 @@ class _PageEditorState extends State<PageEditor> {
     try {
       if (change.uid == AuthenticationService.value.uid &&
           change.timestamp > _sessionStartTimestamp &&
-          change.type != ChangeType.format) {
+          change.type != ChangeType.format &&
+          change.requeue) {
         return;
       }
       //print('Remote -> ${change.toString()}');
