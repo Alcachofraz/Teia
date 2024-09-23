@@ -28,6 +28,7 @@ class AuthController {
   Future<void> sendPasswordResetEmail() async {
     await AuthenticationService.value
         .sendPasswordResetEmail(emailController.text);
+    Get.snackbar('Password Reset Email Sent', 'Check your email');
   }
 
   Future<void> logout() async {

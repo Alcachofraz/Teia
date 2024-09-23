@@ -35,7 +35,7 @@ class _ChapterGraphViewState extends State<ChapterGraphView> {
     Graph graph = Graph();
     graph.addNode(Node.Id(1));
 
-    chapter.graph.forEachConnection((start, end) {
+    chapter.tree.forEachConnection((start, end) {
       graph.addEdge(
         Node.Id(start),
         Node.Id(end),

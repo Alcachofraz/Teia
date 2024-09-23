@@ -8,10 +8,8 @@ import 'package:teia/models/chapter.dart';
 import 'package:teia/models/chapter_graph.dart';
 import 'package:teia/models/comment.dart';
 import 'package:teia/models/letter.dart';
-import 'package:teia/models/note/note.dart';
 import 'package:teia/models/page.dart';
 import 'package:teia/models/snippets/snippet.dart';
-import 'package:teia/services/authentication_service.dart';
 import 'package:teia/services/firebase/firestore_utils.dart';
 import 'package:teia/utils/logs.dart';
 
@@ -117,7 +115,7 @@ class ChapterManagementService extends GetxService {
           chapterId,
           storyId,
         ),
-        ChapterGraph.empty(),
+        ChapterTree.empty(),
       );
     } catch (e) {
       Logs.d('Creating chapter $chapterId\n$e');
@@ -181,7 +179,7 @@ class ChapterManagementService extends GetxService {
     }
   }
 
-  Future<void> pageCreate(tPage page, ChapterGraph newGraph) async {
+  Future<void> pageCreate(tPage page, ChapterTree newGraph) async {
     FirebaseUtils.firestore.runTransaction((transaction) async {
       transaction.update(
         FirebaseUtils.firestore
@@ -217,25 +215,6 @@ class ChapterManagementService extends GetxService {
         .doc(pageId.toString())
         .delete();
   }
-
-  Stream<List<Note>> commentThreadsStream(
-    String storyId,
-    String chapterId,
-    String pageId,
-  ) =>
-      FirebaseUtils.firestore
-          .collection('stories')
-          .doc(storyId)
-          .collection('chapters')
-          .doc(chapterId)
-          .collection('pages')
-          .doc(pageId)
-          .collection('notes')
-          .snapshots()
-          .asyncMap(
-            (snapshot) =>
-                snapshot.docs.map((map) => Note.fromMap(map.data())).toList(),
-          );
 
   Stream<Change> streamPageChanges(
     String storyId,

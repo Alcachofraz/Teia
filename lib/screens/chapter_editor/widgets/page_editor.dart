@@ -260,9 +260,9 @@ class _PageEditorState extends State<PageEditor> {
   /// When a remote change is received.
   void _onRemoteChange(Change change) {
     try {
-      if (change.uid == AuthenticationService.value.uid &&
-          change.timestamp > _sessionStartTimestamp &&
-          change.type != ChangeType.format &&
+      if ((change.uid == AuthenticationService.value.uid &&
+              change.timestamp > _sessionStartTimestamp &&
+              change.type != ChangeType.format) ||
           change.requeue) {
         return;
       }
@@ -468,7 +468,7 @@ class _PageEditorState extends State<PageEditor> {
           int.parse(widget.chapter.id.toString()),
           widget.chapter.storyId,
         ),
-        widget.chapter.graph,
+        widget.chapter.tree,
       );
     }
 
@@ -496,7 +496,7 @@ class _PageEditorState extends State<PageEditor> {
     }
     bool secondToLastPage = true;
     while (i > 1) {
-      i = widget.chapter.graph.nodes.entries
+      i = widget.chapter.tree.nodes.entries
           .firstWhere(
               (MapEntry<int, Set<int>> entry) => entry.value.contains(i))
           .key;
@@ -685,7 +685,7 @@ class _PageEditorState extends State<PageEditor> {
                               child: Column(
                                 children: [
                                   for (int id in widget
-                                      .chapter.graph.nodes[widget.pageId]!)
+                                      .chapter.tree.nodes[widget.pageId]!)
                                     InkWell(
                                       customBorder: RoundedRectangleBorder(
                                         borderRadius:
@@ -866,7 +866,7 @@ class _PageEditorState extends State<PageEditor> {
 
     missingLinks.clear();
     int pageId = widget.pageId;
-    for (int id in widget.chapter.graph.nodes[pageId]!) {
+    for (int id in widget.chapter.tree.nodes[pageId]!) {
       if (!widget.chapter.links.nodes[pageId]!.contains(id)) {
         missingLinks.add(id);
       }

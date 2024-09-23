@@ -149,7 +149,7 @@ class _ChapterEditorScreenState extends State<ChapterEditorScreen> {
         int.parse(widget.chapterId),
         widget.storyId,
       ),
-      _chapter!.graph,
+      _chapter!.tree,
     );
   }
 
@@ -325,8 +325,8 @@ class _ChapterEditorScreenState extends State<ChapterEditorScreen> {
 
     missingLinks.clear();
     if (_chapter != null) {
-      for (int id in _chapter!.graph.nodes.keys) {
-        for (int link in _chapter!.graph.nodes[id] ?? []) {
+      for (int id in _chapter!.tree.nodes.keys) {
+        for (int link in _chapter!.tree.nodes[id] ?? []) {
           if (_chapter!.links.nodes[id] == null ||
               !_chapter!.links.nodes[id]!.contains(link)) {
             missingLinks.add(id);

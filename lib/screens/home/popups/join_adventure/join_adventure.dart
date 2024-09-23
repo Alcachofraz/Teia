@@ -15,7 +15,8 @@ Future<void> launchJoinAdventurePopup(BuildContext context) {
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text('Enter the name and password of the adventure:'),
+            const Text(
+                'Enter the name and password of the adventure you want to join:'),
             const SizedBox(height: 10),
             TextField(
               controller: adventureNameController,

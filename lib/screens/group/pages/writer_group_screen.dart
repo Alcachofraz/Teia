@@ -132,7 +132,7 @@ class WriterGroupScreen extends StatelessWidget {
                                         controller.group.value!);
                                   },
                                   text:
-                                      '(${controller.group.value!.userState.entries.where((e) => e.value.role == Role.writer && e.value.ready).length} / ${controller.group.value!.userState.entries.where((e) => e.value.role == Role.writer).length})  Finish',
+                                      '(${controller.group.value!.userState.entries.where((e) => e.value.role == Role.writer && e.value.ready).length} / ${controller.group.value!.userState.entries.where((e) => e.value.role == Role.writer).length})  Publish',
                                   expand: false,
                                 ),
                               ],

@@ -6,16 +6,16 @@ class Chapter {
   String title;
 
   /// Indicates which pages are connected schematically.
-  ChapterGraph graph;
+  ChapterTree tree;
 
   /// Indicates which pages are connected logically (by links).
-  ChapterGraph links;
+  ChapterTree links;
 
   Chapter(
     this.id,
     this.storyId,
     this.title,
-    this.graph,
+    this.tree,
     this.links,
   );
 
@@ -24,8 +24,8 @@ class Chapter {
       id,
       storyId,
       title,
-      ChapterGraph({1: {}}),
-      ChapterGraph({1: {}}),
+      ChapterTree({1: {}}),
+      ChapterTree({1: {}}),
     );
   }
 
@@ -34,8 +34,8 @@ class Chapter {
       -1,
       'Story ID',
       'Title',
-      ChapterGraph({1: {}}),
-      ChapterGraph({1: {}}),
+      ChapterTree({1: {}}),
+      ChapterTree({1: {}}),
     );
   }
 
@@ -47,17 +47,17 @@ class Chapter {
         -1,
         '',
         '',
-        ChapterGraph.empty(),
-        ChapterGraph.empty(),
+        ChapterTree.empty(),
+        ChapterTree.empty(),
       );
     }
     return Chapter(
       map['id'] as int,
       map['storyId'] as String,
       map['title'] as String,
-      ChapterGraph.fromMap(Map<String, dynamic>.from(map['graph'])
+      ChapterTree.fromMap(Map<String, dynamic>.from(map['graph'])
           .map((key, value) => MapEntry(int.parse(key), Set<int>.from(value)))),
-      ChapterGraph.fromMap(Map<String, dynamic>.from(map['links'])
+      ChapterTree.fromMap(Map<String, dynamic>.from(map['links'])
           .map((key, value) => MapEntry(int.parse(key), Set<int>.from(value)))),
     );
   }
@@ -66,8 +66,8 @@ class Chapter {
   /// * [id] parent id.
   /// Returns the id of the child.
   int addPage(int id, {String? uid}) {
-    int newId = graph.numberOfPages() + 1;
-    graph.addConnection(id, newId);
+    int newId = tree.numberOfPages() + 1;
+    tree.addConnection(id, newId);
     return newId;
   }
 
@@ -90,13 +90,13 @@ class Chapter {
 
   /// Connect page [from] to [to].
   bool connectPages(int from, int to) {
-    return graph.addConnection(from, to);
+    return tree.addConnection(from, to);
   }
 
   /// Check if page is last in chapter.
   /// * [id] page id.
   bool isFinalPage(int id) {
-    return graph.isLeaf(id);
+    return tree.isLeaf(id);
   }
 
   /// Check if page can be deleted.
@@ -104,14 +104,12 @@ class Chapter {
   /// If page has children in graph, it can't be deleted.
   /// If page has parent in links, it can't be deleted.
   bool canPageBeDeleted(int pageId) {
-    return !graph.isRoot(pageId) &&
-        graph.isLeaf(pageId) &&
-        links.isRoot(pageId);
+    return !tree.isRoot(pageId) && tree.isLeaf(pageId) && links.isRoot(pageId);
   }
 
   /// Delete page from chapter. Undo links.
   void deletePage(int pageId) {
-    graph.removeNode(pageId);
+    tree.removeNode(pageId);
     links.removeNode(pageId);
   }
 
@@ -122,7 +120,7 @@ class Chapter {
         'id': id,
         'storyId': storyId,
         'title': title,
-        'graph': graph.toMap(),
+        'graph': tree.toMap(),
         'links': links.toMap(),
       };
     } catch (e) {

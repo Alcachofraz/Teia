@@ -1,22 +1,22 @@
-class ChapterGraph {
+class ChapterTree {
   final Map<int, Set<int>> _nodes;
 
-  ChapterGraph(this._nodes);
+  ChapterTree(this._nodes);
 
   /// Nodes getter
   Map<int, Set<int>> get nodes => _nodes;
 
   /// Map Page constructor. Instantiate a page from a
   /// Map<String, dynamic> object.
-  factory ChapterGraph.fromMap(Map<int, Set<int>>? map) {
-    if (map == null) return ChapterGraph({});
-    return ChapterGraph(map);
+  factory ChapterTree.fromMap(Map<int, Set<int>>? map) {
+    if (map == null) return ChapterTree({});
+    return ChapterTree(map);
   }
 
   /// Map Page constructor. Instantiate a page from a
   /// Map<String, dynamic> object.
-  factory ChapterGraph.empty() {
-    return ChapterGraph({1: {}});
+  factory ChapterTree.empty() {
+    return ChapterTree({1: {}});
   }
 
   /// Execute [action] for each connection of the graph.

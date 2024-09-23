@@ -11,12 +11,12 @@ launchCreateAdventurePopup(BuildContext context) {
     context: context,
     builder: (context) {
       return AlertDialog(
-        title: const Text('Join adventure'),
+        title: const Text('Create adventure'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             const Text(
-                'Enter the name and password of the adventure you want to join:'),
+                'Enter the name and password of the adventure you want to create:'),
             const SizedBox(height: 10),
             TextField(
               controller: adventureNameController,
