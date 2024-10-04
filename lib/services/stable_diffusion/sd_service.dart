@@ -72,6 +72,7 @@ class StableDiffusionService {
       "Access-Control-Allow-Methods": "GET,PUT,PATCH,POST,DELETE",
       "Access-Control-Allow-Headers":
           "Access-Control-Allow-Headers: X-Requested-With",
+      "Access-Control-Allow-Credentials": "True",
       //"Content-Type": "multipart/form-data",
     };
     //FormData formData = FormData.fromMap(body);
