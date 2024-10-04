@@ -4,23 +4,27 @@ import 'dart:typed_data';
 import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:image/image.dart' as img;
+import 'package:http/http.dart' as http;
 
 class StableDiffusionService {
   static const String engineId = 'stable-diffusion-v1-6';
   static const String maskingEngineId = 'stable-diffusion-v1-6';
-
+  static const String cloudflareAccountId = '3c3b1cd42e83b213fbc387bf1969c201';
+  static const String cloudflareToken =
+      'G442RWU8fdqa-C5qaBQz7QJ8Iaj75k9XyMct_Zvv';
   static const String promptStylerAppend = ', cinematic illustration';
 
   /// ERROR
   static List<dynamic> errors = [];
 
   //static Uri apiHost = Uri.https('api.stability.ai', 'v1/generation/$engineId');
-  static Uri apiHost =
-      Uri.https('api.stability.ai', 'v2beta/stable-image/generate/core');
+  //static Uri apiHost = Uri.https('api.stability.ai', 'v2beta/stable-image/generate/core');
+  static Uri apiHost = Uri.https('api.cloudflare.com',
+      'client/v4/accounts/$cloudflareAccountId/ai/run/@cf/stabilityai/stable-diffusion-xl-base-1.0');
   //static Uri apiHost = Uri.https('lovely-clowns-carry-34-87-173-242.loca.lt', 'inator');
 
-  static const String apiKey =
-      'sk-DY0hd8PcPKrQCRtiGL6bzRObUbOmBjgGHuQJudHTGHdjcCZa';
+  //static const String apiKey = 'sk-DY0hd8PcPKrQCRtiGL6bzRObUbOmBjgGHuQJudHTGHdjcCZa';
+  static const String apiKey = cloudflareToken;
 
   static const int samples = 1;
 
@@ -54,32 +58,39 @@ class StableDiffusionService {
     return Uint8List.fromList(img.encodePng(image));
   }
 
-  static Future<Response<dynamic>?> txt2img(Map<String, dynamic> body) async {
+  static Future<http.Response?> txt2img(Map<String, dynamic> body) async {
     log('TXT2IMG -> $engineId');
+    log(apiHost.toString());
     var headers = {
       "Authorization": "Bearer $apiKey",
       "Accept": "application/json",
-      "Content-Type": "multipart/form-data",
+      "Origin": "https://teia-tawny.vercel.app",
+      "Access-Control-Allow-Origin": "https://teia-tawny.vercel.app",
+      "Access-Control-Request-Method": "POST",
+      "Access-Control-Request-Headers": "X-Custom-Header",
+      //"Content-Type": "multipart/form-data",
     };
-    FormData formData = FormData.fromMap(body);
+    //FormData formData = FormData.fromMap(body);
     try {
-      return await dio.post(
-        apiHost.toString(),
-        options: Options(
+      return await http.post(
+        apiHost,
+        /*options: Options(
           headers: headers,
         ),
-        data: formData,
+        data: formData,*/
+        headers: headers,
+        body: jsonEncode(body),
       );
     } on DioException catch (e) {
-      log(e.toString() +
-          e.error.toString() +
-          e.message.toString() +
-          e.response.toString());
+      log(e.toString());
+      log(e.error.toString());
+      log(e.message.toString());
+      log(e.response.toString());
       return null;
     }
   }
 
-  static Future<Response<dynamic>?> inpaint(Map<String, dynamic> body,
+  static Future<http.Response?> inpaint(Map<String, dynamic> body,
       Uint8List initImage, Uint8List maskImage) async {
     log('INPAINT -> $maskingEngineId');
     var headers = {
@@ -99,12 +110,12 @@ class StableDiffusionService {
     });
 
     try {
-      return await dio.post(
-        '$apiHost/$maskingEngineId/image-to-image/masking',
-        data: formData,
+      return await http.post(
+        Uri(),
+        /*data: formData,
         options: Options(
           headers: headers,
-        ),
+        ),*/
       );
     } catch (e) {
       log(e.toString());
@@ -116,7 +127,7 @@ class StableDiffusionService {
       String prompt, String storyId, String chapterId,
       {Uint8List? initImage, Uint8List? maskImage}) async {
     try {
-      Response<dynamic>? response;
+      http.Response? response;
       if (initImage != null && maskImage != null) {
         response = await inpaint(
           {
@@ -131,7 +142,7 @@ class StableDiffusionService {
         response = await txt2img(
           {
             'prompt': prompt + promptStylerAppend,
-            'samples': samples,
+            //'samples': samples,
           },
         );
       }
@@ -139,7 +150,10 @@ class StableDiffusionService {
       if (response.statusCode != 200) return null;
       Map<String, dynamic> data;
       try {
-        data = jsonDecode(response.toString());
+        //data = jsonDecode(response.toString());
+        data = {
+          "image": base64.encode(response.bodyBytes),
+        };
       } catch (e) {
         log(e.toString());
         log('Can\'t parse Stable Diffusion response.');

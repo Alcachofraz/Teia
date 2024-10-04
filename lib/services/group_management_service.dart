@@ -274,17 +274,31 @@ class GroupManagementService extends GetxService {
         await StoryManagementService.value.storyAddChapter(group.story!);
       }
       currentChapter++;
+      await FirebaseUtils.firestore.collection('groups').doc(group.name).set(
+        {
+          'userState': group.userState.map<String, Map<String, dynamic>>(
+            (key, value) => MapEntry(key, value.copyWith(ready: false).toMap()),
+          ),
+          'currentChapter': currentChapter,
+          'state': state.index,
+        },
+        SetOptions(merge: true),
+      );
+    } else {
+      await FirebaseUtils.firestore.collection('groups').doc(group.name).set(
+        {
+          'userState': group.userState.map<String, Map<String, dynamic>>(
+            (key, value) => MapEntry(
+              key,
+              key == AuthenticationService.value.uid
+                  ? value.copyWith(ready: true).toMap()
+                  : value.toMap(),
+            ),
+          ),
+        },
+        SetOptions(merge: true),
+      );
     }
-    await FirebaseUtils.firestore.collection('groups').doc(group.name).set(
-      {
-        'userState': group.userState.map(
-          (key, value) => MapEntry(key, value.copyWith(ready: false).toMap()),
-        ),
-        'currentChapter': currentChapter,
-        'state': state.index,
-      },
-      SetOptions(merge: true),
-    );
   }
 
   // Check if group is ready to start

@@ -125,15 +125,18 @@ class WriterGroupScreen extends StatelessWidget {
                                   ],
                                 ),
                                 const Gap(8),
-                                TeiaButton(
-                                  color: color,
-                                  onTap: () {
-                                    GroupManagementService.value.setWriterReady(
-                                        controller.group.value!);
-                                  },
-                                  text:
-                                      '(${controller.group.value!.userState.entries.where((e) => e.value.role == Role.writer && e.value.ready).length} / ${controller.group.value!.userState.entries.where((e) => e.value.role == Role.writer).length})  Publish',
-                                  expand: false,
+                                Obx(
+                                  () => TeiaButton(
+                                    color: color,
+                                    onTap: () {
+                                      GroupManagementService.value
+                                          .setWriterReady(
+                                              controller.group.value!);
+                                    },
+                                    text:
+                                        '(${controller.group.value!.userState.entries.where((e) => e.value.role == Role.writer && e.value.ready).length} / ${controller.group.value!.userState.entries.where((e) => e.value.role == Role.writer).length})  Publish',
+                                    expand: false,
+                                  ),
                                 ),
                               ],
                             ),

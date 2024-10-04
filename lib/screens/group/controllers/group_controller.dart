@@ -140,7 +140,13 @@ class GroupController extends GetxController {
   }
 
   Future<void> startStory() async {
-    await GroupManagementService.value.groupSetWritingState(group.value!.name);
+    if (group.value!.userState[AuthenticationService.value.uid] != null &&
+        group.value!.userState[AuthenticationService.value.uid]!.admin) {
+      await GroupManagementService.value
+          .groupSetWritingState(group.value!.name);
+    } else {
+      Get.snackbar("No no!", "Only the admin can start the story.");
+    }
   }
 
   Future<void> setReaderReady() async {
