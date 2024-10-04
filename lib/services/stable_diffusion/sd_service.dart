@@ -68,6 +68,10 @@ class StableDiffusionService {
       "Access-Control-Allow-Origin": "https://teia-tawny.vercel.app",
       "Access-Control-Request-Method": "POST",
       "Access-Control-Request-Headers": "X-Custom-Header",*/
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "GET,PUT,PATCH,POST,DELETE",
+      "Access-Control-Allow-Headers":
+          "Access-Control-Allow-Headers: X-Requested-With",
       //"Content-Type": "multipart/form-data",
     };
     //FormData formData = FormData.fromMap(body);
