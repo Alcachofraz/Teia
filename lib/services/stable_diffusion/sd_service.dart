@@ -63,11 +63,11 @@ class StableDiffusionService {
     log(apiHost.toString());
     var headers = {
       "Authorization": "Bearer $apiKey",
-      "Accept": "application/json",
+      /*"Accept": "application/json",
       "Origin": "https://teia-tawny.vercel.app",
       "Access-Control-Allow-Origin": "https://teia-tawny.vercel.app",
       "Access-Control-Request-Method": "POST",
-      "Access-Control-Request-Headers": "X-Custom-Header",
+      "Access-Control-Request-Headers": "X-Custom-Header",*/
       //"Content-Type": "multipart/form-data",
     };
     //FormData formData = FormData.fromMap(body);
