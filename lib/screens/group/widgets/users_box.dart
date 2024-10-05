@@ -111,7 +111,7 @@ class UsersBox extends StatelessWidget {
                                   child: Material(
                                     color: Colors.transparent,
                                     child: InkWell(
-                                      onTap: userInfo.state.uid ==
+                                      onTap: group!.state == GroupState.idle && userInfo.state.uid ==
                                               AuthenticationService.value.uid
                                           ? onTapEditUser
                                           : null,
