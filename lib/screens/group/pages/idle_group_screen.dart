@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:teia/models/user_state.dart';
 import 'package:teia/screens/group/controllers/group_controller.dart';
 import 'package:teia/screens/group/widgets/story_box.dart';
 import 'package:teia/screens/group/widgets/story_create_box.dart';
@@ -87,7 +88,13 @@ class IdleGroupScreen extends StatelessWidget {
               () => Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 24),
                 child: TeiaButton(
-                  locked: controller.group.value!.story == null,
+                  locked: controller.group.value!.story == null ||
+                      (controller.group.value!.story!.finished &&
+                          controller.group.value!.userState.entries.any(
+                              (entry) => entry.value.role == Role.writer)) ||
+                      (!controller.group.value!.story!.finished &&
+                          !controller.group.value!.userState.entries
+                              .any((entry) => entry.value.role == Role.writer)),
                   text: 'Start Story',
                   onTap: controller.startStory,
                 ),
