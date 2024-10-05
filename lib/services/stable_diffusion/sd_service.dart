@@ -58,22 +58,15 @@ class StableDiffusionService {
     log('TXT2IMG -> $engineId');
     log(apiHost.toString());
     var headers = {
-      //"Authorization": "Bearer $apiKey",
       "Access-Control-Allow-Origin": "*",
       "Access-Control-Allow-Methods": "GET,PUT,PATCH,POST,DELETE",
       "Access-Control-Allow-Headers":
           "Access-Control-Allow-Headers: X-Requested-With",
       "Access-Control-Allow-Credentials": "True",
-      //"Content-Type": "multipart/form-data",
     };
-    //FormData formData = FormData.fromMap(body);
     try {
       return await dio.post(
         apiHost.toString(),
-        /*options: Options(
-          headers: headers,
-        ),
-        data: formData,*/
         options: Options(
           headers: headers,
         ),
@@ -88,62 +81,19 @@ class StableDiffusionService {
     }
   }
 
-  static Future<Response<dynamic>?> inpaint(Map<String, dynamic> body,
-      Uint8List initImage, Uint8List maskImage) async {
-    log('INPAINT -> $maskingEngineId');
-    var headers = {
-      "Authorization": "Bearer $apiKey",
-      "Accept": "application/json",
-      "Content-Type": "multipart/form-data",
-    };
-
-    FormData formData = FormData.fromMap({
-      ...{
-        'init_image':
-            MultipartFile.fromBytes(initImage, filename: 'init_image'),
-        'mask_image':
-            MultipartFile.fromBytes(maskImage, filename: 'mask_image'),
-      },
-      ...body,
-    });
-
-    try {
-      return await dio.post(
-        '',
-        /*data: formData,
-        options: Options(
-          headers: headers,
-        ),*/
-      );
-    } catch (e) {
-      log(e.toString());
-      return null;
-    }
-  }
-
   static Future<Uint8List?> generate(
       String prompt, String storyId, String chapterId,
       {Uint8List? initImage, Uint8List? maskImage}) async {
     try {
       Response<dynamic>? response;
-      if (initImage != null && maskImage != null) {
-        response = await inpaint(
-          {
-            'mask_source': 'MASK_IMAGE_WHITE',
-            'samples': samples,
-            'prompt': prompt + promptStylerAppend,
-          },
-          initImage,
-          maskImage,
-        );
-      } else {
-        response = await txt2img(
-          {
-            'prompt': prompt + promptStylerAppend,
-            //'samples': samples,
-          },
-        );
-      }
+
+      response = await txt2img(
+        {
+          'prompt': prompt + promptStylerAppend,
+          //'samples': samples,
+        },
+      );
+
       if (response == null) return null;
       if (response.statusCode != 200) return null;
       Map<String, dynamic> data;

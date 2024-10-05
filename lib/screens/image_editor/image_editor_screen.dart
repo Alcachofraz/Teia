@@ -57,7 +57,7 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
 
   Future<Uint8List?> generate() async {
     if (text.isNotEmpty) {
-      Uint8List? mask;
+      /*Uint8List? mask;
       try {
         Uint8List? byteArray = await painterController.finish().toPNG();
         mask = StableDiffusionService.normalizeMask(
@@ -66,13 +66,13 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
         );
       } catch (e) {
         mask = null;
-      }
+      }*/
       return await StableDiffusionService.generate(
         text,
         storyId,
         chapterId,
         initImage: image,
-        maskImage: mask,
+        //maskImage: mask,
       );
     } else {
       return null;
@@ -139,7 +139,7 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
                   ],
                 ),
               ),
-              Tile(
+              /* Tile(
                 padding: EdgeInsets.zero,
                 child: IntrinsicHeight(
                   child: Row(
@@ -191,7 +191,7 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
                     ],
                   ),
                 ),
-              ),
+              ),*/
               Padding(
                 padding: const EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 16.0),
                 child: TextFormField(
@@ -218,6 +218,14 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
                           setState(() {
                             image = imageBytes;
                             painterController.clear();
+                            generateBusy = false;
+                          });
+                        } else {
+                          Get.snackbar(
+                            "Error",
+                            "The generator failed. Please try again later.",
+                          );
+                          setState(() {
                             generateBusy = false;
                           });
                         }

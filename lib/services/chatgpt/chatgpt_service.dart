@@ -15,12 +15,13 @@ class ChatGPTService extends GetxService {
 
   static final dio = Dio();
 
-  Future<String> getDraft(List<String> context) async {
+  Future<String> getDraft(List<String> context,
+      {String language = "english"}) async {
     final List<dynamic> content = [
       {
         "role": "system",
         "content":
-            "You are a story inspiration tool. The users will provide you the previous pages of their Choose Your Own Adventure book, and you will continue the story. You must not answer like a chat bot. You must use the same language as the previous pages. You must write in second-person. You must not provide options. You must not write more than 1000 characters",
+            "You are a story inspiration tool. The users will provide you the previous pages of their Choose Your Own Adventure book, and you will continue the story. You must not answer like a chat bot. You must speak in $language. You must write in second-person. You must not provide options. You must not write more than 1000 characters",
       },
       if (context.isNotEmpty) ...[
         for (String page in context)

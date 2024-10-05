@@ -1,4 +1,5 @@
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:country_flags/country_flags.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:teia/screens/chapter_editor/controller/chatgpt_controller.dart';
@@ -13,7 +14,7 @@ class ChatGPTView extends GetView<ChatGPTController> {
 
   @override
   Widget build(BuildContext context) {
-    Get.delete<ChatGPTController>();
+    //Get.delete<ChatGPTController>();
     Get.put(ChatGPTController(getChapterContent: getChapterContent));
     return Tile(
       width: double.infinity,
@@ -36,6 +37,42 @@ class ChatGPTView extends GetView<ChatGPTController> {
                   style: TextStyle(color: Colors.black, fontSize: 18),
                 ),
               ],
+            ),
+            const SizedBox(height: 12),
+            Obx(
+              () => controller.loadingPrefs.value
+                  ? const SizedBox(
+                      width: 24,
+                      height: 24,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                      ),
+                    )
+                  : SizedBox(
+                      width: double.infinity,
+                      child: Wrap(
+                        spacing: 8,
+                        runSpacing: 8,
+                        alignment: WrapAlignment.start,
+                        runAlignment: WrapAlignment.start,
+                        crossAxisAlignment: WrapCrossAlignment.start,
+                        children: [
+                          for (final language in Language.values)
+                            FilterChip(
+                              label: CountryFlag.fromLanguageCode(
+                                language.code,
+                                width: 24,
+                                height: 16,
+                              ),
+                              selected: controller.language.value == language,
+                              onSelected: (bool value) {
+                                controller.language.value = language;
+                                controller.prefs.setInt('lang', language.index);
+                              },
+                            )
+                        ],
+                      ),
+                    ),
             ),
             const SizedBox(height: 12),
             TeiaButton(

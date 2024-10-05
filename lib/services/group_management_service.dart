@@ -11,10 +11,13 @@ class GroupManagementService extends GetxService {
   static GroupManagementService get value => Get.put(GroupManagementService());
 
   // Get group by name
-  Future<Group> groupGet(String name) async {
+  Future<Group?> groupGet(String name) async {
     final query =
         await FirebaseUtils.firestore.collection('groups').doc(name).get();
-    Map<String, dynamic> data = query.data() ?? {};
+    Map<String, dynamic>? data = query.data();
+    if (data == null) {
+      return null;
+    }
     return Group.fromMap(
       data,
       await Get.put(StoryManagementService()).storyGet(
@@ -130,9 +133,13 @@ class GroupManagementService extends GetxService {
   // If the group exists, the password is correct and the user is not already in the group, the user is added to the group.
   // If the group does not exist, the group is created and he user joins.
   Future<bool> groupJoin(String name, String password) async {
-    if (await groupExists(name)) {
-      await groupJoinExisting(name, password);
-      return true;
+    Group? group = await groupGet(name);
+    if (group != null) {
+      if (group.state == GroupState.idle) {
+        await groupJoinExisting(name, password);
+        return true;
+      }
+      return false;
     } else {
       //await groupCreate(name, password);
       return false;
