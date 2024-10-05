@@ -3,6 +3,8 @@ import 'dart:typed_data';
 
 import 'dart:convert';
 import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
+import 'package:get/get.dart' as getx;
 import 'package:image/image.dart' as img;
 import 'package:http/http.dart' as http;
 
@@ -77,6 +79,20 @@ class StableDiffusionService {
       log(e.error.toString());
       log(e.message.toString());
       log(e.response.toString());
+      getx.Get.dialog(
+        AlertDialog(
+          title: const Text('Error'),
+          content: Text('${e.message}\n${e.response}\n${e.error}'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                getx.Get.back();
+              },
+              child: const Text('OK'),
+            ),
+          ],
+        ),
+      );
       return null;
     }
   }
