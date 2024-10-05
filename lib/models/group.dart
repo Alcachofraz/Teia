@@ -8,7 +8,18 @@ import 'package:teia/utils/utils.dart';
 enum GroupState {
   idle,
   writing,
-  reading,
+  reading;
+
+  String get name {
+    switch (this) {
+      case GroupState.idle:
+        return 'Idle';
+      case GroupState.writing:
+        return 'Writing';
+      case GroupState.reading:
+        return 'Reading';
+    }
+  }
 }
 
 class Group {

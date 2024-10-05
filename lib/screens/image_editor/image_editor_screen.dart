@@ -221,10 +221,10 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
                             generateBusy = false;
                           });
                         } else {
-                          Get.snackbar(
+                          /*Get.snackbar(
                             "Error",
                             "The generator failed. Please try again later.",
-                          );
+                          );*/
                           setState(() {
                             generateBusy = false;
                           });

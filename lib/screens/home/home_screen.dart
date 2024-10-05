@@ -103,7 +103,7 @@ class HomeScreen extends GetView<HomeController> {
                                   'group': group.name,
                                 });
                               },
-                              adventure: group,
+                              group: group,
                             ),
                         ],
                       ),

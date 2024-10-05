@@ -9,12 +9,12 @@ class AdventureTile extends StatefulWidget {
   const AdventureTile({
     super.key,
     this.onTap,
-    this.adventure,
+    this.group,
     this.text,
   });
 
   final String? text;
-  final Group? adventure;
+  final Group? group;
   final void Function()? onTap;
 
   @override
@@ -31,14 +31,13 @@ class _AdventureTileState extends State<AdventureTile> {
   }
 
   String getRole(Group adventure) {
-    return widget.adventure!.userState
-            .containsKey(AuthenticationService.value.uid)
-        ? 'You are a ${widget.adventure!.userState[AuthenticationService.value.uid]!.role == Role.writer ? 'Narrator' : 'Reader'}'
+    return widget.group!.userState.containsKey(AuthenticationService.value.uid)
+        ? 'You are a ${widget.group!.userState[AuthenticationService.value.uid]!.role == Role.writer ? 'Narrator' : 'Reader'}'
         : 'Choose your role now!';
   }
 
   String getStatus(Group adventure) {
-    return 'Idle';
+    return adventure.state.name;
   }
 
   @override
@@ -61,7 +60,7 @@ class _AdventureTileState extends State<AdventureTile> {
         child: SizedBox(
           width: 300,
           height: 200,
-          child: widget.adventure != null
+          child: widget.group != null
               ? SizedBox(
                   width: double.infinity,
                   child: Column(
@@ -71,7 +70,7 @@ class _AdventureTileState extends State<AdventureTile> {
                       Padding(
                         padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
                         child: Text(
-                          widget.adventure!.name,
+                          widget.group!.name,
                           style: const TextStyle(
                             color: Colors.white,
                             fontSize: 20,
@@ -91,7 +90,7 @@ class _AdventureTileState extends State<AdventureTile> {
                             ),
                             const SizedBox(width: 8),
                             Text(
-                              getRole(widget.adventure!),
+                              getRole(widget.group!),
                               style: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 14,
@@ -113,7 +112,7 @@ class _AdventureTileState extends State<AdventureTile> {
                             ),
                             const SizedBox(width: 8),
                             Text(
-                              getStatus(widget.adventure!),
+                              getStatus(widget.group!),
                               style: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 14,
@@ -135,8 +134,8 @@ class _AdventureTileState extends State<AdventureTile> {
                             ),
                             const SizedBox(width: 8),
                             Text(
-                              widget.adventure!.story != null
-                                  ? widget.adventure!.story!.name
+                              widget.group!.story != null
+                                  ? widget.group!.story!.name
                                   : 'No story yet',
                               style: const TextStyle(
                                 color: Colors.white,
@@ -152,7 +151,7 @@ class _AdventureTileState extends State<AdventureTile> {
                             ),
                             const SizedBox(width: 8),
                             Text(
-                              widget.adventure!.users.length.toString(),
+                              widget.group!.users.length.toString(),
                               style: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 14,

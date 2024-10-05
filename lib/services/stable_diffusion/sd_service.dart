@@ -111,26 +111,63 @@ class StableDiffusionService {
       );
 
       if (response == null) return null;
-      if (response.statusCode != 200) return null;
+      if (response.statusCode != 200) {
+        getx.Get.dialog(
+          AlertDialog(
+            title: const Text('Error'),
+            content: Text('[${response.statusCode}] ${response.data}'),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  getx.Get.back();
+                },
+                child: const Text('OK'),
+              ),
+            ],
+          ),
+        );
+        return null;
+      }
+
       Map<String, dynamic> data;
       try {
         data = jsonDecode(response.toString());
       } catch (e) {
         log(e.toString());
         log('Can\'t parse Stable Diffusion response.');
+        getx.Get.dialog(
+          AlertDialog(
+            title: const Text('Error'),
+            content: Text(e.toString()),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  getx.Get.back();
+                },
+                child: const Text('OK'),
+              ),
+            ],
+          ),
+        );
         return null;
-      }
-      try {
-        // Try to parse errors
-        errors = data['errors'];
-        log(errors.toString());
-        return null;
-      } catch (e) {
-        log('Can\'t parse errors from request.');
       }
       return base64Decode(data['image'] as String);
     } catch (e) {
       log(e.toString());
+      getx.Get.dialog(
+        AlertDialog(
+          title: const Text('Error'),
+          content: Text('[exception] ${e.toString()}'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                getx.Get.back();
+              },
+              child: const Text('OK'),
+            ),
+          ],
+        ),
+      );
       return null;
     }
   }
