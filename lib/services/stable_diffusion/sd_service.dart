@@ -9,9 +9,6 @@ import 'package:http/http.dart' as http;
 class StableDiffusionService {
   static const String engineId = 'stable-diffusion-v1-6';
   static const String maskingEngineId = 'stable-diffusion-v1-6';
-  static const String cloudflareAccountId = '3c3b1cd42e83b213fbc387bf1969c201';
-  static const String cloudflareToken =
-      'G442RWU8fdqa-C5qaBQz7QJ8Iaj75k9XyMct_Zvv';
   static const String promptStylerAppend = ', cinematic illustration';
 
   /// ERROR
@@ -19,12 +16,11 @@ class StableDiffusionService {
 
   //static Uri apiHost = Uri.https('api.stability.ai', 'v1/generation/$engineId');
   //static Uri apiHost = Uri.https('api.stability.ai', 'v2beta/stable-image/generate/core');
-  static Uri apiHost = Uri.https('api.cloudflare.com',
-      'client/v4/accounts/$cloudflareAccountId/ai/run/@cf/stabilityai/stable-diffusion-xl-base-1.0');
+  static Uri apiHost = Uri.https('teia-generate.vercel.app');
   //static Uri apiHost = Uri.https('lovely-clowns-carry-34-87-173-242.loca.lt', 'inator');
 
   //static const String apiKey = 'sk-DY0hd8PcPKrQCRtiGL6bzRObUbOmBjgGHuQJudHTGHdjcCZa';
-  static const String apiKey = cloudflareToken;
+  static const String apiKey = '';
 
   static const int samples = 1;
 
@@ -58,16 +54,11 @@ class StableDiffusionService {
     return Uint8List.fromList(img.encodePng(image));
   }
 
-  static Future<http.Response?> txt2img(Map<String, dynamic> body) async {
+  static Future<Response<dynamic>?> txt2img(Map<String, dynamic> body) async {
     log('TXT2IMG -> $engineId');
     log(apiHost.toString());
     var headers = {
-      "Authorization": "Bearer $apiKey",
-      /*"Accept": "application/json",
-      "Origin": "https://teia-tawny.vercel.app",
-      "Access-Control-Allow-Origin": "https://teia-tawny.vercel.app",
-      "Access-Control-Request-Method": "POST",
-      "Access-Control-Request-Headers": "X-Custom-Header",*/
+      //"Authorization": "Bearer $apiKey",
       "Access-Control-Allow-Origin": "*",
       "Access-Control-Allow-Methods": "GET,PUT,PATCH,POST,DELETE",
       "Access-Control-Allow-Headers":
@@ -77,14 +68,16 @@ class StableDiffusionService {
     };
     //FormData formData = FormData.fromMap(body);
     try {
-      return await http.post(
-        apiHost,
+      return await dio.post(
+        apiHost.toString(),
         /*options: Options(
           headers: headers,
         ),
         data: formData,*/
-        headers: headers,
-        body: jsonEncode(body),
+        options: Options(
+          headers: headers,
+        ),
+        data: body,
       );
     } on DioException catch (e) {
       log(e.toString());
@@ -95,7 +88,7 @@ class StableDiffusionService {
     }
   }
 
-  static Future<http.Response?> inpaint(Map<String, dynamic> body,
+  static Future<Response<dynamic>?> inpaint(Map<String, dynamic> body,
       Uint8List initImage, Uint8List maskImage) async {
     log('INPAINT -> $maskingEngineId');
     var headers = {
@@ -115,8 +108,8 @@ class StableDiffusionService {
     });
 
     try {
-      return await http.post(
-        Uri(),
+      return await dio.post(
+        '',
         /*data: formData,
         options: Options(
           headers: headers,
@@ -132,7 +125,7 @@ class StableDiffusionService {
       String prompt, String storyId, String chapterId,
       {Uint8List? initImage, Uint8List? maskImage}) async {
     try {
-      http.Response? response;
+      Response<dynamic>? response;
       if (initImage != null && maskImage != null) {
         response = await inpaint(
           {
@@ -155,10 +148,7 @@ class StableDiffusionService {
       if (response.statusCode != 200) return null;
       Map<String, dynamic> data;
       try {
-        //data = jsonDecode(response.toString());
-        data = {
-          "image": base64.encode(response.bodyBytes),
-        };
+        data = jsonDecode(response.toString());
       } catch (e) {
         log(e.toString());
         log('Can\'t parse Stable Diffusion response.');
