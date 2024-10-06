@@ -16,56 +16,55 @@ class IdleGroupScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final Size size = MediaQuery.of(context).size;
     return Center(
       child: SizedBox(
         width: 1000,
-        child: Column(
-          mainAxisSize: MainAxisSize.max,
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(
-                24,
-                32,
-                24,
-                0,
-              ),
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  controller.group.value!.name,
-                  style: GoogleFonts.lilitaOne(
-                    fontSize: 32.0,
-                    color: Colors.brown,
-                  ),
-                ),
-              ),
-            ),
-            Expanded(
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Expanded(
-                    flex: 2,
-                    child: Padding(
-                      padding: const EdgeInsets.all(24),
-                      child: Obx(
-                        () => UsersBox(
-                          color: controller.userBoxColor,
-                          info: controller.userInfo,
-                          onRoleChanged: controller.onRoleChanged,
-                          onTapEditUser: controller.onTapEditUser,
-                          loadingRole: controller.loadingRole.value,
-                          group: controller.group.value!,
+        child: size.width <= size.height
+            ? SingleChildScrollView(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(
+                        24,
+                        32,
+                        24,
+                        0,
+                      ),
+                      child: Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          controller.group.value!.name,
+                          style: GoogleFonts.lilitaOne(
+                            fontSize: 32.0,
+                            color: Colors.brown,
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                  Expanded(
-                    child: Obx(
+                    SizedBox(
+                      height: 500,
+                      child: Padding(
+                        padding: const EdgeInsets.all(24),
+                        child: Obx(
+                          () => UsersBox(
+                            color: controller.userBoxColor,
+                            info: controller.userInfo,
+                            onRoleChanged: controller.onRoleChanged,
+                            onTapEditUser: controller.onTapEditUser,
+                            loadingRole: controller.loadingRole.value,
+                            group: controller.group.value!,
+                          ),
+                        ),
+                      ),
+                    ),
+                    Obx(
                       () => Padding(
-                        padding: const EdgeInsets.fromLTRB(0, 24, 24, 24),
+                        padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
                         child: Column(
+                          mainAxisSize: MainAxisSize.min,
                           children: [
                             StoryBox(
                               story: controller.group.value!.story,
@@ -80,29 +79,114 @@ class IdleGroupScreen extends StatelessWidget {
                         ),
                       ),
                     ),
+                    Obx(
+                      () => Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 24),
+                        child: TeiaButton(
+                          locked: controller.group.value!.story == null ||
+                              (controller.group.value!.story!.finished &&
+                                  controller.group.value!.userState.entries.any(
+                                      (entry) =>
+                                          entry.value.role == Role.writer)) ||
+                              (!controller.group.value!.story!.finished &&
+                                  !controller.group.value!.userState.entries
+                                      .any((entry) =>
+                                          entry.value.role == Role.writer)),
+                          text: 'Start Story',
+                          onTap: controller.startStory,
+                        ),
+                      ),
+                    ),
+                    const Gap(40),
+                  ],
+                ),
+              )
+            : Column(
+                mainAxisSize: MainAxisSize.max,
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(
+                      24,
+                      32,
+                      24,
+                      0,
+                    ),
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        controller.group.value!.name,
+                        style: GoogleFonts.lilitaOne(
+                          fontSize: 32.0,
+                          color: Colors.brown,
+                        ),
+                      ),
+                    ),
                   ),
+                  Expanded(
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          flex: 2,
+                          child: Padding(
+                            padding: const EdgeInsets.all(24),
+                            child: Obx(
+                              () => UsersBox(
+                                color: controller.userBoxColor,
+                                info: controller.userInfo,
+                                onRoleChanged: controller.onRoleChanged,
+                                onTapEditUser: controller.onTapEditUser,
+                                loadingRole: controller.loadingRole.value,
+                                group: controller.group.value!,
+                              ),
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          child: Obx(
+                            () => Padding(
+                              padding: const EdgeInsets.fromLTRB(0, 24, 24, 24),
+                              child: Column(
+                                children: [
+                                  StoryBox(
+                                    story: controller.group.value!.story,
+                                  ),
+                                  const Gap(12),
+                                  StoryCreateBox(
+                                    story: controller.group.value!.story,
+                                    color: controller.storyBoxColor,
+                                    onCreate: controller.createStory,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Obx(
+                    () => Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 24),
+                      child: TeiaButton(
+                        locked: controller.group.value!.story == null ||
+                            (controller.group.value!.story!.finished &&
+                                controller.group.value!.userState.entries.any(
+                                    (entry) =>
+                                        entry.value.role == Role.writer)) ||
+                            (!controller.group.value!.story!.finished &&
+                                !controller.group.value!.userState.entries.any(
+                                    (entry) =>
+                                        entry.value.role == Role.writer)),
+                        text: 'Start Story',
+                        onTap: controller.startStory,
+                      ),
+                    ),
+                  ),
+                  const Gap(40),
                 ],
               ),
-            ),
-            Obx(
-              () => Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24),
-                child: TeiaButton(
-                  locked: controller.group.value!.story == null ||
-                      (controller.group.value!.story!.finished &&
-                          controller.group.value!.userState.entries.any(
-                              (entry) => entry.value.role == Role.writer)) ||
-                      (!controller.group.value!.story!.finished &&
-                          !controller.group.value!.userState.entries
-                              .any((entry) => entry.value.role == Role.writer)),
-                  text: 'Start Story',
-                  onTap: controller.startStory,
-                ),
-              ),
-            ),
-            const Gap(40),
-          ],
-        ),
       ),
     );
   }

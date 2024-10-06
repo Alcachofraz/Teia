@@ -89,6 +89,7 @@ class _PageEditorState extends State<PageEditor> {
   final StorageService storageService = Get.put(StorageService());
 
   bool pasting = false;
+  bool showOnlyTools = false;
 
   List<c.Comment> comments = [];
 
@@ -532,78 +533,104 @@ class _PageEditorState extends State<PageEditor> {
   }
 
   Widget _comments() {
-    return SingleChildScrollView(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          if (_atSnippet != null)
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-              child: _snippetCard(_atSnippet!),
-            ),
-          if (showingNewComment)
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-              child: NewCommentCard(
-                onComplete: (String text) {
-                  _onCommentCreate(text);
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: [
+        if (widget.screenSize.width <= Utils.maxWidthShowOnlyEditorPage)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 16),
+            child: Material(
+              color: Colors.white,
+              elevation: 4,
+              borderRadius: BorderRadius.circular(128),
+              child: InkWell(
+                borderRadius: BorderRadius.circular(128),
+                onTap: () {
                   setState(() {
-                    showingNewComment = false;
+                    showOnlyTools = false;
                   });
                 },
-                onDismiss: () {
-                  setState(() {
-                    showingNewComment = false;
-                  });
-                },
-              ),
-            )
-          else
-            Align(
-              alignment: Alignment.topLeft,
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-                child: Tile(
-                  color: Colors.white,
-                  padding: EdgeInsets.zero,
-                  radiusAll: 4.0,
-                  child: InkWell(
-                    child: const Padding(
-                      padding: EdgeInsets.all(16),
-                      child: Row(
-                        children: [
-                          Icon(Icons.add, size: 20),
-                          Gap(8),
-                          Text('New comment'),
-                        ],
-                      ),
-                    ),
-                    onTap: () {
-                      setState(() {
-                        showingNewComment = true;
-                      });
-                    },
+                child: const Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.edit_document),
+                      Gap(16),
+                      Text('Back to text'),
+                    ],
                   ),
                 ),
               ),
             ),
-          for (c.Comment comment in comments)
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-              child: CommentCard(
-                comment: comment,
-                onRespond: _onCommentRespond,
-              ),
-            ),
+          ),
+        if (_atSnippet != null)
           Padding(
             padding: const EdgeInsets.fromLTRB(0, 0, 0, 16),
-            child: ChatGPTView(
-              getChapterContent: getChapterContent,
-              accentColor: accentColor,
+            child: _snippetCard(_atSnippet!),
+          ),
+        if (showingNewComment)
+          Padding(
+            padding: const EdgeInsets.fromLTRB(0, 0, 0, 16),
+            child: NewCommentCard(
+              onComplete: (String text) {
+                _onCommentCreate(text);
+                setState(() {
+                  showingNewComment = false;
+                });
+              },
+              onDismiss: () {
+                setState(() {
+                  showingNewComment = false;
+                });
+              },
+            ),
+          )
+        else
+          Align(
+            alignment: Alignment.topLeft,
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(0, 0, 0, 16),
+              child: Tile(
+                color: Colors.white,
+                padding: EdgeInsets.zero,
+                radiusAll: 4.0,
+                child: InkWell(
+                  child: const Padding(
+                    padding: EdgeInsets.all(16),
+                    child: Row(
+                      children: [
+                        Icon(Icons.add, size: 20),
+                        Gap(8),
+                        Text('New comment'),
+                      ],
+                    ),
+                  ),
+                  onTap: () {
+                    setState(() {
+                      showingNewComment = true;
+                    });
+                  },
+                ),
+              ),
             ),
           ),
-        ],
-      ),
+        for (c.Comment comment in comments)
+          Padding(
+            padding: const EdgeInsets.fromLTRB(0, 0, 0, 16),
+            child: CommentCard(
+              comment: comment,
+              onRespond: _onCommentRespond,
+            ),
+          ),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(0, 0, 0, 16),
+          child: ChatGPTView(
+            getChapterContent: getChapterContent,
+            accentColor: accentColor,
+          ),
+        ),
+      ],
     );
   }
 
@@ -639,215 +666,244 @@ class _PageEditorState extends State<PageEditor> {
     return Positioned(
       left: lelftmargin,
       top: _lineOffset,
-      child: AnimatedSwitcher(
-        duration: const Duration(milliseconds: 300),
-        child: _selection != null
-            ? Tile(
-                padding: EdgeInsets.zero,
-                radiusAll: 64,
-                elevation: 8,
-                width: Utils.textOptionsWidth,
-                color: Colors.white,
-                child: Column(
-                  children: [
-                    JustTheTooltip(
-                      waitDuration: const Duration(milliseconds: 1000),
-                      content: const Padding(
+      child: Column(
+        children: [
+          widget.screenSize.width <= Utils.maxWidthShowOnlyEditorPage
+              ? Padding(
+                  padding: const EdgeInsets.only(bottom: 4),
+                  child: Material(
+                    color: Colors.white,
+                    elevation: 4,
+                    shape: const CircleBorder(),
+                    child: InkWell(
+                      customBorder: const CircleBorder(),
+                      onTap: () {
+                        setState(() {
+                          showOnlyTools = true;
+                        });
+                      },
+                      child: const Padding(
                         padding: EdgeInsets.all(8.0),
-                        child: Text(
-                          'Add a page link',
-                        ),
-                      ),
-                      child: TapIcon(
-                        backgroundColor: Colors.white,
-                        icon: const Icon(
-                          Icons.add_link,
-                        ),
-                        onTap: () {
-                          setState(() {
-                            showingChoiceOption = !showingChoiceOption;
-                            showingImageOption = false;
-                          });
-                          //_onAddChoice();
-                        },
+                        child: Icon(Icons.construction),
                       ),
                     ),
-                    AnimatedSize(
-                      duration: const Duration(milliseconds: 200),
-                      child: !showingChoiceOption
-                          ? const SizedBox.shrink()
-                          : Tile(
-                              padding: EdgeInsets.zero,
-                              radiusAll: 64,
-                              elevation: 4,
-                              width: Utils.textOptionsWidth - 8,
-                              color: Colors.grey[50],
-                              child: Column(
-                                children: [
-                                  for (int id in widget
-                                      .chapter.tree.nodes[widget.pageId]!)
-                                    InkWell(
-                                      customBorder: RoundedRectangleBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(128),
-                                      ),
-                                      child: Container(
-                                        width: Utils.textOptionsWidth - 8,
-                                        height: Utils.textOptionsWidth - 8,
-                                        decoration: BoxDecoration(
-                                          color: Colors.transparent,
-                                          borderRadius:
-                                              BorderRadius.circular(128),
-                                        ),
-                                        child: Center(
-                                          child: Text(
-                                            id.toString(),
-                                            textAlign: TextAlign.center,
-                                            style: TextStyle(
-                                              color: missingLinks.contains(id)
-                                                  ? Colors.red
-                                                  : Colors.green,
+                  ),
+                )
+              : Container(),
+          AnimatedSwitcher(
+            duration: const Duration(milliseconds: 300),
+            child: _selection != null
+                ? Tile(
+                    padding: EdgeInsets.zero,
+                    radiusAll: 64,
+                    elevation: 8,
+                    width: Utils.textOptionsWidth,
+                    color: Colors.white,
+                    child: Column(
+                      children: [
+                        JustTheTooltip(
+                          waitDuration: const Duration(milliseconds: 1000),
+                          content: const Padding(
+                            padding: EdgeInsets.all(8.0),
+                            child: Text(
+                              'Add a page link',
+                            ),
+                          ),
+                          child: TapIcon(
+                            backgroundColor: Colors.white,
+                            icon: const Icon(
+                              Icons.add_link,
+                            ),
+                            onTap: () {
+                              setState(() {
+                                showingChoiceOption = !showingChoiceOption;
+                                showingImageOption = false;
+                              });
+                              //_onAddChoice();
+                            },
+                          ),
+                        ),
+                        AnimatedSize(
+                          duration: const Duration(milliseconds: 200),
+                          child: !showingChoiceOption
+                              ? const SizedBox.shrink()
+                              : Tile(
+                                  padding: EdgeInsets.zero,
+                                  radiusAll: 64,
+                                  elevation: 4,
+                                  width: Utils.textOptionsWidth - 8,
+                                  color: Colors.grey[50],
+                                  child: Column(
+                                    children: [
+                                      for (int id in widget
+                                          .chapter.tree.nodes[widget.pageId]!)
+                                        InkWell(
+                                          customBorder: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(128),
+                                          ),
+                                          child: Container(
+                                            width: Utils.textOptionsWidth - 8,
+                                            height: Utils.textOptionsWidth - 8,
+                                            decoration: BoxDecoration(
+                                              color: Colors.transparent,
+                                              borderRadius:
+                                                  BorderRadius.circular(128),
+                                            ),
+                                            child: Center(
+                                              child: Text(
+                                                id.toString(),
+                                                textAlign: TextAlign.center,
+                                                style: TextStyle(
+                                                  color:
+                                                      missingLinks.contains(id)
+                                                          ? Colors.red
+                                                          : Colors.green,
+                                                ),
+                                              ),
                                             ),
                                           ),
+                                          onTap: () {
+                                            setState(() {
+                                              showingChoiceOption = false;
+                                            });
+                                            _onAddChoice(id);
+                                          },
                                         ),
-                                      ),
-                                      onTap: () {
-                                        setState(() {
-                                          showingChoiceOption = false;
-                                        });
-                                        _onAddChoice(id);
-                                      },
-                                    ),
-                                  TapIcon(
-                                    backgroundColor: Colors.transparent,
-                                    icon: const Icon(
-                                      Icons.add,
-                                    ),
-                                    onTap: () {
-                                      setState(() {
-                                        showingChoiceOption = false;
-                                      });
-                                      _onAddChoice();
-                                    },
-                                  )
-                                ],
-                              ),
-                            ),
-                    ),
-                    JustTheTooltip(
-                      waitDuration: const Duration(milliseconds: 1000),
-                      content: const Padding(
-                        padding: EdgeInsets.all(8.0),
-                        child: Text(
-                          'Add an image link',
-                        ),
-                      ),
-                      child: TapIcon(
-                        icon: const Icon(
-                          Icons.add_photo_alternate_outlined,
-                        ),
-                        onTap: () {
-                          setState(() {
-                            showingImageOption = !showingImageOption;
-                            showingChoiceOption = false;
-                          });
-                        },
-                      ),
-                    ),
-                    AnimatedSize(
-                      duration: const Duration(milliseconds: 200),
-                      child: !showingImageOption
-                          ? const SizedBox.shrink()
-                          : Tile(
-                              padding: EdgeInsets.zero,
-                              radiusAll: 64,
-                              elevation: 4,
-                              width: Utils.textOptionsWidth - 8,
-                              color: Colors.grey[100],
-                              child: Column(
-                                children: [
-                                  TapIcon(
-                                    backgroundColor: Colors.transparent,
-                                    icon: const Icon(
-                                      Icons.brush_rounded,
-                                    ),
-                                    onTap: () async {
-                                      setState(() {
-                                        showingImageOption = false;
-                                      });
-
-                                      var image = await Get.toNamed(
-                                          '/image_generate',
-                                          parameters: {
-                                            'text': _selection?.textInside(
-                                                  _controller.document
-                                                      .toPlainText(),
-                                                ) ??
-                                                '',
-                                            'story_id': widget.chapter.storyId,
-                                            'chapter_id':
-                                                widget.chapter.id.toString(),
+                                      TapIcon(
+                                        backgroundColor: Colors.transparent,
+                                        icon: const Icon(
+                                          Icons.add,
+                                        ),
+                                        onTap: () {
+                                          setState(() {
+                                            showingChoiceOption = false;
                                           });
-                                      if (image != null) {
-                                        await _onAddImage(image);
-                                      }
-                                    },
+                                          _onAddChoice();
+                                        },
+                                      )
+                                    ],
                                   ),
-                                  TapIcon(
-                                    backgroundColor: Colors.transparent,
-                                    icon: const Icon(
-                                      Icons.upload_rounded,
-                                    ),
-                                    onTap: () async {
-                                      FilePickerResult? result =
-                                          await FilePicker.platform
-                                              .pickFiles(type: FileType.image);
-                                      if (result != null) {
-                                        String url =
-                                            await storageService.uploadImage(
-                                          widget.chapter.storyId,
-                                          widget.chapter.id.toString(),
-                                          result.files.single.bytes!,
-                                        );
-                                        _onAddImage(url);
-                                      }
-                                      setState(() {
-                                        showingImageOption = false;
-                                      });
-                                      // Load image from device
-                                    },
-                                  ),
-                                ],
-                              ),
+                                ),
+                        ),
+                        JustTheTooltip(
+                          waitDuration: const Duration(milliseconds: 1000),
+                          content: const Padding(
+                            padding: EdgeInsets.all(8.0),
+                            child: Text(
+                              'Add an image link',
                             ),
+                          ),
+                          child: TapIcon(
+                            icon: const Icon(
+                              Icons.add_photo_alternate_outlined,
+                            ),
+                            onTap: () {
+                              setState(() {
+                                showingImageOption = !showingImageOption;
+                                showingChoiceOption = false;
+                              });
+                            },
+                          ),
+                        ),
+                        AnimatedSize(
+                          duration: const Duration(milliseconds: 200),
+                          child: !showingImageOption
+                              ? const SizedBox.shrink()
+                              : Tile(
+                                  padding: const EdgeInsets.only(bottom: 4),
+                                  radiusAll: 64,
+                                  elevation: 4,
+                                  width: Utils.textOptionsWidth - 8,
+                                  color: Colors.grey[100],
+                                  child: Column(
+                                    children: [
+                                      TapIcon(
+                                        backgroundColor: Colors.transparent,
+                                        icon: const Icon(
+                                          Icons.brush_rounded,
+                                        ),
+                                        onTap: () async {
+                                          setState(() {
+                                            showingImageOption = false;
+                                          });
+
+                                          var image = await Get.toNamed(
+                                              '/image_generate',
+                                              parameters: {
+                                                'text': _selection?.textInside(
+                                                      _controller.document
+                                                          .toPlainText(),
+                                                    ) ??
+                                                    '',
+                                                'story_id':
+                                                    widget.chapter.storyId,
+                                                'chapter_id': widget.chapter.id
+                                                    .toString(),
+                                              });
+                                          if (image != null) {
+                                            await _onAddImage(image);
+                                          }
+                                        },
+                                      ),
+                                      TapIcon(
+                                        backgroundColor: Colors.transparent,
+                                        icon: const Icon(
+                                          Icons.upload_rounded,
+                                        ),
+                                        onTap: () async {
+                                          FilePickerResult? result =
+                                              await FilePicker.platform
+                                                  .pickFiles(
+                                                      type: FileType.image);
+                                          if (result != null) {
+                                            String url = await storageService
+                                                .uploadImage(
+                                              widget.chapter.storyId,
+                                              widget.chapter.id.toString(),
+                                              result.files.single.bytes!,
+                                            );
+                                            _onAddImage(url);
+                                          }
+                                          setState(() {
+                                            showingImageOption = false;
+                                          });
+                                          // Load image from device
+                                        },
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                        ),
+                        /*JustTheTooltip(
+                          waitDuration: const Duration(milliseconds: 1000),
+                          content: const Padding(
+                            padding: EdgeInsets.all(8.0),
+                            child: Text(
+                              'Add a comment',
+                            ),
+                          ),
+                          child: TapIcon(
+                            icon: const Icon(
+                              Icons.comment_outlined,
+                            ),
+                            onTap: () {
+                              setState(() {
+                                showingImageOption = false;
+                                showingChoiceOption = false;
+                                showingNewComment = true;
+                              });
+                            },
+                          ),
+                        ),*/
+                      ],
                     ),
-                    /*JustTheTooltip(
-                      waitDuration: const Duration(milliseconds: 1000),
-                      content: const Padding(
-                        padding: EdgeInsets.all(8.0),
-                        child: Text(
-                          'Add a comment',
-                        ),
-                      ),
-                      child: TapIcon(
-                        icon: const Icon(
-                          Icons.comment_outlined,
-                        ),
-                        onTap: () {
-                          setState(() {
-                            showingImageOption = false;
-                            showingChoiceOption = false;
-                            showingNewComment = true;
-                          });
-                        },
-                      ),
-                    ),*/
-                  ],
-                ),
-              )
-            : const SizedBox.shrink(
-                key: ValueKey<int>(1),
-              ),
+                  )
+                : const SizedBox.shrink(
+                    key: ValueKey<int>(1),
+                  ),
+          ),
+        ],
       ),
     );
   }
@@ -872,64 +928,79 @@ class _PageEditorState extends State<PageEditor> {
       }
     }
 
-    return Stack(
-      children: [
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Expanded(
-              flex: Utils.editorPageWeight * 100 as int,
-              child: Tile(
-                elevation: 2.5,
-                padding: EdgeInsets.zero,
-                color: Utils.pageEditorSheetColor,
-                child: Column(
+    return AnimatedSwitcher(
+      duration: 1.seconds,
+      switchInCurve: Curves.decelerate,
+      switchOutCurve: Curves.decelerate,
+      child: showOnlyTools
+          ? SingleChildScrollView(
+              child: Padding(
+              padding: const EdgeInsets.fromLTRB(4, 0, 16, 0),
+              child: _comments(),
+            ))
+          : Stack(
+              children: [
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Expanded(
-                      child: Padding(
-                        padding:
-                            const EdgeInsets.fromLTRB(24.0, 24.0, 24.0, 24.0),
-                        child: QuillEditor(
-                          controller: _controller,
-                          configurations: QuillEditorConfigurations(
-                            expands: true,
-                            paintCursorAboveText: true,
-                            placeholder: 'Once upon a time...',
-                            scrollable: true,
-                            autoFocus: true,
-                            padding: const EdgeInsets.fromLTRB(
-                              24.0,
-                              20.0,
-                              24.0,
-                              24.0,
+                      flex: Utils.editorPageWeight * 100 as int,
+                      child: Tile(
+                        elevation: 2.5,
+                        padding: EdgeInsets.zero,
+                        color: Utils.pageEditorSheetColor,
+                        child: Column(
+                          children: [
+                            Expanded(
+                              child: Padding(
+                                padding: const EdgeInsets.fromLTRB(
+                                    24.0, 24.0, 24.0, 24.0),
+                                child: QuillEditor(
+                                  controller: _controller,
+                                  configurations: QuillEditorConfigurations(
+                                    expands: true,
+                                    paintCursorAboveText: true,
+                                    placeholder: 'Once upon a time...',
+                                    scrollable: true,
+                                    autoFocus: true,
+                                    padding: const EdgeInsets.fromLTRB(
+                                      24.0,
+                                      20.0,
+                                      24.0,
+                                      24.0,
+                                    ),
+                                    onImagePaste: (bytes) => Future.value(null),
+                                    onLaunchUrl: null,
+                                    embedBuilders: [CursorEmbedBuilder()],
+                                    showCursor: true,
+                                  ),
+                                  focusNode: focus,
+                                  scrollController: _scrollController,
+                                ),
+                              ),
                             ),
-                            onImagePaste: (bytes) => Future.value(null),
-                            onLaunchUrl: null,
-                            embedBuilders: [CursorEmbedBuilder()],
-                            showCursor: true,
-                          ),
-                          focusNode: focus,
-                          scrollController: _scrollController,
+                          ],
                         ),
                       ),
                     ),
+                    widget.screenSize.width > Utils.maxWidthShowOnlyEditorPage
+                        ? Expanded(
+                            flex: (1 - Utils.editorPageWeight) * 100 as int,
+                            child: SingleChildScrollView(
+                                child: Padding(
+                              padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
+                              child: _comments(),
+                            )),
+                          )
+                        : const SizedBox(
+                            width: Utils.collapseButtonSize,
+                          )
                   ],
                 ),
-              ),
+                _textOptions(),
+                _pasting(),
+              ],
             ),
-            widget.screenSize.width > Utils.maxWidthShowOnlyEditorPage
-                ? Expanded(
-                    flex: (1 - Utils.editorPageWeight) * 100 as int,
-                    child: _comments(),
-                  )
-                : const SizedBox(
-                    width: Utils.collapseButtonSize,
-                  )
-          ],
-        ),
-        _textOptions(),
-        _pasting(),
-      ],
     );
   }
 }

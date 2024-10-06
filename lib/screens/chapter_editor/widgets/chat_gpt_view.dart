@@ -18,7 +18,6 @@ class ChatGPTView extends GetView<ChatGPTController> {
     Get.put(ChatGPTController(getChapterContent: getChapterContent));
     return Tile(
       width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 16),
       radiusAll: 4.0,
       child: Padding(
         padding: const EdgeInsets.all(16.0),
