@@ -32,7 +32,7 @@ class ChatGPTView extends GetView<ChatGPTController> {
                 SizedBox(width: 8),
                 AutoSizeText(
                   'Need inspiration?',
-                  minFontSize: 16,
+                  minFontSize: 8,
                   style: TextStyle(color: Colors.black, fontSize: 18),
                 ),
               ],
