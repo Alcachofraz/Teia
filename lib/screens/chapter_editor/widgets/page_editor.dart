@@ -6,6 +6,7 @@ import 'package:flutter_quill/quill_delta.dart';
 import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:just_the_tooltip/just_the_tooltip.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:teia/models/change.dart';
 import 'package:teia/models/chapter.dart';
 import 'package:teia/models/comment_message.dart';
@@ -23,6 +24,7 @@ import 'package:teia/screens/chapter_editor/widgets/snippets/snippet_image_card.
 import 'package:teia/services/art_service.dart';
 import 'package:teia/services/authentication_service.dart';
 import 'package:teia/services/chapter_management_service.dart';
+import 'package:teia/services/chatgpt/chatgpt_service.dart';
 import 'package:teia/services/storage_service.dart';
 import 'package:teia/utils/utils.dart';
 import 'package:teia/views/misc/tap_icon.dart';
@@ -93,8 +95,24 @@ class _PageEditorState extends State<PageEditor> {
 
   List<c.Comment> comments = [];
 
+  RxString idea = ''.obs;
+  RxBool loadingPrefs = true.obs;
+  RxBool loadingIdea = true.obs;
+
+  final ChatGPTService chatGPTService = Get.put(ChatGPTService());
+  late SharedPreferences prefs;
+  late Rx<Language> language;
+
+  Future<void> loadPrefs() async {
+    prefs = await SharedPreferences.getInstance();
+    final lang = prefs.getInt('lang') ?? 0;
+    language = Language.values[lang].obs;
+    loadingPrefs.value = false;
+  }
+
   @override
   void initState() {
+    loadPrefs();
     page = tPage.empty(
       widget.pageId,
       widget.chapter.id,
@@ -485,11 +503,22 @@ class _PageEditorState extends State<PageEditor> {
     ));
   }
 
+  // Get idea from LPU
+  Future<void> getIdea() async {
+    loadingIdea.value = true;
+    idea.value = await chatGPTService.getDraft(
+      await getChapterContent(),
+      language: language.value.name,
+    );
+    loadingIdea.value = false;
+  }
+
   // Get String content from each of the pages before
   // the current page in this chapter
   Future<List<String>> getChapterContent() async {
     List<String> pages = [];
     int i = page.id;
+
     String content =
         _controller.document.getPlainText(0, _controller.document.length);
     if (content.isNotEmpty && content != '\n') {
@@ -535,6 +564,7 @@ class _PageEditorState extends State<PageEditor> {
   Widget _comments() {
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
       children: [
         if (widget.screenSize.width <= Utils.maxWidthShowOnlyEditorPage)
           Padding(
@@ -625,9 +655,18 @@ class _PageEditorState extends State<PageEditor> {
           ),
         Padding(
           padding: const EdgeInsets.fromLTRB(0, 0, 0, 16),
-          child: ChatGPTView(
-            getChapterContent: getChapterContent,
-            accentColor: accentColor,
+          child: Obx(
+            () => ChatGPTView(
+              getIdea: getIdea,
+              idea: idea.value,
+              loadingPrefs: loadingPrefs.value,
+              storedLanguage: language.value,
+              onSelectLanguage: (Language newLanguage) {
+                language.value = newLanguage;
+                prefs.setInt('lang', newLanguage.index);
+              },
+              accentColor: accentColor,
+            ),
           ),
         ),
       ],
@@ -933,11 +972,14 @@ class _PageEditorState extends State<PageEditor> {
       switchInCurve: Curves.decelerate,
       switchOutCurve: Curves.decelerate,
       child: showOnlyTools
-          ? SingleChildScrollView(
-              child: Padding(
-              padding: const EdgeInsets.fromLTRB(4, 0, 16, 0),
-              child: _comments(),
-            ))
+          ? Align(
+              alignment: Alignment.topCenter,
+              child: SingleChildScrollView(
+                  child: Padding(
+                padding: const EdgeInsets.fromLTRB(4, 0, 16, 0),
+                child: _comments(),
+              )),
+            )
           : Stack(
               children: [
                 Row(
