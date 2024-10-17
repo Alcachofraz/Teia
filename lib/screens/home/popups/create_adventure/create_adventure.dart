@@ -52,7 +52,7 @@ launchCreateAdventurePopup(BuildContext context) {
                     (_) => Get.close(1),
                   );
             },
-            child: const Text('Join'),
+            child: const Text('Create'),
           ),
         ],
       );

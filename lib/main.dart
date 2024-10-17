@@ -76,7 +76,13 @@ class LandingScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<bool>(
+    return Scaffold(
+      body: Center(
+        child: Text("Aguardem... Estou aqui com os probleminhas técnicos."),
+      ),
+    );
+
+    /*StreamBuilder<bool>(
       stream: AuthenticationService.value.authStateChanges,
       builder: (context, snapshot) {
         if (snapshot.hasData) {
@@ -93,6 +99,6 @@ class LandingScreen extends StatelessWidget {
           );
         }
       },
-    );
+    );*/
   }
 }

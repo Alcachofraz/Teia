@@ -5,6 +5,7 @@ import 'package:teia/services/group_management_service.dart';
 Future<void> launchJoinAdventurePopup(BuildContext context) {
   TextEditingController adventureNameController = TextEditingController();
   TextEditingController adventurePasswordController = TextEditingController();
+  RxString error = ''.obs;
   GroupManagementService groupManagementService =
       Get.put(GroupManagementService());
   return showDialog(
@@ -34,6 +35,15 @@ Future<void> launchJoinAdventurePopup(BuildContext context) {
               ),
               obscureText: true,
             ),
+            Obx(
+              () => Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  error.value,
+                  style: const TextStyle(color: Colors.red),
+                ),
+              ),
+            ),
           ],
         ),
         actions: [
@@ -49,7 +59,11 @@ Future<void> launchJoinAdventurePopup(BuildContext context) {
                 adventurePasswordController.text,
               )
                   .then((bool result) {
-                if (result) Get.close(1);
+                if (result) {
+                  Get.close(1);
+                } else {
+                  error.value = 'Adventure not found or password is incorrect';
+                }
               });
             },
             child: const Text('Join'),
