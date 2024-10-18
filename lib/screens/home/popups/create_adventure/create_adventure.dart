@@ -7,6 +7,7 @@ launchCreateAdventurePopup(BuildContext context) {
   TextEditingController adventurePasswordController = TextEditingController();
   GroupManagementService groupManagementService =
       Get.put(GroupManagementService());
+  RxString error = ''.obs;
   return showDialog(
     context: context,
     builder: (context) {
@@ -34,6 +35,15 @@ launchCreateAdventurePopup(BuildContext context) {
               ),
               obscureText: true,
             ),
+            Obx(
+              () => Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  error.value,
+                  style: const TextStyle(color: Colors.red),
+                ),
+              ),
+            ),
           ],
         ),
         actions: [
@@ -45,12 +55,16 @@ launchCreateAdventurePopup(BuildContext context) {
             onPressed: () {
               groupManagementService
                   .groupCreate(
-                    adventureNameController.text,
-                    adventurePasswordController.text,
-                  )
-                  .then(
-                    (_) => Get.close(1),
-                  );
+                adventureNameController.text,
+                adventurePasswordController.text,
+              )
+                  .then((bool result) {
+                if (!result) {
+                  error.value = "Can't create adventure. Choose another name.";
+                } else {
+                  Get.close(1);
+                }
+              });
             },
             child: const Text('Create'),
           ),

@@ -67,14 +67,20 @@ class GroupManagementService extends GetxService {
   }
 
   // Create new group
-  Future<void> groupCreate(String name, String password) async {
-    await FirebaseUtils.firestore.collection('groups').doc(name).set(
-          Group.init(
-            name,
-            password,
-            AuthenticationService.value.uid,
-          ).toMap(),
-        );
+  Future<bool> groupCreate(String name, String password) async {
+    Group? group = await groupGet(name);
+    if (group == null) {
+      await FirebaseUtils.firestore.collection('groups').doc(name).set(
+            Group.init(
+              name,
+              password,
+              AuthenticationService.value.uid,
+            ).toMap(),
+          );
+      return true;
+    } else {
+      return false;
+    }
   }
 
   // Check if group exists
@@ -135,9 +141,13 @@ class GroupManagementService extends GetxService {
   Future<bool> groupJoin(String name, String password) async {
     Group? group = await groupGet(name);
     if (group != null) {
-      if (group.state == GroupState.idle) {
-        await groupJoinExisting(name, password);
-        return true;
+      if (group.state == GroupState.idle || group.currentChapter == 1) {
+        try {
+          await groupJoinExisting(name, password);
+          return true;
+        } catch (e) {
+          return false;
+        }
       }
       return false;
     } else {
