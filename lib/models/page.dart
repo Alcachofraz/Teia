@@ -130,6 +130,32 @@ class tPage {
     return letters[index].snippet;
   }
 
+  LetterIdAndLength? findLetterIdAndLengthBySnippet(Snippet snippet) {
+    int count = 0;
+    int index = 0;
+    bool found = false;
+    LetterId first = LetterId([0]);
+    for (var letter in letters) {
+      if (letter.snippet == snippet) {
+        if (!found) {
+          first = letter.id;
+        }
+        found = true;
+        count++;
+      } else {
+        if (found) {
+          return LetterIdAndLength(
+            first,
+            count,
+            index,
+          );
+        }
+      }
+      if (!found) index++;
+    }
+    return null;
+  }
+
   LetterId generateId(LetterId? p, LetterId? q) {
     if (p != null) {
       LetterId ret = p.deepCopy();
@@ -347,4 +373,12 @@ class WorkingSnippet {
   int length;
 
   WorkingSnippet(this.snippet, this.startId, this.length);
+}
+
+class LetterIdAndLength {
+  final LetterId id;
+  final int length;
+  final int index;
+
+  LetterIdAndLength(this.id, this.length, this.index);
 }

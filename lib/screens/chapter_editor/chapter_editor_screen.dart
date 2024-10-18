@@ -345,6 +345,7 @@ class _ChapterEditorScreenState extends State<ChapterEditorScreen> {
           : allowed.value
               ? ScrollableStaticScaffold(
                   backgroundColor: Utils.graphSettings.backgroundColor,
+                  resizeToAvoidBottomInset: true,
                   body: Stack(
                     children: [
                       Image.asset(

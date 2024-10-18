@@ -90,6 +90,7 @@ class _PageEditorState extends State<PageEditor> {
 
   final StorageService storageService = Get.put(StorageService());
 
+  bool saved = true;
   bool pasting = false;
   bool showOnlyTools = false;
 
@@ -101,7 +102,7 @@ class _PageEditorState extends State<PageEditor> {
 
   final ChatGPTService chatGPTService = Get.put(ChatGPTService());
   late SharedPreferences prefs;
-  late Rx<Language> language;
+  Rx<Language> language = Language.english.obs;
 
   Future<void> loadPrefs() async {
     prefs = await SharedPreferences.getInstance();
@@ -175,6 +176,7 @@ class _PageEditorState extends State<PageEditor> {
     _onContextMenu.cancel();
     _scrollController.dispose();
     _commentsChangesSubscription.cancel();
+    timer?.cancel();
     ChapterManagementService.value.simplifyChangesQueue(page);
     super.dispose();
   }
@@ -238,10 +240,46 @@ class _PageEditorState extends State<PageEditor> {
     }
   }*/
 
+  Delta? currentChange;
+  Timer? timer;
+
+  void _startDebounceLogic() {
+    setState(() {
+      saved = false;
+    });
+    timer?.cancel();
+    timer = Timer(1.seconds, () {
+      timer?.cancel();
+      _onEndDebounce(
+        DocChange(
+          currentChange!, // Dummy
+          currentChange!,
+          ChangeSource.local,
+        ),
+      );
+      setState(() {
+        saved = true;
+      });
+      currentChange = null;
+    });
+  }
+
+  // Receive local document change.
+  void _onLocalChange(DocChange change) {
+    // If not page yet or change is remote, do nothing
+    if (change.source == ChangeSource.remote) return;
+    if (currentChange == null) {
+      currentChange = change.change;
+    } else {
+      currentChange = currentChange!.compose(change.change);
+    }
+    _startDebounceLogic();
+  }
+
   /// Receive local document change.
   ///
-  /// * [event] A tuple containing the deltas and change source.
-  void _onLocalChange(DocChange change) {
+  /// * [change] A tuple containing the deltas and change source.
+  void _onEndDebounce(DocChange change) {
     // If not page yet or change is remote, do nothing
     if (change.source == ChangeSource.remote) return;
     // Characters to skip.
@@ -354,7 +392,7 @@ class _PageEditorState extends State<PageEditor> {
   }
 
   /// On document format
-  void _onLocalFormat(LetterId? id, int length, Snippet snippet) {
+  void _onLocalFormat(LetterId? id, int length, Snippet? snippet) {
     //print('FORMAT [$id, $length, $snippet]');
     page.format(id, length, snippet);
     _pushPageChange(
@@ -461,6 +499,26 @@ class _PageEditorState extends State<PageEditor> {
     );
   }
 
+  // Remove the selected snippet
+  void removeSnippet(Snippet snippet) {
+    LetterIdAndLength? lial = page.findLetterIdAndLengthBySnippet(snippet);
+    if (lial == null) return;
+    _onLocalFormat(lial.id, lial.length, null);
+    _controller.formatText(
+      lial.index,
+      lial.length,
+      ColorAttribute(
+        '#${colorToHex(Colors.black)}', // Set color to black - snippet
+      ),
+    );
+    if (snippet.type == SnippetType.choice) {
+      _checkLinksOnDelete();
+    }
+    setState(() {
+      _atSnippet = null;
+    });
+  }
+
   /// Uploads image to Firebase Storage and creates a snippet with the image URL.
   Future<void> _onAddImage(String image) async {
     _createSnippet(Snippet(
@@ -552,10 +610,16 @@ class _PageEditorState extends State<PageEditor> {
   Widget _snippetCard(Snippet snippet) {
     switch (snippet.type) {
       case SnippetType.choice:
-        return SnippetChoiceCard(snippet: snippet, onPageTap: widget.onPageTap);
-
+        return SnippetChoiceCard(
+          snippet: snippet,
+          onPageTap: widget.onPageTap,
+          removeSnippet: () => removeSnippet(snippet),
+        );
       case SnippetType.image:
-        return SnippetImageCard(snippet: snippet);
+        return SnippetImageCard(
+          snippet: snippet,
+          removeSnippet: () => removeSnippet(snippet),
+        );
       default:
         return const SizedBox.shrink();
     }
@@ -670,6 +734,55 @@ class _PageEditorState extends State<PageEditor> {
           ),
         ),
       ],
+    );
+  }
+
+  Widget _saving() {
+    return Padding(
+      padding: const EdgeInsets.only(left: 8),
+      child: SizedBox(
+        height: 32,
+        child: saved
+            ? Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    Icons.check,
+                    color: Colors.green,
+                    size: 18,
+                  ),
+                  Gap(4),
+                  Text(
+                    "Saved",
+                    style: TextStyle(
+                      color: Colors.green,
+                      fontSize: 11,
+                    ),
+                  ),
+                ],
+              )
+            : Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  SizedBox(
+                    height: 14,
+                    width: 14,
+                    child: CircularProgressIndicator(
+                      color: Colors.orange,
+                      strokeWidth: 2,
+                    ),
+                  ),
+                  Gap(8),
+                  Text(
+                    "Saving...",
+                    style: TextStyle(
+                      color: Colors.orange,
+                      fontSize: 11,
+                    ),
+                  ),
+                ],
+              ),
+      ),
     );
   }
 
@@ -1041,6 +1154,7 @@ class _PageEditorState extends State<PageEditor> {
                 ),
                 _textOptions(),
                 _pasting(),
+                _saving(),
               ],
             ),
     );

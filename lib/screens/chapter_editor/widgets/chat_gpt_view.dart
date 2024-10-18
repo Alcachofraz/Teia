@@ -62,10 +62,12 @@ class ChatGPTView extends StatelessWidget {
                   size: 24.0,
                 ),
                 SizedBox(width: 8),
-                AutoSizeText(
-                  'Need inspiration?',
-                  minFontSize: 8,
-                  style: TextStyle(color: Colors.black, fontSize: 18),
+                Expanded(
+                  child: AutoSizeText(
+                    'Need inspiration?',
+                    minFontSize: 8,
+                    style: TextStyle(color: Colors.black, fontSize: 18),
+                  ),
                 ),
               ],
             ),
