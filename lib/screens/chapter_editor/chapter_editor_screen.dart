@@ -8,7 +8,9 @@ import 'package:teia/models/group.dart';
 import 'package:teia/models/page.dart';
 import 'package:teia/models/user_state.dart';
 import 'package:teia/screens/chapter_editor/chapter_graph_view.dart';
+import 'package:teia/screens/chapter_editor/flow_chart.dart';
 import 'package:teia/screens/chapter_editor/popups/delete_page_popup.dart';
+import 'package:teia/screens/chapter_editor/tree_view.dart';
 import 'package:teia/screens/chapter_editor/widgets/page_editor.dart';
 import 'package:teia/services/art_service.dart';
 import 'package:teia/services/authentication_service.dart';
@@ -180,7 +182,15 @@ class _ChapterEditorScreenState extends State<ChapterEditorScreen> {
 
   Widget _chapterGraph(Size size) => _chapter == null
       ? loadingRotate()
-      : ChapterGraphView(
+      : /*TreeViewScreen(
+          chapter: _chapter!,
+          createPage: _createPage,
+          clickPage: _clickPage,
+          width: size.width,
+          height: size.height,
+          missingLinks: missingLinks,
+        );*/
+      ChapterFlowChart(
           chapter: _chapter!,
           createPage: _createPage,
           clickPage: _clickPage,
@@ -188,6 +198,14 @@ class _ChapterEditorScreenState extends State<ChapterEditorScreen> {
           height: size.height,
           missingLinks: missingLinks,
         );
+  /*ChapterGraphView(
+          chapter: _chapter!,
+          createPage: _createPage,
+          clickPage: _clickPage,
+          width: size.width,
+          height: size.height,
+          missingLinks: missingLinks,
+        );*/
 
   Widget _pageEditor(Size size) => _chapter == null
       ? loadingRotate()
@@ -359,7 +377,7 @@ class _ChapterEditorScreenState extends State<ChapterEditorScreen> {
                         width: screenSize.width,
                         height: screenSize.height,
                       ),
-                      _chapterGraph(screenSize),
+                      SizedBox.expand(child: _chapterGraph(screenSize)),
                       if (_group != null)
                         Align(
                           alignment: Alignment.bottomLeft,
