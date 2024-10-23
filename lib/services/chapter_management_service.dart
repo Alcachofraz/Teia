@@ -206,7 +206,12 @@ class ChapterManagementService extends GetxService {
   }
 
   Future<void> pageDelete(String storyId, int chapterId, int pageId) async {
-    FirebaseUtils.firestore
+    // Delete all page changes:
+    await FirebaseUtils.realtime
+        .ref('stories/$storyId/chapters/$chapterId/pages/$pageId')
+        .remove();
+
+    await FirebaseUtils.firestore
         .collection('stories')
         .doc(storyId)
         .collection('chapters')

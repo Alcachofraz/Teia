@@ -61,6 +61,15 @@ class ChapterTree {
     return _nodes.keys.length;
   }
 
+  /// Find next available page ID.
+  int findNextAvailableId() {
+    int id = 1;
+    while (_nodes.containsKey(id)) {
+      id++;
+    }
+    return id;
+  }
+
   /// Check if page is leaf (has no child connections).
   /// Returns true if pageId doesn't exist or nodes is null.
   bool isLeaf(int pageId) {

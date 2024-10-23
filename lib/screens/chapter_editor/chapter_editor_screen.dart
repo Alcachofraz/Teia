@@ -10,7 +10,7 @@ import 'package:teia/models/user_state.dart';
 import 'package:teia/screens/chapter_editor/chapter_graph_view.dart';
 import 'package:teia/screens/chapter_editor/flow_chart.dart';
 import 'package:teia/screens/chapter_editor/popups/delete_page_popup.dart';
-import 'package:teia/screens/chapter_editor/tree_view.dart';
+import 'package:teia/screens/chapter_editor/tree_list_view.dart';
 import 'package:teia/screens/chapter_editor/widgets/page_editor.dart';
 import 'package:teia/services/art_service.dart';
 import 'package:teia/services/authentication_service.dart';
@@ -182,15 +182,7 @@ class _ChapterEditorScreenState extends State<ChapterEditorScreen> {
 
   Widget _chapterGraph(Size size) => _chapter == null
       ? loadingRotate()
-      : /*TreeViewScreen(
-          chapter: _chapter!,
-          createPage: _createPage,
-          clickPage: _clickPage,
-          width: size.width,
-          height: size.height,
-          missingLinks: missingLinks,
-        );*/
-      ChapterFlowChart(
+      : TreeListView(
           chapter: _chapter!,
           createPage: _createPage,
           clickPage: _clickPage,
@@ -198,6 +190,14 @@ class _ChapterEditorScreenState extends State<ChapterEditorScreen> {
           height: size.height,
           missingLinks: missingLinks,
         );
+  /*ChapterFlowChart(
+          chapter: _chapter!,
+          createPage: _createPage,
+          clickPage: _clickPage,
+          width: size.width,
+          height: size.height,
+          missingLinks: missingLinks,
+        );*/
   /*ChapterGraphView(
           chapter: _chapter!,
           createPage: _createPage,
@@ -278,13 +278,15 @@ class _ChapterEditorScreenState extends State<ChapterEditorScreen> {
                                         const Spacer(),
                                         const Gap(4),
                                         IconButton(
-                                          onPressed: () {
+                                          onPressed: () async {
                                             int pageId = selectedPageId!;
                                             if (_chapter!
                                                 .canPageBeDeleted(pageId)) {
                                               setState(() {
                                                 selectedPageId = null;
                                               });
+                                              await Future.delayed(
+                                                  200.milliseconds);
                                               _chapter!.deletePage(pageId);
                                               _pushChapterToRemote(_chapter!);
                                               ChapterManagementService.value
@@ -377,79 +379,91 @@ class _ChapterEditorScreenState extends State<ChapterEditorScreen> {
                         width: screenSize.width,
                         height: screenSize.height,
                       ),
-                      SizedBox.expand(child: _chapterGraph(screenSize)),
-                      if (_group != null)
-                        Align(
-                          alignment: Alignment.bottomLeft,
-                          child: Padding(
-                            padding: const EdgeInsets.all(32),
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'Chapter ${_chapter?.id ?? '...'}',
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 28,
-                                  ),
-                                ),
-                                Obx(
-                                  () => TextField(
-                                    controller: titleController,
-                                    style: const TextStyle(fontSize: 15),
-                                    onSubmitted: (value) async =>
-                                        await updateTitle(value),
-                                    onChanged: (value) {
-                                      titleSaved.value = false;
-                                    },
-                                    decoration: InputDecoration(
-                                      isDense: true,
-                                      fillColor: Colors.transparent,
-                                      filled: true,
-                                      prefixIcon: Padding(
-                                        padding:
-                                            const EdgeInsets.only(right: 8.0),
-                                        child: IconButton(
-                                          onPressed: () async {
-                                            await updateTitle(
-                                              titleController.text,
-                                            );
+                      SizedBox.expand(
+                          child: Column(
+                        children: [
+                          Expanded(
+                            child: _chapterGraph(screenSize),
+                          ),
+                          if (_group != null)
+                            Container(
+                              color: Colors.white,
+                              child: Align(
+                                alignment: Alignment.bottomLeft,
+                                child: Padding(
+                                  padding: const EdgeInsets.all(32),
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        'Chapter ${_chapter?.id ?? '...'}',
+                                        style: const TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 28,
+                                        ),
+                                      ),
+                                      Obx(
+                                        () => TextField(
+                                          controller: titleController,
+                                          style: const TextStyle(fontSize: 15),
+                                          onSubmitted: (value) async =>
+                                              await updateTitle(value),
+                                          onChanged: (value) {
+                                            titleSaved.value = false;
                                           },
-                                          icon: Row(
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: [
-                                              Icon(
-                                                titleSaved.value
-                                                    ? Icons.check
-                                                    : Icons.error_outline,
-                                                color: titleSaved.value
-                                                    ? Colors.green[700]
-                                                    : Colors.red[700],
-                                                size: 14,
+                                          decoration: InputDecoration(
+                                            isDense: true,
+                                            fillColor: Colors.transparent,
+                                            filled: true,
+                                            prefixIcon: Padding(
+                                              padding: const EdgeInsets.only(
+                                                  right: 8.0),
+                                              child: IconButton(
+                                                onPressed: () async {
+                                                  await updateTitle(
+                                                    titleController.text,
+                                                  );
+                                                },
+                                                icon: Row(
+                                                  mainAxisSize:
+                                                      MainAxisSize.min,
+                                                  children: [
+                                                    Icon(
+                                                      titleSaved.value
+                                                          ? Icons.check
+                                                          : Icons.error_outline,
+                                                      color: titleSaved.value
+                                                          ? Colors.green[700]
+                                                          : Colors.red[700],
+                                                      size: 14,
+                                                    ),
+                                                    const Icon(
+                                                      Icons.save,
+                                                    ),
+                                                  ],
+                                                ),
                                               ),
-                                              const Icon(
-                                                Icons.save,
+                                            ),
+                                            border: OutlineInputBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(100.0),
+                                              borderSide: const BorderSide(
+                                                width: 0.0,
+                                                style: BorderStyle.none,
                                               ),
-                                            ],
+                                            ),
                                           ),
                                         ),
                                       ),
-                                      border: OutlineInputBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(100.0),
-                                        borderSide: const BorderSide(
-                                          width: 0.0,
-                                          style: BorderStyle.none,
-                                        ),
-                                      ),
-                                    ),
+                                    ],
                                   ),
                                 ),
-                              ],
+                              ),
                             ),
-                          ),
-                        ),
+                        ],
+                      )),
                       _pageEditor(screenSize),
                     ],
                   ),

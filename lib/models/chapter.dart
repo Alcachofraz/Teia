@@ -66,7 +66,7 @@ class Chapter {
   /// * [id] parent id.
   /// Returns the id of the child.
   int addPage(int id, {String? uid}) {
-    int newId = tree.numberOfPages() + 1;
+    int newId = tree.findNextAvailableId();
     tree.addConnection(id, newId);
     return newId;
   }
@@ -104,7 +104,10 @@ class Chapter {
   /// If page has children in graph, it can't be deleted.
   /// If page has parent in links, it can't be deleted.
   bool canPageBeDeleted(int pageId) {
-    return !tree.isRoot(pageId) && tree.isLeaf(pageId) && links.isRoot(pageId);
+    bool ret1 = !tree.isRoot(pageId);
+    bool ret2 = tree.isLeaf(pageId);
+    bool ret3 = !links.isRoot(pageId);
+    return ret1 && ret2 && ret3;
   }
 
   /// Delete page from chapter. Undo links.
