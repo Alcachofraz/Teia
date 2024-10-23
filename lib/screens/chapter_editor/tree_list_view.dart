@@ -72,6 +72,15 @@ class _TreeListViewState extends State<TreeListView> {
                 Gap(12),
                 Text('Page $nodeId'),
                 Gap(12),
+                if (widget.missingLinks.contains(nodeId))
+                  Padding(
+                    padding: const EdgeInsets.only(right: 12),
+                    child: Icon(
+                      Icons.link_off_rounded,
+                      color: Colors.red,
+                      size: 18.0,
+                    ),
+                  ),
                 Material(
                   color: Colors.transparent,
                   child: InkWell(
@@ -90,6 +99,8 @@ class _TreeListViewState extends State<TreeListView> {
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
+                          if (isExpanded) Gap(6),
+                          Gap(4),
                           Icon(
                             isExpanded
                                 ? Icons.keyboard_arrow_down_rounded
@@ -97,13 +108,14 @@ class _TreeListViewState extends State<TreeListView> {
                             size: 20,
                             color: Colors.deepPurple,
                           ),
-                          Text(
-                            '(${nodes[nodeId]!.length})',
-                            style: TextStyle(
-                              color: Colors.deepPurple,
-                              fontWeight: FontWeight.bold,
+                          if (!isExpanded)
+                            Text(
+                              '(${nodes[nodeId]!.length})',
+                              style: TextStyle(
+                                color: Colors.deepPurple,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
-                          ),
                         ],
                       ),
                     ),

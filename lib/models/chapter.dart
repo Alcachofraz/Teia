@@ -106,7 +106,7 @@ class Chapter {
   bool canPageBeDeleted(int pageId) {
     bool ret1 = !tree.isRoot(pageId);
     bool ret2 = tree.isLeaf(pageId);
-    bool ret3 = !links.isRoot(pageId);
+    bool ret3 = links.isRoot(pageId);
     return ret1 && ret2 && ret3;
   }
 

@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:teia/firebase_options.dart';
 import 'package:teia/screens/auth/auth_screen.dart';
 import 'package:teia/screens/chapter_editor/chapter_editor_screen.dart';
+import 'package:teia/screens/chapter_editor/preview_chapter_screen.dart';
 import 'package:teia/screens/group/pages/group_screen.dart';
 import 'package:teia/screens/home/home_screen.dart';
 import 'package:teia/screens/image_editor/image_editor_screen.dart';
@@ -58,6 +59,10 @@ class Teia extends StatelessWidget {
         GetPage(
           name: '/read_chapter',
           page: () => ReadChapterScreen(),
+        ),
+        GetPage(
+          name: '/preview_chapter',
+          page: () => PreviewChapterScreen(),
         ),
       ],
       theme: ThemeData(

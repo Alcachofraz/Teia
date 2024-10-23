@@ -207,6 +207,14 @@ class _ChapterEditorScreenState extends State<ChapterEditorScreen> {
           missingLinks: missingLinks,
         );*/
 
+  Future<void> onPreview() async {
+    await Get.toNamed('/preview_chapter', parameters: {
+      'storyId': _group!.story!.id,
+      'chapterId': _group!.currentChapter.toString(),
+      'group': _group!.name,
+    });
+  }
+
   Widget _pageEditor(Size size) => _chapter == null
       ? loadingRotate()
       : Stack(
@@ -454,6 +462,18 @@ class _ChapterEditorScreenState extends State<ChapterEditorScreen> {
                                                 style: BorderStyle.none,
                                               ),
                                             ),
+                                          ),
+                                        ),
+                                      ),
+                                      TextButton(
+                                        onPressed: onPreview,
+                                        child: Text(
+                                          'Preview',
+                                          style: TextStyle(
+                                            color: Colors.blue[700],
+                                            fontSize: 16,
+                                            decoration:
+                                                TextDecoration.underline,
                                           ),
                                         ),
                                       ),
