@@ -7,8 +7,6 @@ import 'package:teia/models/chapter.dart';
 import 'package:teia/models/group.dart';
 import 'package:teia/models/page.dart';
 import 'package:teia/models/user_state.dart';
-import 'package:teia/screens/chapter_editor/chapter_graph_view.dart';
-import 'package:teia/screens/chapter_editor/flow_chart.dart';
 import 'package:teia/screens/chapter_editor/popups/delete_page_popup.dart';
 import 'package:teia/screens/chapter_editor/tree_list_view.dart';
 import 'package:teia/screens/chapter_editor/widgets/page_editor.dart';
@@ -55,6 +53,7 @@ class _ChapterEditorScreenState extends State<ChapterEditorScreen> {
   final String landscape = ArtService.value.landscape();
   RxBool loading = false.obs;
   RxBool titleSaved = true.obs;
+  RxBool loadingCheckbox = false.obs;
   late final TextEditingController titleController = TextEditingController();
 
   Set<int> missingLinks = {};
@@ -465,17 +464,46 @@ class _ChapterEditorScreenState extends State<ChapterEditorScreen> {
                                           ),
                                         ),
                                       ),
-                                      TextButton(
-                                        onPressed: onPreview,
-                                        child: Text(
-                                          'Preview',
-                                          style: TextStyle(
-                                            color: Colors.blue[700],
-                                            fontSize: 16,
-                                            decoration:
-                                                TextDecoration.underline,
+                                      Row(
+                                        children: [
+                                          TextButton(
+                                            onPressed: onPreview,
+                                            child: Text(
+                                              'Preview',
+                                              style: TextStyle(
+                                                color: Colors.blue[700],
+                                                fontSize: 16,
+                                                decoration:
+                                                    TextDecoration.underline,
+                                              ),
+                                            ),
                                           ),
-                                        ),
+                                          Gap(4),
+                                          Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              Transform.scale(
+                                                scale: 0.8,
+                                                child: Checkbox(
+                                                  value:
+                                                      _chapter!.showHighlights,
+                                                  onChanged:
+                                                      (bool? value) async {
+                                                    loadingCheckbox.value =
+                                                        true;
+                                                    _chapter!.showHighlights =
+                                                        value ?? false;
+                                                    await _pushChapterToRemote(
+                                                        _chapter!);
+                                                    loadingCheckbox.value =
+                                                        false;
+                                                  },
+                                                ),
+                                              ),
+                                              Text("Highlights"),
+                                            ],
+                                          ),
+                                        ],
                                       ),
                                     ],
                                   ),

@@ -4,6 +4,7 @@ class Chapter {
   int id;
   String storyId;
   String title;
+  bool showHighlights;
 
   /// Indicates which pages are connected schematically.
   ChapterTree tree;
@@ -17,6 +18,7 @@ class Chapter {
     this.title,
     this.tree,
     this.links,
+    this.showHighlights,
   );
 
   factory Chapter.create(int id, String storyId, String title) {
@@ -26,6 +28,7 @@ class Chapter {
       title,
       ChapterTree({1: {}}),
       ChapterTree({1: {}}),
+      true,
     );
   }
 
@@ -36,6 +39,7 @@ class Chapter {
       'Title',
       ChapterTree({1: {}}),
       ChapterTree({1: {}}),
+      true,
     );
   }
 
@@ -49,6 +53,7 @@ class Chapter {
         '',
         ChapterTree.empty(),
         ChapterTree.empty(),
+        true,
       );
     }
     return Chapter(
@@ -59,6 +64,7 @@ class Chapter {
           .map((key, value) => MapEntry(int.parse(key), Set<int>.from(value)))),
       ChapterTree.fromMap(Map<String, dynamic>.from(map['links'])
           .map((key, value) => MapEntry(int.parse(key), Set<int>.from(value)))),
+      map['showHighlights'] as bool? ?? true,
     );
   }
 
@@ -125,6 +131,7 @@ class Chapter {
         'title': title,
         'graph': tree.toMap(),
         'links': links.toMap(),
+        'showHighlights': showHighlights,
       };
     } catch (e) {
       print(e);

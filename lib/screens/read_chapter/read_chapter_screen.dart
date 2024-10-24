@@ -148,6 +148,20 @@ class _ReadChapterScreenState extends State<ReadChapterScreen> {
         .map(
           (s) => TextSpan(
             text: s.text,
+            style: !_chapter.value!.showHighlights
+                ? Utils.textReadingStyle
+                : (s.type == SnippetType.text
+                    ? Utils.textReadingStyle
+                    : (s.type == SnippetType.choice
+                        ? Utils.textReadingStyle.copyWith(
+                            color: Colors.blue[700],
+                            fontWeight: FontWeight.bold,
+                            decoration: TextDecoration.underline,
+                          )
+                        : Utils.textReadingStyle.copyWith(
+                            color: color,
+                            decoration: TextDecoration.underline,
+                          ))),
             recognizer:
                 s.type == SnippetType.text ? null : TapGestureRecognizer()
                   ?..onTap = () {
