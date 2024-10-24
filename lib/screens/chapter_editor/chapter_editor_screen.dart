@@ -422,7 +422,7 @@ class _ChapterEditorScreenState extends State<ChapterEditorScreen> {
                                           },
                                           decoration: InputDecoration(
                                             isDense: true,
-                                            fillColor: Colors.transparent,
+                                            fillColor: Colors.grey[200],
                                             filled: true,
                                             prefixIcon: Padding(
                                               padding: const EdgeInsets.only(
