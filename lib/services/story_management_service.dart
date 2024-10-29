@@ -51,14 +51,4 @@ class StoryManagementService extends GetxService {
         .doc(story.id)
         .update({'numberOfChapters': FieldValue.increment(1)});
   }
-
-  Future<void> convertToReadableChapter(Story story, int chapterId) async {
-    Chapter? chapter = await ChapterManagementService.value.chapterGet(
-      story.id,
-      chapterId.toString(),
-    );
-    if (chapter == null) {
-      return;
-    }
-  }
 }

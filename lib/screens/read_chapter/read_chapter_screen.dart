@@ -176,6 +176,56 @@ class _ReadChapterScreenState extends State<ReadChapterScreen> {
         .toList();
   }
 
+  Widget _header() => Column(
+        children: [
+          SizedBox(height: 16),
+          Obx(
+            () => Text(
+              'Chapter ${_chapter.value?.id.toString() ?? '...'}',
+              style: TextStyle(
+                fontSize: 13.0,
+                color: color,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+          Obx(
+            () => Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: Text(
+                    _chapter.value?.title ?? '...',
+                    style: const TextStyle(
+                      fontSize: 28.0,
+                    ),
+                  ),
+                ),
+                Material(
+                  shape: const StadiumBorder(),
+                  color: color,
+                  child: Padding(
+                    padding: const EdgeInsets.all(8),
+                    child: Text(
+                      'Page ${currentPage.value}',
+                      style: const TextStyle(
+                        fontSize: 11.0,
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const Padding(
+            padding: EdgeInsets.fromLTRB(0.0, 8.0, 0.0, 8.0),
+            child: Divider(),
+          ),
+        ],
+      );
+
   @override
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
@@ -202,142 +252,24 @@ class _ReadChapterScreenState extends State<ReadChapterScreen> {
                         width: screenSize.width,
                         height: screenSize.height,
                       ),
-                      Material(
-                        color: Utils.pageEditorBackgroundColor,
-                        elevation: 4,
-                        child: SizedBox(
-                          width: 800,
-                          child: CustomScrollView(
-                            slivers: [
-                              SliverFillRemaining(
-                                hasScrollBody: false,
-                                child: Padding(
-                                  padding:
-                                      const EdgeInsets.fromLTRB(16, 16, 16, 0),
+                      Obx(
+                        () => loading.value
+                            ? Material(
+                                color: Utils.pageEditorBackgroundColor,
+                                elevation: 4,
+                                child: SizedBox(
+                                  width: 800,
                                   child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
                                     mainAxisSize: MainAxisSize.max,
                                     children: [
-                                      SizedBox(
-                                          height: screenSize.height * 0.03),
-                                      Obx(
-                                        () => Text(
-                                          'Chapter ${_chapter.value?.id.toString() ?? '...'}',
-                                          style: TextStyle(
-                                            fontSize: 13.0,
-                                            color: color,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                      ),
-                                      Obx(
-                                        () => Row(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Expanded(
-                                              child: Text(
-                                                _chapter.value?.title ?? '...',
-                                                style: const TextStyle(
-                                                  fontSize: 28.0,
-                                                ),
-                                              ),
-                                            ),
-                                            Material(
-                                              shape: const StadiumBorder(),
-                                              color: color,
-                                              child: Padding(
-                                                padding:
-                                                    const EdgeInsets.all(8),
-                                                child: Text(
-                                                  'Page ${currentPage.value}',
-                                                  style: const TextStyle(
-                                                    fontSize: 11.0,
-                                                    color: Colors.white,
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                      const Padding(
-                                        padding: EdgeInsets.fromLTRB(
-                                            0.0, 8.0, 0.0, 8.0),
-                                        child: Divider(),
-                                      ),
+                                      _header(),
                                       Expanded(
-                                        child: Obx(
-                                          () => Tile(
-                                            width: double.infinity,
-                                            elevation: 2.5,
-                                            padding: EdgeInsets.zero,
-                                            color: Utils.pageEditorSheetColor,
-                                            child: Padding(
-                                              padding:
-                                                  const EdgeInsets.fromLTRB(
-                                                24,
-                                                28,
-                                                24,
-                                                24,
-                                              ),
-                                              child: loadingPage.value
-                                                  ? Center(
-                                                      child: SizedBox(
-                                                        width: 40,
-                                                        height: 40,
-                                                        child:
-                                                            CircularProgressIndicator(
-                                                          color: color,
-                                                        ),
-                                                      ),
-                                                    )
-                                                  : Column(
-                                                      crossAxisAlignment:
-                                                          CrossAxisAlignment
-                                                              .start,
-                                                      children: [
-                                                        RichText(
-                                                          text: TextSpan(
-                                                            style: Utils
-                                                                .textReadingStyle,
-                                                            children: _getSpans(
-                                                                _page.value),
-                                                          ),
-                                                        ),
-                                                        if (_page.value?.isLeaf(
-                                                                reading:
-                                                                    true) ??
-                                                            false)
-                                                          Center(
-                                                            child: Padding(
-                                                              padding:
-                                                                  const EdgeInsets
-                                                                      .only(
-                                                                top: 16,
-                                                              ),
-                                                              child: TextButton(
-                                                                onPressed:
-                                                                    _finish,
-                                                                child:
-                                                                    const Text(
-                                                                  '🏁 Finish Chapter',
-                                                                  style:
-                                                                      TextStyle(
-                                                                    color: Colors
-                                                                        .blue,
-                                                                    decoration:
-                                                                        TextDecoration
-                                                                            .underline,
-                                                                  ),
-                                                                ),
-                                                              ),
-                                                            ),
-                                                          ),
-                                                      ],
-                                                    ),
+                                        child: Center(
+                                          child: SizedBox(
+                                            width: 40,
+                                            height: 40,
+                                            child: CircularProgressIndicator(
+                                              color: color,
                                             ),
                                           ),
                                         ),
@@ -345,10 +277,80 @@ class _ReadChapterScreenState extends State<ReadChapterScreen> {
                                     ],
                                   ),
                                 ),
+                              )
+                            : Material(
+                                color: Utils.pageEditorBackgroundColor,
+                                elevation: 4,
+                                child: SizedBox(
+                                  width: 800,
+                                  child: CustomScrollView(
+                                    slivers: [
+                                      SliverFillRemaining(
+                                        hasScrollBody: false,
+                                        child: Padding(
+                                          padding: const EdgeInsets.fromLTRB(
+                                              16, 16, 16, 0),
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            mainAxisSize: MainAxisSize.max,
+                                            children: [
+                                              _header(),
+                                              Gap(24),
+                                              Padding(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                  horizontal: 20,
+                                                ),
+                                                child: Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    RichText(
+                                                      text: TextSpan(
+                                                        style: Utils
+                                                            .textReadingStyle,
+                                                        children: _getSpans(
+                                                            _page.value),
+                                                      ),
+                                                    ),
+                                                    if (_page.value?.isLeaf(
+                                                            reading: true) ??
+                                                        false)
+                                                      Center(
+                                                        child: Padding(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .only(
+                                                            top: 16,
+                                                          ),
+                                                          child: TextButton(
+                                                            onPressed: _finish,
+                                                            child: const Text(
+                                                              '🏁 Finish Chapter',
+                                                              style: TextStyle(
+                                                                color:
+                                                                    Colors.blue,
+                                                                decoration:
+                                                                    TextDecoration
+                                                                        .underline,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                  ],
+                                                ),
+                                              ),
+                                              Gap(64),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
                               ),
-                            ],
-                          ),
-                        ),
                       ),
                     ],
                   ),

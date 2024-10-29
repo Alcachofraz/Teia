@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:teia/models/group.dart';
 import 'package:teia/models/user_state.dart';
 import 'package:teia/services/authentication_service.dart';
+import 'package:teia/services/chapter_management_service.dart';
 import 'package:teia/services/firebase/firestore_utils.dart';
 import 'package:teia/services/story_management_service.dart';
 import 'package:teia/utils/utils.dart';
@@ -283,7 +284,7 @@ class GroupManagementService extends GetxService {
       state = GroupState.reading;
 
       // Convert to readeable chapter
-      await StoryManagementService.value
+      await ChapterManagementService.value
           .convertToReadableChapter(group.story!, currentChapter);
 
       // If not final chapter, add another after

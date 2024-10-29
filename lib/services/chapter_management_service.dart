@@ -10,6 +10,7 @@ import 'package:teia/models/comment.dart';
 import 'package:teia/models/letter.dart';
 import 'package:teia/models/page.dart';
 import 'package:teia/models/snippets/snippet.dart';
+import 'package:teia/models/story.dart';
 import 'package:teia/services/firebase/firestore_utils.dart';
 import 'package:teia/utils/logs.dart';
 
@@ -140,21 +141,19 @@ class ChapterManagementService extends GetxService {
   Future<void> pageSet(tPage page, String? uid) async {
     //Logs.d('Sending $page - ${page.id.toString()}');
     try {
-      final pageRef = FirebaseUtils.firestore
+      await FirebaseUtils.firestore
           .collection('stories')
           .doc(page.storyId)
           .collection('chapters')
           .doc(page.chapterId.toString())
           .collection('pages')
-          .doc(page.id.toString());
-      await FirebaseUtils.firestore.runTransaction((transaction) async {
-        transaction.update(pageRef, {
-          ...page.toMap(),
-          ...{'lastModifierUid': uid},
-        });
+          .doc(page.id.toString())
+          .set({
+        ...page.toMap(),
+        ...{'lastModifierUid': uid},
       });
     } catch (e) {
-      Logs.d('Sending $page\n$e');
+      Logs.d('Error sending $page\n$e');
     }
   }
 
@@ -397,5 +396,15 @@ class ChapterManagementService extends GetxService {
         throw Exception('Error parsing comments: $e');
       }
     });
+  }
+
+  Future<void> convertToReadableChapter(Story story, int chapterId) async {
+    Chapter? chapter = await ChapterManagementService.value.chapterGet(
+      story.id,
+      chapterId.toString(),
+    );
+    if (chapter == null) {
+      return;
+    }
   }
 }
