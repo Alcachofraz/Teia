@@ -58,23 +58,26 @@ class WriterGroupScreen extends StatelessWidget {
                             story: controller.group.value!.story,
                           ),
                           const Gap(12),
-                          TeiaButton(
-                            text: 'Chapter Editor',
-                            color: color,
-                            widget: const Icon(
-                              Icons.schema_outlined,
-                              color: Colors.white,
+                          if (!(controller.group.value!.finalChapter &&
+                              controller.group.value!.state ==
+                                  GroupState.reading))
+                            TeiaButton(
+                              text: 'Chapter Editor',
+                              color: color,
+                              widget: const Icon(
+                                Icons.schema_outlined,
+                                color: Colors.white,
+                              ),
+                              onTap: () {
+                                Get.toNamed('/chapter_editor', parameters: {
+                                  'storyId': controller.group.value!.story!.id,
+                                  'chapterId':
+                                      (controller.group.value!.currentChapter)
+                                          .toString(),
+                                  'group': controller.group.value!.name,
+                                });
+                              },
                             ),
-                            onTap: () {
-                              Get.toNamed('/chapter_editor', parameters: {
-                                'storyId': controller.group.value!.story!.id,
-                                'chapterId':
-                                    (controller.group.value!.currentChapter)
-                                        .toString(),
-                                'group': controller.group.value!.name,
-                              });
-                            },
-                          ),
                           const Gap(16),
                           GroupStatusBox(
                             group: controller.group.value!,
@@ -197,24 +200,29 @@ class WriterGroupScreen extends StatelessWidget {
                                   story: controller.group.value!.story,
                                 ),
                                 const Gap(12),
-                                TeiaButton(
-                                  text: 'Chapter Editor',
-                                  color: color,
-                                  widget: const Icon(
-                                    Icons.schema_outlined,
-                                    color: Colors.white,
+                                if (!(controller.group.value!.finalChapter &&
+                                    controller.group.value!.state ==
+                                        GroupState.reading))
+                                  TeiaButton(
+                                    text: 'Chapter Editor',
+                                    color: color,
+                                    widget: const Icon(
+                                      Icons.schema_outlined,
+                                      color: Colors.white,
+                                    ),
+                                    onTap: () {
+                                      Get.toNamed('/chapter_editor',
+                                          parameters: {
+                                            'storyId': controller
+                                                .group.value!.story!.id,
+                                            'chapterId': (controller.group
+                                                    .value!.currentChapter)
+                                                .toString(),
+                                            'group':
+                                                controller.group.value!.name,
+                                          });
+                                    },
                                   ),
-                                  onTap: () {
-                                    Get.toNamed('/chapter_editor', parameters: {
-                                      'storyId':
-                                          controller.group.value!.story!.id,
-                                      'chapterId': (controller
-                                              .group.value!.currentChapter)
-                                          .toString(),
-                                      'group': controller.group.value!.name,
-                                    });
-                                  },
-                                ),
                                 const Gap(16),
                                 GroupStatusBox(
                                   group: controller.group.value!,

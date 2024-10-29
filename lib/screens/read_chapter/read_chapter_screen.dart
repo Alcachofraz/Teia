@@ -180,12 +180,15 @@ class _ReadChapterScreenState extends State<ReadChapterScreen> {
         children: [
           SizedBox(height: 16),
           Obx(
-            () => Text(
-              'Chapter ${_chapter.value?.id.toString() ?? '...'}',
-              style: TextStyle(
-                fontSize: 13.0,
-                color: color,
-                fontWeight: FontWeight.bold,
+            () => Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                'Chapter ${_chapter.value?.id.toString() ?? '...'}',
+                style: TextStyle(
+                  fontSize: 13.0,
+                  color: color,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
           ),
