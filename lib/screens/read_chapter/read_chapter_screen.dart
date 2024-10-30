@@ -4,6 +4,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:get/get.dart';
+import 'package:photo_view/photo_view.dart';
 import 'package:teia/models/chapter.dart';
 import 'package:teia/models/group.dart';
 import 'package:teia/models/page.dart';
@@ -15,9 +16,7 @@ import 'package:teia/services/chapter_management_service.dart';
 import 'package:teia/services/group_management_service.dart';
 import 'package:teia/utils/utils.dart';
 import 'package:teia/views/misc/screen_wrapper.dart';
-import 'package:teia/views/misc/tile.dart';
 import 'package:teia/views/teia_button.dart';
-import 'package:photo_view/photo_view.dart';
 
 class ReadChapterScreen extends StatefulWidget {
   final String chapterId = Get.parameters['chapterId']!;
@@ -135,11 +134,10 @@ class _ReadChapterScreenState extends State<ReadChapterScreen> {
 
   /// Callback to when the chapter is finished.
   void _finish() {
-    if (_group.value != null) {
-      GroupManagementService.value.setReaderReady(
-        _group.value!,
-      );
-    }
+    GroupManagementService.value.setReaderReady(
+      _group.value!,
+    );
+    Get.back();
   }
 
   List<TextSpan> _getSpans(tPage? page) {

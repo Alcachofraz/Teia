@@ -257,12 +257,12 @@ class GroupManagementService extends GetxService {
       // If not all readers are ready, set only the current user to ready
       await FirebaseUtils.firestore.collection('groups').doc(group.name).set(
         {
-          'userState': group.userState.map(
+          'userState': group.userState.map<String, Map<String, dynamic>>(
             (key, value) => MapEntry(
               key,
               key == AuthenticationService.value.uid
                   ? value.copyWith(ready: true, currentPage: 1).toMap()
-                  : value,
+                  : value.toMap(),
             ),
           ),
         },
