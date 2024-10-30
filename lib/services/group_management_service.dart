@@ -221,7 +221,9 @@ class GroupManagementService extends GetxService {
         'userState': group.userState.map(
           (key, value) => MapEntry(
             key,
-            value.copyWith(currentPage: currentPage).toMap(),
+            AuthenticationService.value.uid == key
+                ? value.copyWith(currentPage: currentPage).toMap()
+                : value.toMap(),
           ),
         ),
       },
