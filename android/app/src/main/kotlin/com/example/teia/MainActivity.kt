@@ -1,4 +1,4 @@
-package com.example.teia
+package com.alcachofraz.teia
 
 import io.flutter.embedding.android.FlutterActivity
 

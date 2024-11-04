@@ -1,5 +1,3 @@
-import 'dart:html';
-
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:teia/utils/swatch.dart';
@@ -31,9 +29,6 @@ class ChapterGraphSettings {
 class Utils {
   static late ChapterGraphSettings graphSettings;
 
-  static late double width;
-  static late double height;
-
   static const double editorWeight = 0.64;
   static const double editorPageWeight = 0.64;
   static const double maxWidthShowOnlyEditor = 1080;
@@ -57,8 +52,8 @@ class Utils {
 
   static final textEditorStyle =
       GoogleFonts.roboto(textStyle: const TextStyle());
-  static final textReadingStyle =
-      GoogleFonts.roboto(textStyle: const TextStyle(fontSize: 15.0));
+  static final textReadingStyle = GoogleFonts.roboto(
+      textStyle: const TextStyle(fontSize: 15.0, color: Colors.black));
 
   static void init() {
     graphSettings = ChapterGraphSettings(
@@ -74,8 +69,6 @@ class Utils {
     );
     pageEditorBackgroundColor = swatch(Colors.grey[50]!);
     pageEditorSheetColor = swatch(Colors.white);
-    width = window.screen?.width?.toDouble() ?? 1920;
-    height = window.screen?.height?.toDouble() ?? 1080;
   }
 
   static String colorHex(Color color) =>

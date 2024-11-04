@@ -29,7 +29,6 @@ import 'package:teia/services/storage_service.dart';
 import 'package:teia/utils/utils.dart';
 import 'package:teia/views/misc/tap_icon.dart';
 import 'package:teia/views/misc/tile.dart';
-import 'package:universal_html/html.dart';
 import 'package:file_picker/file_picker.dart';
 
 class PageEditor extends StatefulWidget {
@@ -132,8 +131,7 @@ class _PageEditorState extends State<PageEditor> {
     _controller.onSelectionChanged = _onSelectionChanged;
 
     // Prevent default event handler
-    _onContextMenu =
-        document.onContextMenu.listen((event) => event.preventDefault());
+    //_onContextMenu = document.onContextMenu.listen((event) => event.preventDefault());
 
     _pageChangesSubscription = ChapterManagementService.value
         .streamPageChanges(
@@ -1099,7 +1097,7 @@ class _PageEditorState extends State<PageEditor> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Expanded(
-                      flex: Utils.editorPageWeight * 100 as int,
+                      flex: (Utils.editorPageWeight * 100).toInt(),
                       child: Tile(
                         elevation: 2.5,
                         padding: EdgeInsets.zero,

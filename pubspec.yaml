@@ -74,6 +74,7 @@ dependencies:
   country_flags: ^3.0.0
   flutter_flow_chart: ^3.2.1
   animated_tree_view: ^2.3.0
+  flutter_launcher_icons: ^0.14.1
   
 dev_dependencies:
   flutter_test:
