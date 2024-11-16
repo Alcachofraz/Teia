@@ -13,6 +13,7 @@ import 'package:teia/screens/read_chapter/read_chapter_screen.dart';
 import 'package:teia/services/authentication_service.dart';
 import 'package:teia/utils/utils.dart';
 import 'package:url_strategy/url_strategy.dart';
+import 'package:upgrader/upgrader.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -71,7 +72,9 @@ class Teia extends StatelessWidget {
         textTheme: GoogleFonts.montserratTextTheme(textTheme),
         scaffoldBackgroundColor: Colors.white,
       ),
-      home: const LandingScreen(),
+      home: UpgradeAlert(
+        child: const LandingScreen(),
+      ),
     );
   }
 }
